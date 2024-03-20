@@ -160,37 +160,37 @@ offspring = function(mom, dad, minDist, lmax, n){
 }
 # offspring(mom, dad, minDist, lmax, n)
 
-#--------------------------
-mutation = function(minDist, Pb, lmax, mmax, n){
-  # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
-  # some inputs ++++++++++++++++++
-  #   minDist= minimum distances between two adjacent changepoints
-  #   Pb= prob of changepoints for every time series
-  #   lmax= max length of chromosome
-  #   mmax= max number of changepoints
-  #   n= sample size
-  # outputs ++++++++++++++++++
-  #   childMut  = the chromosome representation produced from mutation
-
-  childMut = rep(0, lmax)
-
-  resTau = SelectTau(n, minDist, Pb, mmax)
-  mChild = resTau$m
-  tauChild = resTau$tau
-
-  tauNew = rep(0, mChild+1)
-  if(mChild==0){
-    tauNew[1] = n+1
-  }else{
-    tauNew[1:mChild] = tauChild[1:mChild]
-    tauNew[mChild+1] = n+1
-  }
-  childMut[1] = mChild
-  childMut[2:(2+mChild)] = tauNew
-
-  return(childMut)
-}
-# mutation(minDist, Pb, lmax, mmax, n)
+# #--------------------------
+# mutation = function(minDist, Pb, lmax, mmax, n){
+#   # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
+#   # some inputs ++++++++++++++++++
+#   #   minDist= minimum distances between two adjacent changepoints
+#   #   Pb= prob of changepoints for every time series
+#   #   lmax= max length of chromosome
+#   #   mmax= max number of changepoints
+#   #   n= sample size
+#   # outputs ++++++++++++++++++
+#   #   childMut  = the chromosome representation produced from mutation
+#
+#   childMut = rep(0, lmax)
+#
+#   resTau = SelectTau(n, minDist, Pb, mmax)
+#   mChild = resTau$m
+#   tauChild = resTau$tau
+#
+#   tauNew = rep(0, mChild+1)
+#   if(mChild==0){
+#     tauNew[1] = n+1
+#   }else{
+#     tauNew[1:mChild] = tauChild[1:mChild]
+#     tauNew[mChild+1] = n+1
+#   }
+#   childMut[1] = mChild
+#   childMut[2:(2+mChild)] = tauNew
+#
+#   return(childMut)
+# }
+# # mutation(minDist, Pb, lmax, mmax, n)
 
 #--------------------------
 Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring, ...){

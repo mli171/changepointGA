@@ -44,7 +44,7 @@ thetaT = c(0.5, 2, -2) # intercept, cp1, cp2
 sigmaT = 1
 phiT = 0.5
 
-Ts = 5000
+Ts = 10000
 tau.prop = c(1/4, 3/4)
 tauT = floor(Ts*tau.prop)
 CpConfigT = rep(0, Ts)
@@ -96,8 +96,8 @@ GA_param = list(
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
-  maxgen       = 1000,
-  maxconv      = 1000,
+  maxgen       = 10000,
+  maxconv      = 10000,
   monitoring   = FALSE,
   parallel     = FALSE,
   nCore        = NULL,
@@ -114,26 +114,6 @@ tim1 = Sys.time()
 tmp1 = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=Z.sim)
 tim2 = Sys.time()
 
-sourceCpp("src/PopInitia.cpp")
-ga_operators = list(population = "random_population_cpp",
-                    selection  = "selection_linearrank",
-                    crossover  = "offspring_uniformcrossover",
-                    mutation   = "mutation")
-
-tim3 = Sys.time()
-tmp2 = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=Z.sim)
-tim4 = Sys.time()
-
-ga_operators = list(population = "Initial_pop",
-                    selection  = "selection_linearrank",
-                    crossover  = "offspring",
-                    mutation   = "mutation")
-
-tim5 = Sys.time()
-tmp3 = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=Z.sim)
-tim6 = Sys.time()
-
-
 
 IslandGA_param = list(
   popsize      = 40,
@@ -148,7 +128,7 @@ IslandGA_param = list(
   maxgen       = 20,
   maxconv      = 20,
   monitoring   = FALSE,
-  parallel     = FALSE,
+  parallel     = FALSE, ###
   nCore        = NULL,
   tol          = 1e-5,
   seed         = NULL
@@ -178,7 +158,7 @@ IslandGA_param = list(
   maxgen       = 20,
   maxconv      = 20,
   monitoring   = FALSE,
-  parallel     = TRUE,
+  parallel     = TRUE, ###
   nCore        = 5,
   tol          = 1e-5,
   seed         = NULL
@@ -207,8 +187,10 @@ tmp3$overbestfit
 tmp4$bestfit
 tmp5$bestfit
 
+# GA
 tmp1$overbestchrom
 tmp2$overbestchrom
 tmp3$overbestchrom
+# island GA
 tmp4$bestchrom[tmp4$bestchrom!=0]
 tmp5$bestchrom[tmp5$bestchrom!=0]
