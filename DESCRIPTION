@@ -1,0 +1,11 @@
+Package: changepointGA
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Mo Li
+Maintainer: The package maintainer <mo.li@louisiana.edu>
+Description: Modified genetic algorithm special for changepoint detection in time series
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
