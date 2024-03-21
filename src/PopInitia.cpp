@@ -73,14 +73,17 @@ arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int 
 // }
 
 // [[Rcpp::export]]
-void offspring_uniformcrossover_cpp(arma::vec& child, arma::vec& mom, arma::vec& dad, int minDist, int n){
+arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, int minDist, int lmax, int n){
   //  In uniform crossover, typically, each bit is chosen from either parent with equal probability.
   //  Other mixing ratios are sometimes used, resulting in offspring which inherit more genetic
   // information from one parent than the other. In a uniform crossover, we don’t divide the
   // chromosome into segments, rather we treat each gene separately. In this, we essentially
   // flip a coin for each chromosome to decide whether or not it will be included in the off-spring.
 
-  lmax = child.size();
+  // Rcout << "mom:" << mom << std::endl;
+  // Rcout << "dad:" << dad << std::endl;
+
+  arma::vec child(lmax, fill::zeros);
 
   int child_mmax = dad(0) + mom(0);
   if(child_mmax == 0){
@@ -89,13 +92,17 @@ void offspring_uniformcrossover_cpp(arma::vec& child, arma::vec& mom, arma::vec&
       child(1) = n+1;
     }else{
       double a;
-
       // 1). combine dad's and mom's changepoints
       int mom_m = mom(0);
       int dad_m = dad(0);
       arma::vec parents(child_mmax, fill::zeros);
-      parents.subvec(0,mom_m-1) = mom.subvec(1,mom_m);
-      parents.subvec(mom_m,child_mmax-1) = dad.subvec(1,dad_m);
+      if(mom_m > 0){
+        parents.subvec(0,mom_m-1) = mom.subvec(1,mom_m);
+      }
+      if(dad_m >0){
+        parents.subvec(mom_m,child_mmax-1) = dad.subvec(1,dad_m);
+      }
+
       // 2). remove same changepoints and sort
       parents = sort(unique(parents));
       int parents_count = parents.size();
@@ -103,7 +110,7 @@ void offspring_uniformcrossover_cpp(arma::vec& child, arma::vec& mom, arma::vec&
       // 3). select subset from parents
       int child_m = 0;
       int tmpm = 1;
-      int tmptau = parents(tmpm-1);
+      int tmptau = parents(0);
       int temp;
       do{
         a = runif(1)[0];
@@ -113,8 +120,8 @@ void offspring_uniformcrossover_cpp(arma::vec& child, arma::vec& mom, arma::vec&
           tmptau = tmptau + 2*minDist;
           if(tmptau >= n-minDist){break;} // boundary changepoints limits
         }
-        // if the number of changepoints of child is larger than parents, break
-        if(tmpm >= parents_count){break;}
+
+        if(tmpm >= parents_count-1){break;} // if the number of changepoints of child is larger than parents, break
 
         temp = parents(tmpm);
 
@@ -135,6 +142,7 @@ void offspring_uniformcrossover_cpp(arma::vec& child, arma::vec& mom, arma::vec&
       child(child_m+1) = n+1;
     }
 
+  return(child);
 }
 
 // [[Rcpp::export]]
