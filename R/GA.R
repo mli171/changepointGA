@@ -1,4 +1,34 @@
-#-------------------------- Genetic Algorithm Main Function is to minimize
+#' Genetic algorithm
+#'
+#' Perform the modified genetic algorithm for multiple changepoint detection.
+#'
+#' @param ObjFunc The fitness function to be maximized. Users can specify any R
+#' functions as the fitness function with setting input as potential solution to
+#' the optimization problem and returning a numerical value as the output/fitness.
+#' @param n
+#' @param GA_param
+#' @param ga_operators
+#' @param ... additional arguments that will be passed to the fitness function.
+#' @Value Returns a list that has components:
+#' \item{overbestfit}{Matrix of simulated presence-absence data}
+#' \item{overbestchrom}{Matrix of simulated relative-abundance data}
+#' \item{bestfit}{Matrix of simulated count data}
+#' \item{bestchrom}{Matrix of simulated count data}
+#' \item{count}{}
+#' \item{convg}{}
+#' @author Mo Li
+#'
+#' @examples
+#'
+#' data("throat.otu.tab")
+#' otu.tab = throat.otu.tab[,colSums(throat.otu.tab>0)>1]
+#'
+#' fitted = MIDASim.setup(otu.tab)
+#' fitted.modified = MIDASim.modify(fitted)
+#' sim = MIDASim(fitted.modified, only.rel = FALSE)
+#'
+#' @importFrom stats runif
+#' @export
 GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
 
   call = match.call()

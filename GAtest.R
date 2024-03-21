@@ -44,7 +44,7 @@ thetaT = c(0.5, 2, -2) # intercept, cp1, cp2
 sigmaT = 1
 phiT = 0.5
 
-Ts = 10000
+Ts = 50000
 tau.prop = c(1/4, 3/4)
 tauT = floor(Ts*tau.prop)
 CpConfigT = rep(0, Ts)
@@ -108,7 +108,7 @@ GA_param = list(
 ga_operators = list(population = "random_population_cpp",
                     selection  = "selection_linearrank",
                     crossover  = "offspring_uniformcrossover",
-                    mutation   = "mutation_new")
+                    mutation   = "mutation")
 
 tim1 = Sys.time()
 tmp1 = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=Z.sim)
@@ -124,9 +124,9 @@ IslandGA_param = list(
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
-  maxMig       = 100,
-  maxgen       = 20,
-  maxconv      = 20,
+  maxMig       = 500,
+  maxgen       = 100,
+  maxconv      = 100,
   monitoring   = FALSE,
   parallel     = FALSE, ###
   nCore        = NULL,
@@ -138,7 +138,7 @@ IslandGA_param = list(
 IslandGA_operators = list(population = "random_population_cpp",
                           selection  = "selection_linearrank",
                           crossover  = "offspring_uniformcrossover",
-                          mutation   = "mutation_new")
+                          mutation   = "mutation")
 
 tim7 = Sys.time()
 tmp4 = IslandGA(BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=Z.sim)
@@ -154,9 +154,9 @@ IslandGA_param = list(
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
-  maxMig       = 100,
-  maxgen       = 20,
-  maxconv      = 20,
+  maxMig       = 500,
+  maxgen       = 100,
+  maxconv      = 100,
   monitoring   = FALSE,
   parallel     = TRUE, ###
   nCore        = 5,
@@ -168,7 +168,7 @@ IslandGA_param = list(
 IslandGA_operators = list(population = "random_population_cpp",
                           selection  = "selection_linearrank",
                           crossover  = "offspring_uniformcrossover",
-                          mutation   = "mutation_new")
+                          mutation   = "mutation")
 
 tim9 = Sys.time()
 tmp5 = IslandGA(BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=Z.sim)
@@ -176,21 +176,21 @@ tim10 = Sys.time()
 
 
 tim2 - tim1
-tim4 - tim3
-tim6 - tim5
+# tim4 - tim3
+# tim6 - tim5
 tim8 - tim7
 tim10 - tim9
 
 tmp1$overbestfit
-tmp2$overbestfit
-tmp3$overbestfit
+# tmp2$overbestfit
+# tmp3$overbestfit
 tmp4$bestfit
 tmp5$bestfit
 
 # GA
 tmp1$overbestchrom
-tmp2$overbestchrom
-tmp3$overbestchrom
+# tmp2$overbestchrom
+# tmp3$overbestchrom
 # island GA
 tmp4$bestchrom[tmp4$bestchrom!=0]
 tmp5$bestchrom[tmp5$bestchrom!=0]

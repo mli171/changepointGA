@@ -591,7 +591,7 @@ offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
 }
 
 #--------------------------
-mutation_new = function(minDist, Pb, lmax, mmax, n){
+mutation = function(minDist, Pb, lmax, mmax, n){
   # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
   # some inputs ++++++++++++++++++
   #   minDist= minimum distances between two adjacent changepoints
