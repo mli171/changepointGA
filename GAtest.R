@@ -12,8 +12,6 @@ source("R/GAfunc.R")
 ##### Simulation for stationary AR1 process
 ar1.sim = function(theta, sigma, phi, XMat, CpConfig, seed=NULL){
 
-  len_par = length(par)
-
   m = sum(CpConfig)
 
   if(m==0){

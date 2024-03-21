@@ -539,7 +539,6 @@ GA.cls <- function(ObjFunc, n, ..., clsGA_param){
 
 
 
-
 selection_linearrank = function(pop, popFit){
   ## linear ranking
   # least fit (largest value with selectrank = 0) has the lowest probability
