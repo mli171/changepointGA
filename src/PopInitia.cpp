@@ -9,6 +9,7 @@ int m, i, j, id, jp;
 int popsize, islandSize;
 int lmax;
 
+//' @export
 // [[Rcpp::export]]
 IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 {
@@ -17,6 +18,7 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
   return rank;
 }
 
+//' @export
 // [[Rcpp::export]]
 arma::vec selectTau_cpp(int n, int minDist, double Pb, int mmax, int lmax){
 
@@ -40,6 +42,7 @@ arma::vec selectTau_cpp(int n, int minDist, double Pb, int mmax, int lmax){
   return(tau);
 }
 
+//' @export
 // [[Rcpp::export]]
 arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int mmax, int lmax){
 
@@ -52,6 +55,7 @@ arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int 
   return(pop);
 }
 
+// //' @export
 // // [[Rcpp::export]]
 // void InitialPopCpp(arma::cube& Island, int n, int minDist, double Pb, int mmax){
 //
@@ -72,6 +76,7 @@ arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int 
 //
 // }
 
+//' @export
 // [[Rcpp::export]]
 arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, int minDist, int lmax, int n){
   //  In uniform crossover, typically, each bit is chosen from either parent with equal probability.
@@ -145,6 +150,7 @@ arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, int min
   return(child);
 }
 
+//' @export
 // [[Rcpp::export]]
 List selection_linearrank_cpp(arma::mat& pop, arma::vec& popFit){
 

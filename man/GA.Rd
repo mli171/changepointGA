@@ -38,5 +38,4 @@ In steady state GA, we generate one or two off-springs in each iteration and the
 }
 
 \examples{
-hello()
 }

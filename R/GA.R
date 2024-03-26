@@ -16,19 +16,15 @@
 #' \item{bestchrom}{Matrix of simulated count data}
 #' \item{count}{}
 #' \item{convg}{}
-#' @author Mo Li
 #'
-#' @examples
-#'
-#' data("throat.otu.tab")
-#' otu.tab = throat.otu.tab[,colSums(throat.otu.tab>0)>1]
-#'
-#' fitted = MIDASim.setup(otu.tab)
-#' fitted.modified = MIDASim.modify(fitted)
-#' sim = MIDASim(fitted.modified, only.rel = FALSE)
-#'
-#' @importFrom stats runif
+#' @import Rcpp
+#' @importFrom Rcpp
+#' @useDynLib changepointGA
 #' @export
+#' @examples
+#' library(changepointGA)
+#'
+#'
 GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
 
   call = match.call()

@@ -1,1 +1,11 @@
 exportPattern("^[[:alpha:]]+")
+
+import(foreach)
+import(doMC)
+import(Rcpp)
+import(RcppArmadillo)
+
+importFrom("Rcpp", sourceCpp)
+importFrom("stats", "runif")
+
+useDynLib(changepointGA, .registration=TRUE)
