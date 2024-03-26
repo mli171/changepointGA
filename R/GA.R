@@ -10,10 +10,10 @@
 #' @param ga_operators
 #' @param ... additional arguments that will be passed to the fitness function.
 #' @Value Returns a list that has components:
-#' \item{overbestfit}{Matrix of simulated presence-absence data}
-#' \item{overbestchrom}{Matrix of simulated relative-abundance data}
-#' \item{bestfit}{Matrix of simulated count data}
-#' \item{bestchrom}{Matrix of simulated count data}
+#' \item{overbestfit}{}
+#' \item{overbestchrom}{}
+#' \item{bestfit}{}
+#' \item{bestchrom}{}
 #' \item{count}{}
 #' \item{convg}{}
 #'
