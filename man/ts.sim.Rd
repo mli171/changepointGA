@@ -2,7 +2,7 @@
 % Please edit documentation in R/datasimulation.R
 \name{ts.sim}
 \alias{ts.sim}
-\title{Example time series models simulation with introducing changepoint effects.}
+\title{Time series simulation with changepoint effects}
 \usage{
 ts.sim(theta, XMat, sigma, phi = NULL, Delta = NULL, CpLoc = NULL, seed = NULL)
 }
@@ -11,68 +11,53 @@ ts.sim(theta, XMat, sigma, phi = NULL, Delta = NULL, CpLoc = NULL, seed = NULL)
 
 \item{XMat}{The covairates for time series mean function without changepoint indicators.}
 
-\item{sigma}{The standard deviation for time series residuals $\epsilon_{t}$.}
+\item{sigma}{The standard deviation for time series residuals \eqn{\epsilon_{t}}.}
 
 \item{phi}{A single value for the autocorrelation parameter for AR(1) errors.}
 
 \item{Delta}{The parameter vector contains the changepoint parameters for time series mean function.}
 
-\item{CpLoc}{A vector contains the changepoint locations range from $1\leq\tau\leq T_{s}$.}
+\item{CpLoc}{A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}.}
 
 \item{seed}{The random seed for simulation reproducibility.}
 }
 \value{
 Returns the simulated time series with attributes:
-\item{Z}{The simulated time series.}
+\item{\code{Z}}{The simulated time series.}
 \item{Attributes}{
 \itemize{
- \item{DesignX} The covariates include all changepoint indicators.
- \item{mu} A vector includes the mean values for simulated time series sequences.
- \item{theta} The true parameter vector (including changepoint effects).
- \item{CpLoc} The true changepoint locations where we introduce the mean changing effects.
- \item{seed} The random seed used for this simulation.
+ \item{\code{DesignX}} The covariates include all changepoint indicators.
+ \item{\code{mu}} A vector includes the mean values for simulated time series sequences.
+ \item{\code{theta}} The true parameter vector (including changepoint effects).
+ \item{\code{CpLoc}} The true changepoint locations where we introduce the mean changing effects.
+ \item{\code{seed}} The random seed used for this simulation.
  }
 }
 }
 \description{
-This is a function to simulate time series $Z_{t}$ from different models,
-\begin{center}
- $Z_{t}=\mu_{t}+\e_{t}$
-\end{center}
+This is a function to simulate time series \eqn{Z_{t}, t=1,\ldots,T_{s}} from a class of models,
+ \deqn{Z_{t}=\mu_{t}+e_{t}.}
 \itemize{
- \item{Stationary time series without autocorrelation} $\mu_{t}$ is a constant
- and $\e_{t}$'s are independent and identically distributed as $N(0,\sigma)$.
- \item{Stationary time series with autocorrelation} $\mu_{t}$ is a constant
- and $\e_{t}$ follows an AR(1) process,
- #' \begin{center}
- $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
-\end{center}
-where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
- \item{Stationary with seasonality and autocorrelation} $\mu_{t}$ is not a constant,
- \begin{center}
- $\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S})$,
-\end{center}
- and $\e_{t}$ follows an AR(1) process,
- #' \begin{center}
- $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
-\end{center}
-where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
- \item{Stationary with seasonality, trend, and autocorrelation} $\mu_{t}$ is not a constant,
- \begin{center}
- $\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha\frac{t}{Ts}$,
-\end{center}
- and $\e_{t}$ follows an AR(1) process,
- #' \begin{center}
- $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
-\end{center}
-where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
+ \item{Stationary time series without autocorrelation} \cr \eqn{\mu_{t}} is a constant and \eqn{e_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+ \item{Stationary time series with autocorrelation} \cr \eqn{\mu_{t}} is a constant
+ and \eqn{e_{t}} follows an AR(1) process,
+ \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
+where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+ \item{Stationary with seasonality and autocorrelation} \cr \eqn{\mu_{t}} is not a constant,
+ \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}),}
+ and \eqn{e_{t}} follows an AR(1) process,
+ \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
+where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+ \item{Stationary with seasonality, trend, and autocorrelation} \cr \eqn{\mu_{t}} is not a constant,
+ \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha t,}
+ and \eqn{e_{t}} follows an AR(1) process,
+ \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
+where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
 }
-The changepoint effects could be introduced through the $\mu_{t}$ as
-\begin{center}
- $\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},
-\end{center}
-where $1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}$ are the changepoint locations and
-$\Delta_{1},\ldots,\Delta_{m}$ are the changepoint parameter that need to be estimted.
+The changepoint effects could be introduced through the \eqn{\mu_{t}} as
+ \deqn{\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},}
+where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}} are the changepoint locations and
+\eqn{\Delta_{1},\ldots,\Delta_{m}} are the changepoint parameter that need to be estimated.
 }
 \examples{
 Ts = 1000
