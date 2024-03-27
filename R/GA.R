@@ -106,7 +106,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
   { stop("Probability of mutation must be between 0 and 1.") }
   if(Pchangepoint < 0 | Pchangepoint > 1)
   { stop("Probability of changepoint must be between 0 and 1.") }
-  if(minDist >= Ts | minDist <= 1)
+  if(minDist >= n | minDist <= 1)
   { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
   { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }

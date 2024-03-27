@@ -10,7 +10,7 @@ BinSearch.BIC = function(tau, m, Xt){
     sigma.hatsq = sum( (Xt-Xt.hat)^2 )/N
     BIC.obj = N*log(sigma.hatsq)+ 3*log(N) #6 always there
   }else{
-    tau = tau[tau>1 & tau<Ts+1] #keep CPT locations only
+    tau = tau[tau>1 & tau<N+1] #keep CPT locations only
     tau.ext = c(1,tau,(N+1)) #include CPT boundary 1 and N+1
 
     ## Split Xt to regimes/segments to

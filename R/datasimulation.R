@@ -1,3 +1,79 @@
+#' Example time series models simulation with introducing changepoint effects.
+#'
+#' This is a function to simulate time series $Z_{t}$ from different models,
+#' \begin{center}
+#'  $Z_{t}=\mu_{t}+\e_{t}$
+#' \end{center}
+#' \itemize{
+#'  \item{Stationary time series without autocorrelation}
+#'  \item{Stationary time series with autocorrelation}
+#'  \item{Stationary with seasonality and autocorrelation}
+#'  \item{Stationary with seasonality, trend, and autocorrelation}
+#' }
+#' The changepoint
+#' effects could be introduced through the mean of time series random variables.
+#'
+#' @param theta A parameter vector contains other mean function parameters without changepoint parameters.
+#' @param XMat The covairates for time series mean function without changepoint indicators.
+#' @param sigma The standard deviation for time series residuals $\epsilon_{t}$.
+#' @param phi A single value for the autocorrelation parameter for AR(1) errors.
+#' @param Delta The parameter vector contains the changepoint parameters for time series mean function.
+#' @param CpLoc A vector contains the changepoint locations range from $1\leq\tau\leq T_{s}$.
+#' @param seed The random seed for simulation reproducibility.
+#' @return Returns the simulated time series with attributes:
+#' \item{Z}{The simulated time series.}
+#' \item{Attributes}{
+#' \itemize{
+#'  \item{DesignX}
+#'  \item{mu}
+#'  \item{theta}
+#'  \item{CpLoc}
+#'  \item{seed}
+#'  }
+#' }
+#'
+#' @import Rcpp
+#' @import stats
+#' @useDynLib changepointGA
+#' @export
+#' @examples
+#' Ts = 1000
+#' Cp.prop = c(1/4, 3/4)
+#' CpLocT = floor(Ts*Cp.prop)
+#' DeltaT = c(2, -2)
+#' sigmaT = 1
+#'
+#' ##### M1: Stationary time series without autocorrelation
+#' thetaT = c(0.5) # intercept
+#' XMatT = matrix(1, nrow=Ts, ncol=1)
+#' colnames(XMatT) = "intercept"
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#' TsPlotCheck(myts, tau=CpLocT)
+#'
+#' ##### M2: Stationary time series with autocorrelation
+#' phiT = 0.5
+#' thetaT = c(0.5) # intercept
+#' XMatT = matrix(1, nrow=Ts, ncol=1)
+#' colnames(XMatT) = "intercept"
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#' TsPlotCheck(myts, tau=CpLocT)
+#'
+#' ##### M3: Stationary with seasonality and autocorrelation
+#' thetaT = c(0.5, -0.5, 0.3) # intercept, B, D
+#' period = 30
+#' XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
+#' colnames(XMatT) = c("intercept", "Bvalue", "DValue")
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#' TsPlotCheck(myts, tau=CpLocT)
+#'
+#' ##### M4: Stationary with seasonality, trend, and autocorrelation
+#' # scaled trend if large number of sample size
+#' thetaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
+#' period = 30
+#' XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period), 1:Ts)
+#' colnames(XMatT) = c("intercept", "Bvalue", "DValue", "trend")
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#' TsPlotCheck(myts, tau=CpLocT)
 ts.sim = function(theta, XMat, sigma, phi=NULL, Delta=NULL, CpLoc=NULL, seed=NULL){
 
   if(!is.null(seed)){set.seed(seed)}
@@ -80,47 +156,3 @@ TsPlotCheck = function(Z, tau=NULL, mu=NULL){
   }
 
 }
-
-
-Ts = 1000
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
-DeltaT = c(2, -2)
-
-sigmaT = 1
-
-##### M1: Stationary time series without autocorrelation
-thetaT = c(0.5) # intercept
-
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
-myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
-TsPlotCheck(myts, tau=CpLocT)
-
-##### M2: Stationary time series with autocorrelation
-phiT = 0.5
-thetaT = c(0.5) # intercept
-
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
-myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
-TsPlotCheck(myts, tau=CpLocT)
-
-##### M3: Stationary with seasonality and autocorrelation
-thetaT = c(0.5, -0.5, 0.3) # intercept, B, D
-period = 30
-
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
-colnames(XMatT) = c("intercept", "Bvalue", "DValue")
-myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
-TsPlotCheck(myts, tau=CpLocT)
-
-##### M4: Stationary with seasonality, trend, and autocorrelation
-# scaled trend if large number of sample size
-thetaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
-period = 30
-
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period), 1:Ts)
-colnames(XMatT) = c("intercept", "Bvalue", "DValue", "trend")
-myts = ts.sim(theta=thetaT, XMat=XMatT, phi=phiT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
-TsPlotCheck(myts, tau=CpLocT)
