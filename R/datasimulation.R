@@ -5,14 +5,39 @@
 #'  $Z_{t}=\mu_{t}+\e_{t}$
 #' \end{center}
 #' \itemize{
-#'  \item{Stationary time series without autocorrelation}
-#'  \item{Stationary time series with autocorrelation}
-#'  \item{Stationary with seasonality and autocorrelation}
-#'  \item{Stationary with seasonality, trend, and autocorrelation}
+#'  \item{Stationary time series without autocorrelation} $\mu_{t}$ is a constant
+#'  and $\e_{t}$'s are independent and identically distributed as $N(0,\sigma)$.
+#'  \item{Stationary time series with autocorrelation} $\mu_{t}$ is a constant
+#'  and $\e_{t}$ follows an AR(1) process,
+#'  #' \begin{center}
+#'  $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
+#' \end{center}
+#' where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
+#'  \item{Stationary with seasonality and autocorrelation} $\mu_{t}$ is not a constant,
+#'  \begin{center}
+#'  $\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S})$,
+#' \end{center}
+#'  and $\e_{t}$ follows an AR(1) process,
+#'  #' \begin{center}
+#'  $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
+#' \end{center}
+#' where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
+#'  \item{Stationary with seasonality, trend, and autocorrelation} $\mu_{t}$ is not a constant,
+#'  \begin{center}
+#'  $\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha\frac{t}{Ts}$,
+#' \end{center}
+#'  and $\e_{t}$ follows an AR(1) process,
+#'  #' \begin{center}
+#'  $\e_{t} = \phi_{t-1}\e_{t-1}+\epsilon_{t}$,
+#' \end{center}
+#' where \epsilon_{t}'s are independent and identically distributed as $N(0,\sigma)$.
 #' }
-#' The changepoint
-#' effects could be introduced through the mean of time series random variables.
-#'
+#' The changepoint effects could be introduced through the $\mu_{t}$ as
+#' \begin{center}
+#'  $\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},
+#' \end{center}
+#' where $1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}$ are the changepoint locations and
+#' $\Delta_{1},\ldots,\Delta_{m}$ are the changepoint parameter that need to be estimted.
 #' @param theta A parameter vector contains other mean function parameters without changepoint parameters.
 #' @param XMat The covairates for time series mean function without changepoint indicators.
 #' @param sigma The standard deviation for time series residuals $\epsilon_{t}$.
@@ -24,11 +49,11 @@
 #' \item{Z}{The simulated time series.}
 #' \item{Attributes}{
 #' \itemize{
-#'  \item{DesignX}
-#'  \item{mu}
-#'  \item{theta}
-#'  \item{CpLoc}
-#'  \item{seed}
+#'  \item{DesignX} The covariates include all changepoint indicators.
+#'  \item{mu} A vector includes the mean values for simulated time series sequences.
+#'  \item{theta} The true parameter vector (including changepoint effects).
+#'  \item{CpLoc} The true changepoint locations where we introduce the mean changing effects.
+#'  \item{seed} The random seed used for this simulation.
 #'  }
 #' }
 #'
