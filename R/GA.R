@@ -32,7 +32,7 @@
 #'
 #' @import Rcpp
 #' @import stats
-#' @importFrom Rcpp
+#' @import Rcpp
 #' @useDynLib changepointGA
 #' @export
 #' @examples
