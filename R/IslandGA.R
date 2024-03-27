@@ -14,7 +14,7 @@
 #' new individual selection, and genetic operator of crossover and mutation.
 #' See \code{\link{IslandGA_operators}} for the details.
 #' @param ... additional arguments that will be passed to the fitness function.
-#' @return Returns a list that has components:, bestchrom=bestchrom, countMig=countMig
+#' @return Returns a list that has the following components.
 #' \item{bestfit}{The obtained minimum value of the objective function after
 #' the final iteration.}
 #' \item{bestchrom}{The locations of the detected changepoints associating
@@ -33,11 +33,8 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #' DeltaT = c(2, -2)
-#'
 #' sigmaT = 1
-#'
 #' thetaT = c(0.5) # intercept
-#'
 #' XMatT = matrix(1, nrow=Ts, ncol=1)
 #' colnames(XMatT) = "intercept"
 #' myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
