@@ -1,33 +1,85 @@
 #' Genetic algorithm
 #'
 #' Perform the modified genetic algorithm for multiple changepoint detection.
-#'
-#' @param ObjFunc The fitness function to be maximized. Users can specify any R
+#' Minimization of an objective function using genetic algorithm (GA).
+#' The algorithm can be run sequentially or in explicit parallelisation.
+#' @param ObjFunc The fitness function to be minimized. Users can specify any R or Rcpp
 #' functions as the fitness function with setting input as potential solution to
 #' the optimization problem and returning a numerical value as the output/fitness.
-#' @param n
-#' @param GA_param
-#' @param ga_operators
+#'
+#' @param n The sample size of the time series.
+#' @param GA_param A list contains the hyper-parameters for genetic algorithm.
+#' See \code{\link{GA_param}} for the details.
+#' @param ga_operators A list includes the functions for population initialization,
+#' new individual selection, and genetic operator of crossover and mutation.
+#' See \code{\link{ga_operators}} for the details.
 #' @param ... additional arguments that will be passed to the fitness function.
-#' @Value Returns a list that has components:
-#' \item{overbestfit}{}
-#' \item{overbestchrom}{}
-#' \item{bestfit}{}
-#' \item{bestchrom}{}
-#' \item{count}{}
-#' \item{convg}{}
+#' @return Returns a list that has components:
+#' \item{overbestfit}{The obtained minimum value of the objective function after
+#' the final iteration.}
+#' \item{overbestchrom}{The locations of the detected changepoints associating
+#' with the \code{overbestfit} the after the final iteration.}
+#' \item{bestfit}{The minimized fitness function values at each iteration.}
+#' \item{bestchrom}{The detected changepoints at each iteration.}
+#' \item{count}{The number of iterations undertaken by the genetic algorithm.}
+#' \item{convg}{An integer code.
+#' \itemize{
+#'  \item{0} indicates the algorithm successful completion.
+#'  \item{1} indicates the the total number of generations exceeds the
+#'  prespecified \item{\code{maxgen}} limit.
+#'  }
+#' }
 #'
 #' @import Rcpp
+#' @import stats
 #' @importFrom Rcpp
 #' @useDynLib changepointGA
 #' @export
 #' @examples
 #' library(changepointGA)
 #'
+#' Ts = 1000
+#' Cp.prop = c(1/4, 3/4)
+#' CpLocT = floor(Ts*Cp.prop)
+#' DeltaT = c(2, -2)
 #'
+#' sigmaT = 1
+#'
+#' thetaT = c(0.5) # intercept
+#'
+#' XMatT = matrix(1, nrow=Ts, ncol=1)
+#' colnames(XMatT) = "intercept"
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#'
+#' GA_param = list(
+#'   popsize      = 200,
+#'   Pcrossover   = 0.95,
+#'   Pmutation    = 0.15,
+#'   Pchangepoint = 0.06,
+#'   minDist      = 2,
+#'   mmax         = Ts/2 - 1,
+#'   lmax         = 2 + Ts/2 - 1,
+#'   maxgen       = 10000,
+#'   maxconv      = 10000,
+#'   monitoring   = FALSE,
+#'   parallel     = FALSE,
+#'   nCore        = NULL,
+#'   tol          = 1e-5,
+#'   seed         = NULL
+#' )
+#'
+#' ga_operators = list(population = "random_population_cpp",
+#'                     selection  = "selection_linearrank_cpp",
+#'                     crossover  = "offspring_uniformcrossover_cpp",
+#'                     mutation   = "mutation")
+#' GA.res = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
+#' GA.res$overbestfit
+#' GA.res$overbestchrom
 GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
 
   call = match.call()
+
+  i = NULL # add for global variables declare
 
   popsize      = GA_param$popsize
   Pcrossover   = GA_param$Pcrossover
@@ -166,7 +218,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
           cat("\n overall bestfit =", overbestfit)
           cat("\n overall bestchrom =", overbestchrom, "\n")
         }
-        pp = which(is.na(overbest))[1] - 1
+        pp = which(is.na(bestfit))[1] - 1
         bestfit = bestfit[1:pp]
         bestchrom = bestchrom[,1:pp]
         convg = 0

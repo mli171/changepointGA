@@ -4,8 +4,13 @@ import(foreach)
 import(doMC)
 import(Rcpp)
 import(RcppArmadillo)
+import(clue)
+import(stats)
+import(parallel)
 
+importFrom("parallel", detectCores)
 importFrom("Rcpp", sourceCpp)
 importFrom("stats", "runif")
+importFrom("graphics", "abline", "lines", "segments")
 
 useDynLib(changepointGA, .registration=TRUE)
