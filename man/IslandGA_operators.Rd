@@ -44,12 +44,12 @@ IslandGA_operators = list(population, selection, crossover, mutation)
 \item{n} The sample size of the time series.
 }
 }
-\seealso{See Also as \code{\link{GA}}.}
+\seealso{See Also as \code{\link{IslandGA}}.}
 \references{Lu, Q., Lund, R., & Lee, T. C. (2010). An MDL approach to the climate segmentation problem.
 \emph{Ann. Appl. Stat.} 4 (1) 299 - 319.}
 \examples{
-ga_operators = list(population = "random_population_cpp",
-                    selection  = "selection_linearrank",
-                    crossover  = "offspring",
-                    mutation   = "mutation")
+IslandGA_operators = list(population = "random_population_cpp",
+                          selection  = "selection_linearrank",
+                          crossover  = "offspring",
+                          mutation   = "mutation")
 }
