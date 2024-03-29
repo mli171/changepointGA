@@ -72,6 +72,7 @@
 #'                     selection  = "selection_linearrank_cpp",
 #'                     crossover  = "offspring_uniformcrossover_cpp",
 #'                     mutation   = "mutation")
+#'
 #' GA.res = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
 #' GA.res$overbestfit
 #' GA.res$overbestchrom

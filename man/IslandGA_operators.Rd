@@ -1,14 +1,14 @@
-\name{ga_operators}
-\alias{ga_operators}
+\name{IslandGA_operators}
+\alias{IslandGA_operators}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-ga_operators
+IslandGA_operators
 }
 \description{
-A list object contains the GA operators function names.
+A list object contains the Island model based GA operators function names.
 }
 \usage{
-ga_operators = list(population, selection, crossover, mutation)
+IslandGA_operators = list(population, selection, crossover, mutation)
 }
 \arguments{
 \item{population}{It could be a function or a matrix. The function should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population_cpp}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome.}
