@@ -70,15 +70,3 @@ cptDist = function(tau1, tau2, n){
 
   return(dist)
 }
-
-n = 100
-
-tau2 = c(25, 50, 75)
-tau1 = c(20, 35, 70, 80, 90)
-
-cptDist(tau1=tau1, tau2=tau2, n=n)
-cptDist(tau1=tau2, tau2=tau1, n=n)
-cptDist(tau1=tau1, tau2=tau1, n=n)
-cptDist(tau1=tau1, tau2=NULL, n=n)
-cptDist(tau1=NULL, tau2=tau2, n=n)
-cptDist(tau1=NULL, tau2=NULL, n=n)
