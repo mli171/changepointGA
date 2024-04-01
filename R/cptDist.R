@@ -2,7 +2,7 @@
 #'
 #' Given a true changepoint configuration, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}},
 #' for time series simulation, we want to compare an estimated multiple
-#' changepoint configuration, \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{m}\}}, to \eqn{C_{1}} to
+#' changepoint configuration, \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{k}\}}, to \eqn{C_{1}} to
 #' examine the detection algorithm performance.
 #'
 #' The pairwise distance was proposed by Shi et al. (2022),
@@ -12,6 +12,8 @@
 #' The term \eqn{min(A(C_{1}, C_{2}))} reflects the cost that matches
 #' changepoint locations between \eqn{C_{1}} and \eqn{C_{2}} and cloud be calculated
 #' by linear assignment method. Details can be found in Shi et al. (2022).
+#' Note: if one configuration doesn't contain any changepoint (valued \code{NULL}),
+#' the distance is defined as the \eqn{|m-k|}.
 #' @param tau1 A vector contains the changepoint locations for \eqn{C_{1}}
 #' for comparison. A value \code{NULL} is required if there is no changepoint detected.
 #' @param tau2 A vector contains the changepoint locations for  \eqn{C_{2}}
@@ -45,28 +47,28 @@ cptDist = function(tau1, tau2, n){
   k = length(tau2)
 
   if(is.null(tau1) & is.null(tau2)){
-    dist = NA
+    dist.res = NA
     warning("Both configurations are NULL.")
   }else{
-    if(is.null(tau1)){tau1 = rep(0,k)}
-    tmpm = length(tau1)
+    if(is.null(tau1) | is.null(tau2)){
+      ACC = 0
+    }else{
+      if(any(tau1 < 0 | tau1 > n)){stop("First changepoint configuration invalid.")}
+      if(any(tau2 < 0 | tau2 > n)){stop("Second changepoint configuration invalid.")}
 
-    if(is.null(tau2)){tau2 = rep(0,m)}
-    tmpk = length(tau2)
-
-    if(any(tau1 < 0 | tau1 > n)){stop("First changepoint configuration invalid.")}
-    if(any(tau2 < 0 | tau2 > n)){stop("Second changepoint configuration invalid.")}
-
-    costs = matrix(0, nrow=tmpm, ncol=tmpk)
-    for(i in 1:tmpm){
-      for(j in 1:tmpk){
-        costs[i,j] = abs(tau1[i] - tau2[j])/n
+      costs = matrix(0, nrow=m, ncol=k)
+      for(i in 1:m){
+        for(j in 1:k){
+          costs[i,j] = abs(tau1[i] - tau2[j])/n
+        }
       }
+      if(m > k){costs=t(costs)}
+      y = clue::solve_LSAP(costs, maximum = FALSE)
+      ACC = sum(costs[cbind(seq_along(y), y)])
     }
-    if(tmpm>tmpk){costs=t(costs)}
-    y = clue::solve_LSAP(costs, maximum = FALSE)
-    dist = abs(m-k) + sum(costs[cbind(seq_along(y), y)])
+    dist.res = abs(m-k) + ACC
   }
 
-  return(dist)
+  return(dist.res)
 }
+

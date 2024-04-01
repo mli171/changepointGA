@@ -22,7 +22,7 @@ should have the same \eqn{n} values.}
 \description{
 Given a true changepoint configuration, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}},
 for time series simulation, we want to compare an estimated multiple
-changepoint configuration, \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{m}\}}, to \eqn{C_{1}} to
+changepoint configuration, \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{k}\}}, to \eqn{C_{1}} to
 examine the detection algorithm performance.
 }
 \details{
@@ -33,6 +33,8 @@ where \eqn{m} is the number of changepoints in configuration \eqn{C_{1}} and
 The term \eqn{min(A(C_{1}, C_{2}))} reflects the cost that matches
 changepoint locations between \eqn{C_{1}} and \eqn{C_{2}} and cloud be calculated
 by linear assignment method. Details can be found in Shi et al. (2022).
+Note: if one configuration doesn't contain any changepoint (valued \code{NULL}),
+the distance is defined as the \eqn{|m-k|}.
 }
 \examples{
 n = 100
