@@ -122,8 +122,8 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
   ###### step 1: Initialize population
   if(class(ga_operators$population)[1] == "matrix"){
     # from input
-    if(any(is.na(population))){stop("NA's in provided population matrix")}
-    population = ga_operators$population
+    if(all(is.na(ga_operators$population))){stop("NA's in provided population matrix")}
+    pop = ga_operators$population
   }else{
     if(!is.function(ga_operators$population)) population = get(ga_operators$population)
     # generate by function
@@ -137,7 +137,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
     registerDoMC(cores = nCore)
     popFit = foreach(i=1:popsize, .combine = "c") %dopar%
       (
-        do.call(ObjFunc, c(list(pop[2:(2+pop[1,i]),i], pop[1,i], ...)) )
+        do.call(ObjFunc, c(list(pop[2:(2+pop[1,i]),i], pop[1,i], ...)))
       )
   }else{
     popFit = rep(NA, popsize)

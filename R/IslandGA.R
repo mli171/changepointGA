@@ -114,10 +114,10 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
   Bchrom = matrix(0, nrow=lmax, ncol=Islandsize)
 
   ###### step 1: generate initial population for each island
-  if(class(IslandGA_operators$population)[1] == "matrix"){
+  if(class(IslandGA_operators$population)[1] == "array"){
     # from input
-    if(any(is.na(population))){stop("NA's in provided population matrix")}
-    population = IslandGA_operators$population
+    if(all(is.na(IslandGA_operators$population))){stop("NA's in provided population array")}
+    Island = IslandGA_operators$population
   }else{
     if(!is.function(IslandGA_operators$population)) population = get(IslandGA_operators$population)
     # generate by function
