@@ -73,7 +73,7 @@ thetaT = c(0.5, 1, -1, 1, -1) # intercept, cp1, cp2
 sigmaT = 1
 phiT = 0.75
 
-Ts = 30*365*24
+Ts = 5000
 tau.prop = c(1/4, 1/2, 2.5/4, 3/4)
 tauT = floor(Ts*tau.prop)
 CpConfigT = rep(0, Ts)
@@ -125,9 +125,7 @@ ga_operators = list(population = "random_population_cpp",
                     crossover  = "offspring_uniformcrossover_cpp",
                     mutation   = "mutation")
 
-# ellaClc = c(10, 8, 6, 4, 3, 2)
-
-ellaClc = c(365*24, 30*24, 24, 10, 8, 6, 4, 3, 2)
+ellaClc = c(10, 8, 6, 4, 3, 2)
 
 multids.pop = matrix(NA, nrow=2+Ts/2-1, ncol=length(ellaClc))
 
@@ -226,8 +224,19 @@ tmp2 = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=Z.sim)
 tim4 = Sys.time()
 
 
+if(tmp1$overbestchrom[1] == 0){
+  tau2 = NULL
+}else{
+  tau2 = tmp1$overbestchrom[2:(tmp1$overbestchrom[1]+1)]
+}
 dist1 = cptDist(tauT, tmp1$overbestchrom[2:(tmp1$overbestchrom[1]+1)], Ts)
-dist2 = cptDist(tauT, tmp2$overbestchrom[2:(tmp2$overbestchrom[1]+1)], Ts)
+
+if(tmp2$overbestchrom[1] == 0){
+  tau2 = NULL
+}else{
+  tau2 = tmp2$overbestchrom[2:(tmp2$overbestchrom[1]+1)]
+}
+dist2 = cptDist(tauT, tau2, Ts)
 
 tmp1$overbestfit
 tmp1$overbestchrom
