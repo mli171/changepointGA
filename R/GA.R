@@ -210,6 +210,9 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
     if(count >= maxconv){
       tmpbestfit = bestfit[(count-maxconv+1):count]
       decision = checkConv(tmpbestfit, maxconv, tol)
+      if(monitoring){
+        cat("\n My decision:", decision)
+      }
       if (decision==1){
         overbestfit = bestfit[count]
         overbestchrom = bestchrom[,count]

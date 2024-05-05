@@ -90,11 +90,11 @@ GA_param = list(
   popsize      = 200,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 0.06,
+  Pchangepoint = 0.1,
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
-  maxgen       = 10000,
+  maxgen       = 100000,
   maxconv      = 10000,
   monitoring   = FALSE,
   parallel     = FALSE,
@@ -126,7 +126,7 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 0.06,
+  Pchangepoint = 0.1,
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
@@ -156,7 +156,7 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 0.06,
+  Pchangepoint = 0.1,
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
@@ -165,7 +165,7 @@ IslandGA_param = list(
   maxconv      = 100,
   monitoring   = FALSE,
   parallel     = TRUE, ###
-  nCore        = 5,
+  nCore        = 10,
   tol          = 1e-5,
   seed         = NULL
 )
@@ -200,7 +200,8 @@ tmp5$bestfit
 tmp1$overbestchrom
 # tmp2$overbestchrom
 # tmp3$overbestchrom
+
 # island GA
-tmp4$bestchrom[tmp4$bestchrom!=0]
-tmp5$bestchrom[tmp5$bestchrom!=0]
+tmp4$bestchrom
+tmp5$bestchrom
 # tmp6$bestchrom[tmp6$bestchrom!=0]
