@@ -27,9 +27,12 @@
 #'  pre-specified \item{\code{maxMig}} limit.
 #'  }
 #' }
-#' @import Rcpp
 #' @import stats
 #' @import Rcpp
+#' @import foreach
+#' @import doMC
+#' @import RcppArmadillo
+#' @import parallel
 #' @useDynLib changepointGA
 #' @export
 #' @examples
@@ -69,9 +72,9 @@
 #'                           crossover  = "offspring_uniformcrossover_cpp",
 #'                           mutation   = "mutation")
 #'
-#' IslandGA.res = IslandGA(BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 #' IslandGA.res$bestfit
-#' IslandGA.res$bestchrom[IslandGA.res$bestchrom!=0]
+#' IslandGA.res$bestchrom
 #-------------------------- Genetic Algorithm Main Function is to minimize
 IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
 

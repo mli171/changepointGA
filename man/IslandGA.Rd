@@ -29,6 +29,13 @@ the final iteration.}
 \item{bestchrom}{The locations of the detected changepoints associating
 with the \code{bestfit} the after the final iteration.}
 \item{countMig}{The number of migrations undertaken by the IslandGA.}
+\item{convg}{An integer code indicate convergence.
+\itemize{
+ \item{0} indicates the algorithm successful completion.
+ \item{1} indicates the the total number of migrations exceeds the
+ pre-specified \item{\code{maxMig}} limit.
+ }
+}
 }
 \description{
 Perform the modified island-based genetic algorithm (IslandGA) for multiple changepoint detection.
@@ -72,7 +79,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           crossover  = "offspring_uniformcrossover_cpp",
                           mutation   = "mutation")
 
-IslandGA.res = IslandGA(BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 IslandGA.res$bestfit
-IslandGA.res$bestchrom[IslandGA.res$bestchrom!=0]
+IslandGA.res$bestchrom
 }

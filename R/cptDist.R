@@ -21,7 +21,7 @@
 #' @param n The simulated time series sample size. Two changepoint configurations
 #' should have the same \eqn{n} values.
 #' @return
-#' \code{dist}{The calculated distance.}
+#' \item{dist}{The calculated distance.}
 #' @references{
 #'   Shi, X., Gallagher, C., Lund, R., & Killick, R. (2022).
 #'   A comparison of single and multiple changepoint techniques for time series data.

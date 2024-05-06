@@ -7,9 +7,6 @@ ga_operators
 \description{
 A list object contains the GA operators function names.
 }
-\usage{
-ga_operators = list(population, selection, crossover, mutation)
-}
 \arguments{
 \item{population}{It could be a function or a matrix. The function should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population_cpp}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome.}
 \item{selection}{A function can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.}

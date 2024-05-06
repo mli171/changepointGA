@@ -144,6 +144,7 @@ ts.sim = function(theta, XMat, sigma, phi=NULL, Delta=NULL, CpLoc=NULL, seed=NUL
 #' @param mu The provided meam values for each time \eqn{t}.
 #' @import Rcpp
 #' @import stats
+#' @import graphics
 #' @useDynLib changepointGA
 #' @export
 #' @examples

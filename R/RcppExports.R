@@ -3,26 +3,26 @@
 
 #' @export
 rank_asR <- function(x, decreasing = FALSE) {
-    .Call(`_changepointGA_rank_asR`, x, decreasing)
+    .Call('_changepointGA_rank_asR', PACKAGE = 'changepointGA', x, decreasing)
 }
 
 #' @export
 selectTau_cpp <- function(n, minDist, Pb, mmax, lmax) {
-    .Call(`_changepointGA_selectTau_cpp`, n, minDist, Pb, mmax, lmax)
+    .Call('_changepointGA_selectTau_cpp', PACKAGE = 'changepointGA', n, minDist, Pb, mmax, lmax)
 }
 
 #' @export
 random_population_cpp <- function(popsize, n, minDist, Pb, mmax, lmax) {
-    .Call(`_changepointGA_random_population_cpp`, popsize, n, minDist, Pb, mmax, lmax)
+    .Call('_changepointGA_random_population_cpp', PACKAGE = 'changepointGA', popsize, n, minDist, Pb, mmax, lmax)
 }
 
 #' @export
 offspring_uniformcrossover_cpp <- function(mom, dad, minDist, lmax, n) {
-    .Call(`_changepointGA_offspring_uniformcrossover_cpp`, mom, dad, minDist, lmax, n)
+    .Call('_changepointGA_offspring_uniformcrossover_cpp', PACKAGE = 'changepointGA', mom, dad, minDist, lmax, n)
 }
 
 #' @export
 selection_linearrank_cpp <- function(pop, popFit) {
-    .Call(`_changepointGA_selection_linearrank_cpp`, pop, popFit)
+    .Call('_changepointGA_selection_linearrank_cpp', PACKAGE = 'changepointGA', pop, popFit)
 }
 

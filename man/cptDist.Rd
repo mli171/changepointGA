@@ -17,7 +17,7 @@ for comparison. A value \code{NULL} is required if there is no changepoint detec
 should have the same \eqn{n} values.}
 }
 \value{
-\code{dist}{The calculated distance.}
+\item{dist}{The calculated distance.}
 }
 \description{
 Given a true changepoint configuration, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}},

@@ -30,9 +30,12 @@
 #'  }
 #' }
 #'
-#' @import Rcpp
 #' @import stats
 #' @import Rcpp
+#' @import foreach
+#' @import doMC
+#' @import RcppArmadillo
+#' @import parallel
 #' @useDynLib changepointGA
 #' @export
 #' @examples
@@ -73,7 +76,7 @@
 #'                     crossover  = "offspring_uniformcrossover_cpp",
 #'                     mutation   = "mutation")
 #'
-#' GA.res = GA(BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
+#' GA.res = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
 #' GA.res$overbestfit
 #' GA.res$overbestchrom
 GA = function(ObjFunc, n, GA_param, ga_operators, ... ){

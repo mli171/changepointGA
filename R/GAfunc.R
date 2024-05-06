@@ -158,39 +158,6 @@ offspring = function(mom, dad, minDist, lmax, n){
 
   return(child)
 }
-# offspring(mom, dad, minDist, lmax, n)
-
-# #--------------------------
-# mutation = function(minDist, Pb, lmax, mmax, n){
-#   # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
-#   # some inputs ++++++++++++++++++
-#   #   minDist= minimum distances between two adjacent changepoints
-#   #   Pb= prob of changepoints for every time series
-#   #   lmax= max length of chromosome
-#   #   mmax= max number of changepoints
-#   #   n= sample size
-#   # outputs ++++++++++++++++++
-#   #   childMut  = the chromosome representation produced from mutation
-#
-#   childMut = rep(0, lmax)
-#
-#   resTau = SelectTau(n, minDist, Pb, mmax)
-#   mChild = resTau$m
-#   tauChild = resTau$tau
-#
-#   tauNew = rep(0, mChild+1)
-#   if(mChild==0){
-#     tauNew[1] = n+1
-#   }else{
-#     tauNew[1:mChild] = tauChild[1:mChild]
-#     tauNew[mChild+1] = n+1
-#   }
-#   childMut[1] = mChild
-#   childMut[2:(2+mChild)] = tauNew
-#
-#   return(childMut)
-# }
-# # mutation(minDist, Pb, lmax, mmax, n)
 
 #--------------------------
 Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring, ...){
@@ -317,245 +284,6 @@ checkConv = function(a, maxconv, tol){
   }
   return(decision)
 }
-# checkConv(a, maxconv, tol)
-
-#-------------------------- Genetic Algorithm Main Function is to minimize
-GA.Main <- function(ObjFunc, n, ..., IslandGA_param){
-  # GA: island models
-  #     chromosome representation: real number: a vector of m, tau=(tau_1, ... tau_m, tau_{m+1}=n+1)
-  #     selection: linear ranking: least fit has rank 0 and best fit has rank popsize-1
-  #     crossover: apply crossover to the chosen parents with prob pc.
-  #                if r1 <= pc then apply crossover and produce only one child; otherwise, child=best fif of parents
-  #                p: either from mom or dad with equal probs
-  #                tau: selected from all possible changepoints for mom and dad
-  #     mutation: apply mutation to the child (the result of crossover) (#with rate pm=1/n)
-  #               p: if r1 < 0.5, p=child's p; otherwise, select p from 0,1,2
-  #               tau: if r1 < 0.5, tau=child's tau; otherwise, select new tau
-  #     new generation: steady-state (replace least fit in the current pop with child if child's fit is better)
-  #     migration: apply migration after maxgen generations
-  #                the least fit in each subpop is replaced with one selected at random from the best fits of all subpops
-  #     stopping: converge: if the overall best fit after each migration does not change for maxconv consecutive migrations
-  #               ternimate: if the total number of migrations is larger than maxMig
-  # some inputs ++++++++++++++++++
-  #   ObjFunc= the objective function to minimize
-  #   n= sample size
-  #   popsize= size of each island/subpop
-  #   islandsize= number of the island/subpop
-  #   Pc= prob of crossover
-  #   Pm= prob of mutation
-  #   Pb= prob of changepoints for every time series
-  #   minDist= minimum distance between two adjacent changepoints
-  #   mmax= max number of changepoints
-  #   lmax= max length of chromosome
-  #   maxMig= max # for the migration, after maxMig migration then stop
-  #   maxgen= for each subpopulation, after maxgen then apply migration
-  #   maxconv= if maxconv consecutive migrations, the overall best does not change, then stop
-  #   monitoring= if we want to have bestfit and best chrome displayed during GA
-  #   tol = tolerance for changes in bestfits
-  #   penalty= selection criterion to choose
-  #   ...= additional arguments on to a subsequent function.
-  # outputs ++++++++++++++++++
-  #   bestfit  = min value of MDL
-  #   bestchrom = optimal m, p, and tau
-
-  cat("\n\n This island-GA is to minimize ... \n\n")
-
-  ObjFunc1 = function(tau, m) ObjFunc(tau, m, ...)
-
-  popsize    = IslandGA_param$popsize
-  islandSize = IslandGA_param$islandSize
-  Pc         = IslandGA_param$Pc
-  Pm         = IslandGA_param$Pm
-  Pb         = IslandGA_param$Pb
-  minDist    = IslandGA_param$minDist
-  mmax       = IslandGA_param$mmax
-  lmax       = IslandGA_param$lmax
-  maxMig     = IslandGA_param$maxMig
-  maxgen     = IslandGA_param$maxgen
-  maxconv    = IslandGA_param$maxconv
-  monitoring = IslandGA_param$monitoring
-  tol        = IslandGA_param$tol
-
-  island = array(0, dim=c(lmax, popsize, islandSize))
-  islandFit = matrix(0, nrow=popsize, ncol=islandSize)
-  Bfit = rep(0, islandSize)
-  Bchrom = matrix(0, nrow=lmax, ncol=islandSize)
-
-  # step 1: generate initial population for each island
-  # step 2: evaluate the fitness of the initial individuals in the population
-  for(k in 1:islandSize){
-    pop = Initial_pop(popsize, n, minDist, Pb, mmax, lmax)
-    island[,,k] = pop
-    for(j in 1:popsize){
-      m = pop[1,j]
-      tau = pop[2:(2+m),j]
-      islandFit[j,k] = ObjFunc1(tau, m)
-    }
-  }
-
-  countMig = 0
-  overbest = rep(0, maxMig)
-  overbestChrom = matrix(0, nrow=lmax, ncol=maxMig)
-  repeat{
-    # step 2,3,4,5: select parents, crossover, mutation, new pop
-    for(k in 1:islandSize){
-      resNewpop = Newpopulation(ObjFunc1=ObjFunc1, pop=island[,,k], fit=islandFit[,k], popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring=F)
-      # update bestfit in each island
-      Bfit[k] = resNewpop$bestfit
-      Bchrom[,k] = resNewpop$bestchrom
-      # update island chromosomes
-      island[,,k] = resNewpop$pop
-      islandFit[,k] = resNewpop$fit
-    }
-
-    # step 6: migration
-    for (k in 1:islandSize){
-      pleast = which.max(islandFit[,k])
-      leastfit = islandFit[pleast,k]
-      # replace the worst in kth island with the best from another randomly selected island
-      pisland = sample(1:islandSize, 1)
-      if(pisland != k){
-        island[,pleast,k] = Bchrom[,pisland]
-        islandFit[pleast,k] = Bfit[pisland]
-      }
-    }
-    # update the overall bestfit
-    for (k in 1:islandSize){
-      pbest = which.min(islandFit[,k])
-      Bchrom[,k] = island[,pbest,k]
-      Bfit[k] = islandFit[pbest,k]
-    }
-
-    countMig = countMig + 1
-    genbest = which.min(Bfit)
-    overbest[countMig] = Bfit[genbest]
-    overbestChrom[,countMig] = Bchrom[,genbest]
-
-    # step 7: check convergence once countMig >= maxconv
-    if(countMig >= maxconv){
-      tmpoverbest = overbest[(countMig-maxconv+1):countMig]
-      decision = checkConv(tmpoverbest, maxconv, tol)
-      if (decision==1){
-        bestfit = overbest[countMig]
-        bestchrom = overbestChrom[,countMig]
-        break
-      }
-    }
-
-    # step 8: check stopping if countMig > maxMig
-    if(countMig >= maxMig){
-      bestfit = overbest[countMig]
-      bestchrom = overbestChrom[,countMig]
-      break
-    }
-
-    if(monitoring){
-      bestfit = overbest[countMig]
-      bestchrom = overbestChrom[,countMig]
-
-      cat("\n==== No.", countMig, "Migration ====")
-      cat("\n countMig =", countMig)
-      cat("\n bestfit =", bestfit)
-      cat("\n bestchrom =", bestchrom, "\n")
-    }
-  }
-
-  return(list(bestfit=bestfit, bestchrom=bestchrom, countMig=countMig))
-}
-# GA.Main(ObjFunc, n, popsize, islandSize, Pc, Pm, Pb, minDist, mmax, lmax, maxMig, maxgen, maxconv, monitoring, tol, X_hour, XMat, penalty)
-
-
-#-------------------------- Genetic Algorithm Main Function is to minimize
-GA.cls <- function(ObjFunc, n, ..., clsGA_param){
-  # GA: Classical genetic algorithm
-  #     chromosome representation: real number: a vector of m, tau=(tau_1, ... tau_m, tau_{m+1}=n+1)
-  #     selection: linear ranking: least fit has rank 0 and best fit has rank popsize-1
-  #     crossover: apply crossover to the chosen parents with prob pc.
-  #                if r1 <= pc then apply crossover and produce only one child; otherwise, child=best fif of parents
-  #                p: either from mom or dad with equal probs
-  #                tau: selected from all possible changepoints for mom and dad
-  #     mutation: apply mutation to the child (the result of crossover) (#with rate pm=1/n)
-  #               p: if r1 < 0.5, p=child's p; otherwise, select p from 0,1,2
-  #               tau: if r1 < 0.5, tau=child's tau; otherwise, select new tau
-  #     new generation: steady-state (replace least fit in the current pop with child if child's fit is better)
-  #     stopping: converge: if the overall best fit after each generation does
-  #               not change for maxconv consecutive generation ternimate;
-  # some inputs ++++++++++++++++++
-  #   ObjFunc= the objective function to minimize
-  #   n= sample size
-  #   popsize= size of each generation
-  #   Pc= prob of crossover
-  #   Pm= prob of mutation
-  #   Pb= prob of changepoints for every time series
-  #   minDist= minimum distance between two adjacent changepoints
-  #   mmax= max number of changepoints
-  #   lmax= max length of chromosome
-  #   maxconv= if maxconv consecutive migrations, the overall best does not change, then stop
-  #   monitoring= if we want to have bestfit and best chrome displayed during GA
-  #   tol = tolerance for changes in bestfits
-  #   ...= additional arguments on to a subsequent function.
-  # outputs ++++++++++++++++++
-  #   bestfit  = the optimized function value
-  #   bestchrom = optimal m, p, and tau
-
-  cat("\n\n This classical Genetic Algorithm is to minimize ... \n\n")
-
-  ObjFunc1 = function(tau, m) ObjFunc(tau, m, ...)
-
-  popsize    = clsGA_param$popsize
-  Pc         = clsGA_param$Pc
-  Pm         = clsGA_param$Pm
-  Pb         = clsGA_param$Pb
-  minDist    = clsGA_param$minDist
-  mmax       = clsGA_param$mmax
-  lmax       = clsGA_param$lmax
-  maxgen     = clsGA_param$maxgen
-  monitoring = clsGA_param$monitoring
-  tol        = clsGA_param$tol
-
-  # step 1: generate initial population
-  populationFit = rep(0, popsize)
-  population = Initial_pop(popsize, n, minDist, Pb, mmax, lmax)
-
-  # step 2: evaluate the fitness of the initial individuals in the population
-  for(j in 1:popsize){
-    m = population[1,j]
-    tau = population[2:(2+m),j]
-    populationFit[j] = ObjFunc1(tau, m)
-  }
-
-  # step 2,3,4,5: select parents, crossover, mutation, new pop
-  resNewpop = Newpopulation(ObjFunc1=ObjFunc1, pop=population, fit=populationFit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring)
-  # update population chromosomes
-  population = resNewpop$pop
-  populationFit = resNewpop$fit
-
-  # bestfit
-  bestfit = resNewpop$bestfit
-  bestchrom = resNewpop$bestchrom
-
-  return(list(bestfit=bestfit, bestchrom=bestchrom, countMig=NULL))
-}
-
-
-
-selection_linearrank = function(pop, popFit){
-  ## linear ranking
-  # least fit (largest value with selectrank = 0) has the lowest probability
-  # best fit (smallest value with selectrank = popsize-1) has the largest probability
-  popsize = length(popFit)
-
-  selectrank = popsize - rank(popFit)
-  probs0 = 2.0*selectrank/(popsize*(popsize-1))
-  parentI = sample(1:popsize, 2, prob=probs0)
-  tmp = pop[,parentI]
-  tmpp = order(popFit[parentI], decreasing = FALSE)
-  # dad has (better fit/smaller value/larger rank) than mom
-  dad = tmp[,tmpp[1]]
-  mom = tmp[,tmpp[2]]
-
-  return(list(dad=dad, mom=mom))
-}
 
 #--------------------------
 offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
@@ -605,95 +333,6 @@ mutation = function(minDist, Pb, lmax, mmax, n){
 
   return(childMut)
 }
-# mutation(minDist, Pb, lmax, mmax, n)
-
-
-# NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring, ...){
-#   # This function is used to form new population
-#   # some inputs ++++++++++++++++++
-#   #   pop= population
-#   #   fit= fitness evaluated for population
-#   #   popsize= size of each island/subpop
-#   #   minDist= minimum distances between two adjacent changepoints
-#   #   lmax= max length of chromosome
-#   #   mmax= max number of changepoints
-#   #   Pc= prob of crossover
-#   #   Pm= prob of mutation
-#   #   Pb= prob of changepoints for every time series
-#   #   maxgen= for each subpopulation, after maxgen then apply migration
-#   #   n= sample size
-#   #   X_hour= categorical time series
-#   #   XMat= Design matrix including covariate other than changepoint
-#   #   penalty= selection criterion to choose
-#   # outputs ++++++++++++++++++
-#   #   pop= updated population
-#   #   fit= updated population fitness
-#   #   bestfit  = currnt minimum of fitness values
-#   #   bestchrom = chromosome representation of the individual associated with bestfit
-#
-#   count = 1
-#   repeat{
-#     # indicator for c("crossover", "mutation")
-#     #     flag[1]=1 indicating no cross-over
-#     #     flag[2]=1 indicating no mutation
-#     flag = rep(0, 2)
-#     ##### step 2: parents selection
-#     parents = selection(pop, fit)
-#     dad = parents$dad
-#     mom = parents$mom
-#
-#     ##### step 3: crossover
-#     a1 = runif(1)
-#     if(a1 <= Pc){
-#       child = offspring(mom, dad, minDist, lmax, n)
-#     }else{
-#       child = dad
-#       flag[1] = 1
-#     }
-#
-#     ## step 4-2: mutation
-#     a2 = runif(1)
-#     if(a2 <= Pm){
-#       child = mutation(minDist, Pb, lmax, mmax, n)
-#     }else{
-#       flag[2] = 1
-#     }
-#
-#     ## step 5: form new generation
-#     #  steady state method:
-#     #     replace the least fit in the current pop with child if child is better.
-#     flagsum = flag[1] + flag[2]
-#     if (flagsum<2){
-#       # flagsum < 2 indicating new individual produced and fitness evaluation needed
-#       mChild = child[1]
-#       tauChild = child[2:(2+mChild)]
-#       fitChild = do.call(ObjFunc, c(list(tauChild, mChild, ...)) )
-#       leastfit = max(fit) # with largest fitness value
-#
-#       if (fitChild < leastfit) {
-#         # indicating child is better than the worst one and replace
-#         pp = which.max(fit)
-#         pop[,pp] = child
-#         fit[pp] = fitChild
-#       }
-#       count = count + 1
-#     }
-#
-#     # best fit with minimized fitness value
-#     bestfit = min(fit)
-#     bestchrom = pop[, which.min(fit)]
-#
-#     if(monitoring){
-#       cat("\n bestfit =", bestfit)
-#       cat("\n bestchrom =", bestchrom, "\n")
-#     }
-#
-#     # check: after every maxgen generations, apply migration in GA.Main()
-#     if (count >= maxgen){break}
-#   }
-#
-#   return(list(pop=pop, fit=fit, bestfit=bestfit, bestchrom=bestchrom))
-# }
 
 NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, ...){
   # This function is used to form new population
@@ -772,4 +411,61 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
   }
 
   return(rbind(fit, pop))
+}
+
+#' The example objective function for changepoint search in First order Gaussian
+#' autoregressions (AR(1)) via Bayesian Information Criterion (BIC)
+#'
+#' This is a function to calculate
+#' @param tau The provided changepoint locations (Only locations are included).
+#' @param m The provided number of changepoint locations.
+#' @param Xt The simulated AR(1) time series from \code{ts.sim} function.
+#' @return Returned the value of the obejctive function (i.e. BIC).
+#' @import stats
+#' @useDynLib changepointGA
+#' @export
+#' @examples
+#' library(changepointGA)
+#'
+#' Ts = 1000
+#' Cp.prop = c(1/4, 3/4)
+#' CpLocT = floor(Ts*Cp.prop)
+#' DeltaT = c(2, -2)
+#' sigmaT = 1
+#' thetaT = c(0.5) # intercept
+#' XMatT = matrix(1, nrow=Ts, ncol=1)
+#' colnames(XMatT) = "intercept"
+#' myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+#'
+#'# candidate changepoint configuration
+#' tautest = c(250, 500, 750)
+#' BinSearch.BIC(tau=tautest, m=3, Xt=myts)
+BinSearch.BIC = function(tau, m, Xt){
+
+  N = length(Xt) #length of the series
+
+  if(m == 0){
+    ##Case 1, Zero Changepoint
+    mu.hat = mean(Xt)
+    phi.hat = sum((Xt-mu.hat)[-N]*(Xt-mu.hat)[-1])/sum((Xt-mu.hat)[-1]^2)
+    Xt.hat = c(mu.hat, mu.hat + phi.hat*(Xt[-N]-mu.hat))
+    sigma.hatsq = sum( (Xt-Xt.hat)^2 )/N
+    BIC.obj = N*log(sigma.hatsq)+ 3*log(N) #6 always there
+  }else{
+    tau = tau[tau>1 & tau<N+1] #keep CPT locations only
+    tau.ext = c(1,tau,(N+1)) #include CPT boundary 1 and N+1
+
+    ## Split Xt to regimes/segments to
+    ## compute phi.hat and sigma.hat.sq
+    seg.len = diff(tau.ext) #length of each segments
+    ff = rep(0:m, times=seg.len) ##create factors for segmentation
+    Xseg = split(Xt, ff) ##Segmentation list
+    mu.seg = unlist(lapply(Xseg,mean), use.names=F)
+    mu.hat = rep(mu.seg, seg.len)
+    phi.hat = sum((Xt-mu.hat)[-N]*(Xt-mu.hat)[-1])/sum((Xt-mu.hat)[-1]^2)
+    Xt.hat = c(mu.hat[1], mu.hat[-1] + phi.hat*(Xt[-N]-mu.hat[-N]))
+    sigma.hatsq = sum( (Xt-Xt.hat)^2 )/N
+    BIC.obj = N*log(sigma.hatsq) + (2*m + 3)*log(N)
+  }
+  return(BIC.obj)
 }
