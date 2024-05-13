@@ -156,7 +156,8 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(Ts*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 TsPlotCheck(myts, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
