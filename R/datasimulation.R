@@ -3,26 +3,21 @@
 #' This is a function to simulate time series \eqn{Z_{t}, t=1,\ldots,T_{s}} from a class of models,
 #'  \deqn{Z_{t}=\mu_{t}+e_{t}.}
 #' \itemize{
-#'  \item{Time series observations are IID} \cr \eqn{\mu_{t}} is a constant and \eqn{e_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
-#'  \item{ARMA(p,q) model with constant mean} \cr \eqn{\mu_{t}} is a constant
-#'  and \eqn{e_{t}} follows an AR(1) process,
-#'  \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
-#' where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+#'  \item{Time series observations are IID} \cr \eqn{\mu_{t}} is a constant
+#'  and \eqn{e_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+#'  \item{ARMA(p,q) model with constant mean} \cr \eqn{\mu_{t}} is a constant,
+#'  and \eqn{e_{t}} follows an ARMA(p,q) process.
 #'  \item{ARMA(p,q) model with seasonality} \cr \eqn{\mu_{t}} is not a constant,
 #'  \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}),}
-#'  and \eqn{e_{t}} follows an AR(1) process,
-#'  \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
-#' where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
+#'  and \eqn{e_{t}} follows an ARMA(p,q) process.
 #'  \item{ARMA(p,q) model with seasonality and trend} \cr \eqn{\mu_{t}} is not a constant,
 #'  \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha t,}
-#'  and \eqn{e_{t}} follows an AR(1) process,
-#'  \deqn{e_{t} = \phi_{t-1}e_{t-1}+\epsilon_{t},}
-#' where \eqn{\epsilon_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
-#' }
+#'  and \eqn{e_{t}} follows an ARMA(p,q) process.
 #' The changepoint effects could be introduced through the \eqn{\mu_{t}} as
 #'  \deqn{\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},}
 #' where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}} are the changepoint locations and
 #' \eqn{\Delta_{1},\ldots,\Delta_{m}} are the changepoint parameter that need to be estimated.
+#' }
 #' @param beta A parameter vector contains other mean function parameters without changepoint parameters.
 #' @param XMat The covairates for time series mean function without changepoint indicators.
 #' @param sigma The standard deviation for time series residuals \eqn{\epsilon_{t}}.
@@ -51,7 +46,7 @@
 #' @useDynLib changepointGA
 #' @export
 #' @examples
-#' ##### M1: Stationary time series without autocorrelation
+#' ##### M1: Time series observations are IID
 #' Ts = 1000
 #' betaT = c(0.5) # intercept
 #' XMatT = matrix(1, nrow=Ts, ncol=1)
@@ -61,10 +56,11 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+#'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #' TsPlotCheck(myts, tau=CpLocT)
 #'
-#' ##### M2: Stationary time series with autocorrelation
+#' ##### M2: ARMA(2,1) model with constant mean
 #' Ts = 1000
 #' betaT = c(0.5) # intercept
 #' XMatT = matrix(1, nrow=Ts, ncol=1)
@@ -76,10 +72,11 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #' TsPlotCheck(myts, tau=CpLocT)
 #'
-#' ##### M3: Stationary with seasonality and autocorrelation
+#' ##### M3: ARMA(2,1) model with seasonality
 #' Ts = 1000
 #' betaT = c(0.5, -0.5, 0.3) # intercept, B, D
 #' period = 30
@@ -92,11 +89,12 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #' TsPlotCheck(myts, tau=CpLocT)
 #'
 #'
-#' ##### M4: Stationary with seasonality, trend, and autocorrelation
+#' ##### M4: ARMA(2,1) model with seasonality and trend
 #' # scaled trend if large number of sample size
 #' Ts = 1000
 #' betaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
@@ -110,7 +108,8 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #' TsPlotCheck(myts, tau=CpLocT)
 ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NULL, seed=NULL){
 

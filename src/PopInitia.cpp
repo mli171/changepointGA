@@ -72,6 +72,10 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
 //' to construct a population.
 //' @param popsize An integer represents the number of individual in each
 //' population for GA (or subpopulation for IslandGA).
+//' @param prange Default is \code{NULL} for only changepoint detection. If
+//' \code{prange} is specified as a list object, which contains the range of
+//' each model order parameters for order selection (integers). The number of
+//' order parameters must be equal to the length of \code{prange}.
 //' @param n The length of time series.
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
@@ -108,10 +112,13 @@ arma::mat random_population_cpp(int popsize, List prange, int n, int minDist, do
 //' chromosome representation with lower fitness function value.
 //' @param dad Among two selected individuals, \code{dad} represents the selected
 //' chromosome representation with larger fitness function value.
+//' @param prange Default is \code{NULL} for only changepoint detection. If
+//' \code{prange} is specified as a list object, which contains the range of
+//' each model order parameters for order selection (integers). The number of
+//' order parameters must be equal to the length of \code{prange}.
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param lmax The maximum possible length of the chromosome representation.
 //' @param n The length of time series.
-//' @param plen The length of the length varying model hyperparameter. i.e. order of AR model.
 //' @return The child chromosome that produced from \code{mom} and \code{dad} for
 //' next generation.
 //' @export

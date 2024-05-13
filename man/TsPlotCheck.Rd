@@ -18,16 +18,15 @@ This is a function to plot the simulated time series with segmentation visualiza
 by provided changepoint locations.
 }
 \examples{
-##### M1: Stationary time series without autocorrelation
 Ts = 1000
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
-DeltaT = c(2, -2)
-sigmaT = 1
-thetaT = c(0.5) # intercept
+betaT = c(0.5) # intercept
 XMatT = matrix(1, nrow=Ts, ncol=1)
 colnames(XMatT) = "intercept"
-myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+sigmaT = 1
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
 
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 TsPlotCheck(myts, tau=CpLocT)
 }

@@ -4,11 +4,16 @@
 \alias{random_population_cpp}
 \title{Random population generation}
 \usage{
-random_population_cpp(popsize, n, minDist, Pb, mmax, lmax)
+random_population_cpp(popsize, prange, n, minDist, Pb, mmax, lmax)
 }
 \arguments{
 \item{popsize}{An integer represents the number of individual in each
 population for GA (or subpopulation for IslandGA).}
+
+\item{prange}{Default is \code{NULL} for only changepoint detection. If
+\code{prange} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{prange}.}
 
 \item{n}{The length of time series.}
 

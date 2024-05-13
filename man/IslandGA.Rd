@@ -4,7 +4,7 @@
 \alias{IslandGA}
 \title{Island model based genetic algorithm}
 \usage{
-IslandGA(ObjFunc, n, IslandGA_param, IslandGA_operators, ...)
+IslandGA(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range = NULL, ...)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
@@ -20,6 +20,11 @@ See \code{\link{IslandGA_param}} for the details.}
 new individual selection, and genetic operator of crossover and mutation.
 See \code{\link{IslandGA_operators}} for the details.}
 
+\item{p.range}{Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.}
+
 \item{...}{additional arguments that will be passed to the fitness function.}
 }
 \value{
@@ -29,13 +34,12 @@ the final iteration.}
 \item{bestchrom}{The locations of the detected changepoints associating
 with the \code{bestfit} the after the final iteration.}
 \item{countMig}{The number of migrations undertaken by the IslandGA.}
-\item{convg}{An integer code indicate convergence.
+\item{convg}{An integer code indicate convergence.}
 \itemize{
  \item{0} indicates the algorithm successful completion.
  \item{1} indicates the the total number of migrations exceeds the
  pre-specified \item{\code{maxMig}} limit.
  }
-}
 }
 \description{
 Perform the modified island-based genetic algorithm (IslandGA) for multiple changepoint detection.
@@ -43,43 +47,46 @@ Minimization of an objective function using genetic algorithm (GA).
 The algorithm can be run sequentially or in explicit parallelisation.
 }
 \examples{
-library(changepointGA)
-
 Ts = 1000
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
-DeltaT = c(2, -2)
-sigmaT = 1
-thetaT = c(0.5) # intercept
+betaT = c(0.5) # intercept
 XMatT = matrix(1, nrow=Ts, ncol=1)
 colnames(XMatT) = "intercept"
-myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+sigmaT = 1
+phiT = c(0.5, -0.5)
+thetaT = c(0.8)
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
+              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(myts, tau=CpLocT)
 
 IslandGA_param = list(
   popsize      = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 0.06,
+  Pchangepoint = 10/Ts,
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 100,
+  option       = "cp",
   monitoring   = FALSE,
-  parallel     = FALSE, ###
+  parallel     = FALSE,
   nCore        = NULL,
   tol          = 1e-5,
   seed         = NULL
 )
-
 IslandGA_operators = list(population = "random_population_cpp",
                           selection  = "selection_linearrank_cpp",
                           crossover  = "offspring_uniformcrossover_cpp",
                           mutation   = "mutation")
 
 IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
-IslandGA.res$bestfit
-IslandGA.res$bestchrom
+# IslandGA.res$bestfit
+# IslandGA.res$bestchrom
 }

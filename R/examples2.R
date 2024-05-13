@@ -10,9 +10,12 @@
 #' @param plen Since we want to perform the model order selection and the changepoint
 #' detection task, \code{plen} is nonzero and is set as the number of model
 #' order parameter, which is 2.
+#' @param XMat A matrix contains the covariates (not includes changepoint effects)
+#' for time series regression.
 #' @param Xt The simulated ARMA(2,1) time series from \code{ts.sim} function.
 #' @return Returned the value of the obejctive function (i.e. BIC).
 #' @import stats
+#' @importFrom utils tail
 #' @useDynLib changepointGA
 #' @export
 #' @examples
@@ -27,7 +30,8 @@
 #' Cp.prop = c(1/4, 3/4)
 #' CpLocT = floor(Ts*Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
+#'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #'
 #' # candidate changepoint configuration
 #' chromosome = c(2, 2, 1, 250, 750, 1001)
@@ -52,8 +56,8 @@ ARIMASearch.BIC = function(chromosome, plen=2, XMat, Xt){
     fit = arima(Xt, order = c(p[1],0,p[2]), xreg=DesignX, include.mean=F)
   }else{
     tau = tau[tau>1 & tau<N+1] #keep CPT locations only
-    tmptau = unique(c(tau, Ts+1))
-    CpMat = matrix(0, nrow=Ts, ncol=length(tmptau)-1)
+    tmptau = unique(c(tau, N+1))
+    CpMat = matrix(0, nrow=N, ncol=length(tmptau)-1)
     for(i in 1:NCOL(CpMat)){CpMat[tmptau[i]:(tmptau[i+1]-1),i] = 1}
     DesignX = cbind(XMat, CpMat)
     fit = arima(Xt, order=c(p[1],0,p[2]), xreg=DesignX, include.mean=F)

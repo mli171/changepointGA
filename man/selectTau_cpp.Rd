@@ -4,10 +4,13 @@
 \alias{selectTau_cpp}
 \title{Randomly select the chromosome}
 \usage{
-selectTau_cpp(n, minDist, Pb, mmax, lmax)
+selectTau_cpp(n, prange, minDist, Pb, mmax, lmax)
 }
 \arguments{
 \item{n}{The length of time series.}
+
+\item{prange}{A list object containing the possible range for other
+pre-defined model parameters, i.e. AR/MA order of ARMA models.}
 
 \item{minDist}{The minimum length between two adjacent changepoints.}
 

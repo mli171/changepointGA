@@ -4,12 +4,17 @@
 \alias{GA}
 \title{Genetic algorithm}
 \usage{
-GA(ObjFunc, n, GA_param, ga_operators, ...)
+GA(ObjFunc, n, GA_param, ga_operators, p.range = NULL, ...)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
 functions as the fitness function with setting input as potential solution to
-the optimization problem and returning a numerical value as the output/fitness.}
+the optimization problem and returning a numerical value as the output/fitness.
+Depends on the user-specified chromosome representation, the optimization task
+will be changepoint detection only or changepoint detection + model order selection,
+which can be specified via \code{option} in \code{\link{GA_param}}. Once
+\code{option="both"}, the list \code{p.range} must be specified to give the range
+of model orders.}
 
 \item{n}{The sample size of the time series.}
 
@@ -19,6 +24,11 @@ See \code{\link{GA_param}} for the details.}
 \item{ga_operators}{A list includes the functions for population initialization,
 new individual selection, and genetic operator of crossover and mutation.
 See \code{\link{ga_operators}} for the details.}
+
+\item{p.range}{Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.}
 
 \item{...}{additional arguments that will be passed to the fitness function.}
 }
@@ -45,44 +55,44 @@ Minimization of an objective function using genetic algorithm (GA).
 The algorithm can be run sequentially or in explicit parallelisation.
 }
 \examples{
-library(changepointGA)
-
 Ts = 1000
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
-DeltaT = c(2, -2)
-
-sigmaT = 1
-
-thetaT = c(0.5) # intercept
-
+betaT = c(0.5) # intercept
 XMatT = matrix(1, nrow=Ts, ncol=1)
 colnames(XMatT) = "intercept"
-myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
+sigmaT = 1
+phiT = c(0.5, -0.5)
+thetaT = c(0.8)
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
+              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(myts, tau=CpLocT)
 
 GA_param = list(
   popsize      = 200,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 0.06,
+  Pchangepoint = 10/Ts,
   minDist      = 2,
   mmax         = Ts/2 - 1,
   lmax         = 2 + Ts/2 - 1,
-  maxgen       = 10000,
-  maxconv      = 10000,
+  maxgen       = 100000,
+  maxconv      = 1000,
+  option       = "cp",
   monitoring   = FALSE,
   parallel     = FALSE,
   nCore        = NULL,
   tol          = 1e-5,
   seed         = NULL
 )
-
 ga_operators = list(population = "random_population_cpp",
                     selection  = "selection_linearrank_cpp",
                     crossover  = "offspring_uniformcrossover_cpp",
                     mutation   = "mutation")
 
 GA.res = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
-GA.res$overbestfit
-GA.res$overbestchrom
+# GA.res$overbestfit
+# GA.res$overbestchrom
 }

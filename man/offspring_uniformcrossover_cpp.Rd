@@ -4,7 +4,7 @@
 \alias{offspring_uniformcrossover_cpp}
 \title{Uniform crossover to produce offsprings}
 \usage{
-offspring_uniformcrossover_cpp(mom, dad, minDist, lmax, n)
+offspring_uniformcrossover_cpp(mom, dad, prange, minDist, lmax, n)
 }
 \arguments{
 \item{mom}{Among two selected individuals, \code{mom} represents the selected
@@ -12,6 +12,11 @@ chromosome representation with lower fitness function value.}
 
 \item{dad}{Among two selected individuals, \code{dad} represents the selected
 chromosome representation with larger fitness function value.}
+
+\item{prange}{Default is \code{NULL} for only changepoint detection. If
+\code{prange} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{prange}.}
 
 \item{minDist}{The minimum length between two adjacent changepoints.}
 
