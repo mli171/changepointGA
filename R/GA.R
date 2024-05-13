@@ -6,13 +6,21 @@
 #' @param ObjFunc The fitness function to be minimized. Users can specify any R or Rcpp
 #' functions as the fitness function with setting input as potential solution to
 #' the optimization problem and returning a numerical value as the output/fitness.
-#'
+#' Depends on the user-specified chromosome representation, the optimization task
+#' will be changepoint detection only or changepoint detection + model order selection,
+#' which can be specified via \code{option} in \code{\link{GA_param}}. Once
+#' \code{option="both"}, the list \code{p.range} must be specified to give the range
+#' of model orders.
 #' @param n The sample size of the time series.
 #' @param GA_param A list contains the hyper-parameters for genetic algorithm.
 #' See \code{\link{GA_param}} for the details.
 #' @param ga_operators A list includes the functions for population initialization,
 #' new individual selection, and genetic operator of crossover and mutation.
 #' See \code{\link{ga_operators}} for the details.
+#' @param p.range Default is \code{NULL} for only changepoint detection. If
+#' \code{p.range} is specified as a list object, which contains the range of
+#' each model order parameters for order selection (integers). The number of
+#' order parameters must be equal to the length of \code{p.range}.
 #' @param ... additional arguments that will be passed to the fitness function.
 #' @return Returns a list that has components:
 #' \item{overbestfit}{The obtained minimum value of the objective function after
@@ -64,6 +72,7 @@
 #'   lmax         = 2 + Ts/2 - 1,
 #'   maxgen       = 10000,
 #'   maxconv      = 10000,
+#'   option       = "cp",
 #'   monitoring   = FALSE,
 #'   parallel     = FALSE,
 #'   nCore        = NULL,
@@ -79,11 +88,12 @@
 #' GA.res = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
 #' GA.res$overbestfit
 #' GA.res$overbestchrom
-GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
+GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
 
   call = match.call()
 
   i = NULL # add for global variables declare
+  plen = length(p.range)
 
   popsize      = GA_param$popsize
   Pcrossover   = GA_param$Pcrossover
@@ -94,6 +104,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
   lmax         = GA_param$lmax
   maxgen       = GA_param$maxgen
   maxconv      = GA_param$maxconv
+  option       = GA_param$option
   monitoring   = GA_param$monitoring
   parallel     = GA_param$parallel
   nCore        = GA_param$nCore
@@ -114,6 +125,10 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
   { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
   { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
+  if(option == "both" & plen == 0)
+  { stop("Opt for changepoint and order search, p.range must be provided.") }
+  if(option == "cp" & plen != 0)
+  { stop("Opt for changepoint search, p.range must be NULL.") }
 
   # set seed for reproducibility
   if(!is.null(seed)) set.seed(seed)
@@ -130,7 +145,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
   }else{
     if(!is.function(ga_operators$population)) population = get(ga_operators$population)
     # generate by function
-    pop = population(popsize, n, minDist, Pchangepoint, mmax, lmax)
+    pop = population(popsize, p.range, n, minDist, Pchangepoint, mmax, lmax)
   }
 
   ## evaluate the fitness (Parallel or NOT)
@@ -140,14 +155,14 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
     registerDoMC(cores = nCore)
     popFit = foreach(i=1:popsize, .combine = "c") %dopar%
       (
-        do.call(ObjFunc, c(list(pop[2:(2+pop[1,i]),i], pop[1,i], ...)))
+        do.call(ObjFunc, c(list(pop[1:(pop[1,i]+plen+2),i], plen, ...)))
       )
   }else{
     popFit = rep(NA, popsize)
     for(j in 1:popsize){
-      m = pop[1,j]
-      tau = pop[2:(2+m),j]
-      popFit[j] = do.call(ObjFunc, c(list(tau, m, ...)) )
+      popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, ...)))
+      # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, Xt)))
+      # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, XMat, Xt)))
     }
   }
 
@@ -167,7 +182,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
     ##### step 3: crossover
     a1 = runif(1)
     if(a1 <= Pcrossover){
-      child = crossover(mom, dad, minDist, lmax, n)
+      child = crossover(mom, dad, p.range, minDist, lmax, n)
     }else{
       child = dad
       flag[1] = 1
@@ -176,7 +191,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
     ##### step 4: mutation
     a2 = runif(1)
     if(a2 <= Pmutation){
-      child = mutation(minDist, Pchangepoint, lmax, mmax, n)
+      child = mutation(child, p.range, minDist, Pchangepoint, lmax, mmax, n)
     }else{
       flag[2] = 1
     }
@@ -188,10 +203,8 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
 
     if (flagsum<2){
       # flagsum < 2 indicating new individual produced and fitness evaluation needed
-      mChild = child[1]
-      tauChild = child[2:(2+mChild)]
-
-      fitChild = do.call(ObjFunc, c(list(tauChild, mChild, ...)) )
+      fitChild = do.call(ObjFunc, c(list(child[1:(child[1,]+plen+2),], plen, ...)))
+      # fitChild = do.call(ObjFunc, c(list(child[1:(child[1,]+plen+2),], plen, XMat, Xt)))
       leastfit = max(popFit) # with largest fitness value
 
       if (fitChild < leastfit) {
@@ -219,7 +232,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
       if (decision==1){
         overbestfit = bestfit[count]
         overbestchrom = bestchrom[,count]
-        overbestchrom = overbestchrom[1:(overbestchrom[1]+2)]
+        overbestchrom = overbestchrom[1:(overbestchrom[1]+plen+2)]
         if(monitoring){
           cat("\n==== No.", count, "Generation ====")
           cat("\n overall bestfit =", overbestfit)
@@ -236,7 +249,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, ... ){
 
     overbestfit = bestfit[count]
     overbestchrom = bestchrom[,count]
-    overbestchrom = overbestchrom[1:(overbestchrom[1]+2)]
+    overbestchrom = overbestchrom[1:(overbestchrom[1]+plen+2)]
     if(monitoring){
       cat("\n==== No.", count, "Generation ====")
       cat("\n overall bestfit =", overbestfit)

@@ -19,6 +19,7 @@ A list object contains the hyperparameters for island-based GA running.
   \item{maxMig}{The maximum number of migrations. After \code{maxMig} migrations, the island-based GA algorithm stops.}
   \item{maxgen}{The maximum number of generations that each subpopulation (island) has. The migration will apply after \code{maxgen} generations for each subpopulation(island).}
   \item{maxconv}{If the overall best fitted value doesn't change after  \code{maxconv} consecutive migrations, the island-based GA algorithm stops.}
+  \item{option}{A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.}
   \item{monitoring}{A binary interger 0 or 1, indicating whether print out middle results for each iterations of GA.}
   \item{parallel}{Whether use multiple threads to parallel compute the individual fittness function values.}
   \item{nCore}{An integer represents the number of cores used in parallel computing.}

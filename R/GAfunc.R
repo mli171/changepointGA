@@ -318,9 +318,10 @@ offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
 }
 
 #--------------------------
-mutation = function(minDist, Pb, lmax, mmax, n){
+mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
   # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
   # some inputs ++++++++++++++++++
+  #   prange= The range of the model order
   #   minDist= minimum distances between two adjacent changepoints
   #   Pb= prob of changepoints for every time series
   #   lmax= max length of chromosome
@@ -329,12 +330,36 @@ mutation = function(minDist, Pb, lmax, mmax, n){
   # outputs ++++++++++++++++++
   #   childMut  = the chromosome representation produced from mutation
 
-  childMut = selectTau_cpp(n, minDist, Pb, mmax, lmax)
+  plen = length(p.range)
+
+  a = runif(1)
+  if(a > 0.5){
+    # order from child (p.range=NULL)
+    tmpchildMut = selectTau_cpp(n=n, prange=NULL, minDist=minDist, Pb=Pb,
+                             mmax=mmax, lmax=lmax)
+    if(plen>0){
+      childMut = matrix(0, nrow=lmax, 1)
+      childMut[1,] = tmpchildMut[1]
+      childMut[2:(plen+1),] = child[2:(plen+1)]
+      childMut[(plen+2):(plen+tmpchildMut[1]+2),] = tmpchildMut[2:(tmpchildMut[1]+2)]
+    }else{
+      childMut = tmpchildMut
+    }
+  }else{
+    # order from new generation
+    if(plen>0){
+      childMut = selectTau_cpp(n=n, prange=p.range, minDist=minDist, Pb=Pb,
+                               mmax=mmax, lmax=lmax)
+    }else{
+      childMut = selectTau_cpp(n=n, prange=NULL, minDist=minDist, Pb=Pb,
+                               mmax=mmax, lmax=lmax)
+    }
+  }
 
   return(childMut)
 }
 
-NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, ...){
+NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, p.range, ...){
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -357,6 +382,8 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
   #   bestfit  = currnt minimum of fitness values
   #   bestchrom = chromosome representation of the individual associated with bestfit
 
+  plen = length(p.range)
+
   count = 1
   repeat{
     # indicator for c("crossover", "mutation")
@@ -371,7 +398,7 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
     ##### step 3: crossover
     a1 = runif(1)
     if(a1 <= Pc){
-      child = offspring(mom, dad, minDist, lmax, n)
+      child = crossover(mom, dad, p.range, minDist, lmax, n)
     }else{
       child = dad
       flag[1] = 1
@@ -380,7 +407,7 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
     ## step 4-2: mutation
     a2 = runif(1)
     if(a2 <= Pm){
-      child = mutation(minDist, Pb, lmax, mmax, n)
+      child = mutation(child, p.range, minDist, Pb, lmax, mmax, n)
     }else{
       flag[2] = 1
     }
@@ -391,10 +418,8 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
     flagsum = flag[1] + flag[2]
     if (flagsum<2){
       # flagsum < 2 indicating new individual produced and fitness evaluation needed
-      mChild = child[1]
-      tauChild = child[2:(2+mChild)]
-      fitChild = do.call(ObjFunc, c(list(tauChild, mChild, ...)) )
-      # fitChild = BinSearch.BIC(tauChild, mChild, Xt)
+      fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, ...)))
+      # fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, XMat, Xt)))
       leastfit = max(fit) # with largest fitness value
 
       if (fitChild < leastfit) {
@@ -411,61 +436,4 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
   }
 
   return(rbind(fit, pop))
-}
-
-#' The example objective function for changepoint search in First order Gaussian
-#' autoregressions (AR(1)) via Bayesian Information Criterion (BIC)
-#'
-#' This is a function to calculate
-#' @param tau The provided changepoint locations (Only locations are included).
-#' @param m The provided number of changepoint locations.
-#' @param Xt The simulated AR(1) time series from \code{ts.sim} function.
-#' @return Returned the value of the obejctive function (i.e. BIC).
-#' @import stats
-#' @useDynLib changepointGA
-#' @export
-#' @examples
-#' library(changepointGA)
-#'
-#' Ts = 1000
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
-#' DeltaT = c(2, -2)
-#' sigmaT = 1
-#' thetaT = c(0.5) # intercept
-#' XMatT = matrix(1, nrow=Ts, ncol=1)
-#' colnames(XMatT) = "intercept"
-#' myts = ts.sim(theta=thetaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT)
-#'
-#'# candidate changepoint configuration
-#' tautest = c(250, 500, 750)
-#' BinSearch.BIC(tau=tautest, m=3, Xt=myts)
-BinSearch.BIC = function(tau, m, Xt){
-
-  N = length(Xt) #length of the series
-
-  if(m == 0){
-    ##Case 1, Zero Changepoint
-    mu.hat = mean(Xt)
-    phi.hat = sum((Xt-mu.hat)[-N]*(Xt-mu.hat)[-1])/sum((Xt-mu.hat)[-1]^2)
-    Xt.hat = c(mu.hat, mu.hat + phi.hat*(Xt[-N]-mu.hat))
-    sigma.hatsq = sum( (Xt-Xt.hat)^2 )/N
-    BIC.obj = N*log(sigma.hatsq)+ 3*log(N) #6 always there
-  }else{
-    tau = tau[tau>1 & tau<N+1] #keep CPT locations only
-    tau.ext = c(1,tau,(N+1)) #include CPT boundary 1 and N+1
-
-    ## Split Xt to regimes/segments to
-    ## compute phi.hat and sigma.hat.sq
-    seg.len = diff(tau.ext) #length of each segments
-    ff = rep(0:m, times=seg.len) ##create factors for segmentation
-    Xseg = split(Xt, ff) ##Segmentation list
-    mu.seg = unlist(lapply(Xseg,mean), use.names=F)
-    mu.hat = rep(mu.seg, seg.len)
-    phi.hat = sum((Xt-mu.hat)[-N]*(Xt-mu.hat)[-1])/sum((Xt-mu.hat)[-1]^2)
-    Xt.hat = c(mu.hat[1], mu.hat[-1] + phi.hat*(Xt[-N]-mu.hat[-N]))
-    sigma.hatsq = sum( (Xt-Xt.hat)^2 )/N
-    BIC.obj = N*log(sigma.hatsq) + (2*m + 3)*log(N)
-  }
-  return(BIC.obj)
 }

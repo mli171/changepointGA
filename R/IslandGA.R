@@ -13,6 +13,10 @@
 #' @param IslandGA_operators A list includes the functions for population initialization,
 #' new individual selection, and genetic operator of crossover and mutation.
 #' See \code{\link{IslandGA_operators}} for the details.
+#' @param p.range Default is \code{NULL} for only changepoint detection. If
+#' \code{p.range} is specified as a list object, which contains the range of
+#' each model order parameters for order selection (integers). The number of
+#' order parameters must be equal to the length of \code{p.range}.
 #' @param ... additional arguments that will be passed to the fitness function.
 #' @return Returns a list that has the following components.
 #' \item{bestfit}{The obtained minimum value of the objective function after
@@ -20,7 +24,7 @@
 #' \item{bestchrom}{The locations of the detected changepoints associating
 #' with the \code{bestfit} the after the final iteration.}
 #' \item{countMig}{The number of migrations undertaken by the IslandGA.}
-#' \item{convg}{An integer code indicate convergence.
+#' \item{convg}{An integer code indicate convergence.}
 #' \itemize{
 #'  \item{0} indicates the algorithm successful completion.
 #'  \item{1} indicates the the total number of migrations exceeds the
@@ -60,6 +64,7 @@
 #'   maxMig       = 500,
 #'   maxgen       = 100,
 #'   maxconv      = 100,
+#'   option       = "cp",
 #'   monitoring   = FALSE,
 #'   parallel     = FALSE, ###
 #'   nCore        = NULL,
@@ -76,9 +81,10 @@
 #' IslandGA.res$bestfit
 #' IslandGA.res$bestchrom
 #-------------------------- Genetic Algorithm Main Function is to minimize
-IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
+IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL, ... ){
 
   call = match.call()
+  plen = length(p.range)
 
   popsize      = IslandGA_param$popsize
   Islandsize   = IslandGA_param$Islandsize
@@ -91,6 +97,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
   maxMig       = IslandGA_param$maxMig
   maxgen       = IslandGA_param$maxgen
   maxconv      = IslandGA_param$maxconv
+  option       = IslandGA_param$option
   monitoring   = IslandGA_param$monitoring
   parallel     = IslandGA_param$parallel
   nCore        = IslandGA_param$nCore
@@ -111,6 +118,10 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
   { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
   { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
+  if(option == "both" & plen == 0)
+  { stop("Opt for changepoint and order search, p.range must be provided.") }
+  if(option == "cp" & plen != 0)
+  { stop("Opt for changepoint search, p.range must be NULL.") }
 
   # set seed for reproducibility
   if(!is.null(seed)) set.seed(seed)
@@ -132,7 +143,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
     # generate by function
     Island = array(0, dim=c(lmax, popsize, Islandsize))
     for(k in 1:Islandsize){
-      Island[,,k] = population(popsize, n, minDist, Pchangepoint, mmax, lmax)
+      Island[,,k] = population(popsize, p.range, n, minDist, Pchangepoint, mmax, lmax)
     }
   }
 
@@ -143,14 +154,14 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
     registerDoMC(cores = nCore)
     IslandFit = foreach(k=1:Islandsize, .combine = "cbind") %dopar%
       (
-        apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[2:(x[1]+2)], x[1], ...))))
-        # apply(Island[,,k], 2, function(x) BinSearch.BIC(x[2:(x[1]+2)], x[1], Xt))
+        apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, ...))))
+        # apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, XMat, Xt))))
       )
   }else{
     IslandFit = matrix(0, nrow=popsize, ncol=Islandsize)
     for(k in 1:Islandsize){
-      IslandFit[,k] = apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[2:(x[1]+2)], x[1], ...))))
-      # IslandFit[,k] = apply(Island[,,k], 2, function(x) BinSearch.BIC(x[2:(x[1]+2)], x[1], Xt))
+      IslandFit[,k] = apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, ...))))
+      # IslandFit[,k] = apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, XMat, Xt))))
     }
   }
 
@@ -161,12 +172,18 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
     # step 2,3,4,5: select parents, crossover, mutation, new pop
     if(parallel){
       resNewpop = foreach(k=1:Islandsize) %dopar% (
+        # NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
+        #                     crossover=crossover, mutation=mutation,
+        #                     pop=Island[,,k], fit=IslandFit[,k],
+        #                     popsize, minDist, lmax, mmax,
+        #                     Pcrossover, Pmutation, Pchangepoint,
+        #                     maxgen, n, p.range, XMat, Xt)
         NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                             crossover=crossover, mutation=mutation,
                             pop=Island[,,k], fit=IslandFit[,k],
                             popsize, minDist, lmax, mmax,
                             Pcrossover, Pmutation, Pchangepoint,
-                            maxgen, n, ...)
+                            maxgen, n, p.range, ...)
       )
       for(k in 1:Islandsize){
         tmpfit = resNewpop[[k]][1,]
@@ -178,12 +195,18 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
       }
     }else{
       for(k in 1:Islandsize){
+        # resNewpop = NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
+        #                                 crossover=crossover, mutation=mutation,
+        #                                 pop=Island[,,k], fit=IslandFit[,k],
+        #                                 popsize, minDist, lmax, mmax,
+        #                                 Pc=Pcrossover, Pm=Pmutation, Pb=Pchangepoint,
+        #                                 maxgen, n, p.range, XMat, Xt)
         resNewpop = NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                                         crossover=crossover, mutation=mutation,
                                         pop=Island[,,k], fit=IslandFit[,k],
                                         popsize, minDist, lmax, mmax,
                                         Pcrossover, Pmutation, Pchangepoint,
-                                        maxgen, n, ...)
+                                        maxgen, n, p.range, ...)
         tmpfit = resNewpop[1,]
         tmppop = resNewpop[-1,]
         # update bestfit in each island
@@ -228,7 +251,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
       if (decision==1){
         bestfit = overbest[countMig]
         bestchrom = overbestChrom[,countMig]
-        bestchrom = bestchrom[1:(bestchrom[1]+2)]
+        bestchrom = bestchrom[1:(bestchrom[1]+plen+2)]
         convg = 0
 
         break
@@ -239,7 +262,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
     if(countMig >= maxMig){
       bestfit = overbest[countMig]
       bestchrom = overbestChrom[,countMig]
-      bestchrom = bestchrom[1:(bestchrom[1]+2)]
+      bestchrom = bestchrom[1:(bestchrom[1]+plen+2)]
       convg = 1
 
       break
@@ -248,7 +271,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, ... ){
     if(monitoring){
       bestfit = overbest[countMig]
       bestchrom = overbestChrom[,countMig]
-      bestchrom = bestchrom[1:(bestchrom[1]+2)]
+      bestchrom = bestchrom[1:(bestchrom[1]+plen+2)]
       cat("\n==== No.", countMig, "Migration ====")
       cat("\n countMig =", countMig)
       cat("\n bestfit =", bestfit)

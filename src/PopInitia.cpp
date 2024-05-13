@@ -5,7 +5,7 @@
 using namespace Rcpp;
 using namespace arma;
 
-int m, i, j, id, jp;
+int m, i, j, k, id, jp;
 int popsize, islandSize;
 int lmax;
 
@@ -13,7 +13,7 @@ int lmax;
 IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 {
   IntegerVector rank = match(x, clone(x).sort());
-  if(decreasing) rank = rank.length()+ 1 - rank;
+  if(decreasing) rank = rank.length() + 1 - rank;
   return rank;
 }
 
@@ -25,6 +25,8 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' and the last non-zero element always equal to the length of time series + 1.
 //'
 //' @param n The length of time series.
+//' @param prange A list object containing the possible range for other
+//' pre-defined model parameters, i.e. AR/MA order of ARMA models.
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
 //' @param mmax The maximum possible number of changepoints in the data set.
@@ -32,25 +34,35 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' @return A single changepoint configuration format as above.
 //' @export
 // [[Rcpp::export]]
-arma::vec selectTau_cpp(int n, int minDist, double Pb, int mmax, int lmax){
+arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, int lmax){
 
   m = 0;
   double a;
+  int plen = prange.length();
   arma::vec tau(lmax, fill::zeros);
-  i = 1 + minDist;
 
+  if(plen > 0){
+    double Pp=1/plen;
+    for(k=0; k<plen; k++){
+      arma::vec tmp = prange[k];
+      tau(k+1) = randi(distr_param(tmp[0],tmp[1]));
+    }
+  }
+
+  i = 1 + minDist;
   while(i < n - minDist){
     a = runif(1)[0];
     if(a <= Pb){
       m = m + 1;
-      tau(m) = i;
+      tau(plen+m) = i;
       i = i + minDist;
     }else{
       i = i+1;
     }
   }
+
   tau(0) = m;
-  tau(m+1) = n+1;
+  tau(plen+m+1) = n+1;
   return(tau);
 }
 
@@ -71,12 +83,12 @@ arma::vec selectTau_cpp(int n, int minDist, double Pb, int mmax, int lmax){
 //' to the length of time series + 1.
 //' @export
 // [[Rcpp::export]]
-arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int mmax, int lmax){
+arma::mat random_population_cpp(int popsize, List prange, int n, int minDist, double Pb, int mmax, int lmax){
 
   arma::mat pop(lmax, popsize, fill::zeros);
 
   for(j=0;j<popsize;j++){
-    pop.col(j) = selectTau_cpp(n, minDist, Pb, mmax, lmax);
+    pop.col(j) = selectTau_cpp(n, prange, minDist, Pb, mmax, lmax);
   }
 
   return(pop);
@@ -99,73 +111,86 @@ arma::mat random_population_cpp(int popsize, int n, int minDist, double Pb, int 
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param lmax The maximum possible length of the chromosome representation.
 //' @param n The length of time series.
+//' @param plen The length of the length varying model hyperparameter. i.e. order of AR model.
 //' @return The child chromosome that produced from \code{mom} and \code{dad} for
 //' next generation.
 //' @export
 // [[Rcpp::export]]
-arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, int minDist, int lmax, int n){
+arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int n){
 
   // Rcout << "mom:" << mom << std::endl;
   // Rcout << "dad:" << dad << std::endl;
 
+  int plen = prange.length();
+
   arma::vec child(lmax, fill::zeros);
+
+  // 2). obtain order from dad or mom with equal probability
+  if(plen > 0){
+    double ap = runif(1)[0];
+    if(ap > 0.5){
+      child.subvec(1,plen) = dad.subvec(1,plen);
+    }else{
+      child.subvec(1,plen) = mom.subvec(1,plen);
+    }
+  }
 
   int child_mmax = dad(0) + mom(0);
   if(child_mmax == 0){
-      // no changepoint for both mom and dad
-      child(0) = 0;
-      child(1) = n+1;
-    }else{
-      double a;
-      // 1). combine dad's and mom's changepoints
-      int mom_m = mom(0);
-      int dad_m = dad(0);
-      arma::vec parents(child_mmax, fill::zeros);
-      if(mom_m > 0){
-        parents.subvec(0,mom_m-1) = mom.subvec(1,mom_m);
-      }
-      if(dad_m >0){
-        parents.subvec(mom_m,child_mmax-1) = dad.subvec(1,dad_m);
-      }
-
-      // 2). remove same changepoints and sort
-      parents = sort(unique(parents));
-      int parents_count = parents.size();
-
-      // 3). select subset from parents
-      int child_m = 0;
-      int tmpm = 1;
-      int tmptau = parents(0);
-      int temp;
-      do{
-        a = runif(1)[0];
-        if(a > 0.5){
-          child_m = child_m + 1;
-          child(child_m) = tmptau;
-          tmptau = tmptau + 2*minDist;
-          if(tmptau >= n-minDist){break;} // boundary changepoints limits
-        }
-
-        if(tmpm >= parents_count-1){break;} // if the number of changepoints of child is larger than parents, break
-
-        temp = parents(tmpm);
-
-        if(tmptau < temp){
-          tmptau = temp;
-        }else{
-          tmpm = tmpm + 1;
-          if(tmpm >= child_mmax){break;}
-          tmptau = parents(tmpm);
-        }
-
-        tmpm = tmpm + 1;
-        if(tmptau >= n-minDist){break;}
-      }
-      while(1<2);
-
-      child(0) = child_m;
-      child(child_m+1) = n+1;
+    // no changepoint for both mom and dad
+    child(0) = 0;
+    child(1+plen) = n+1;
+  }else{
+    // 3). combine dad's and mom's changepoints
+    int mom_m = mom(0);
+    int dad_m = dad(0);
+    arma::vec parents(child_mmax, fill::zeros);
+    if(mom_m > 0){
+      parents.subvec(0,mom_m-1) = mom.subvec(plen+1,plen+mom_m);
     }
+    if(dad_m >0){
+      parents.subvec(mom_m,child_mmax-1) = dad.subvec(plen+1,plen+dad_m);
+    }
+
+    // 2). remove same changepoints and sort
+    parents = sort(unique(parents));
+    int parents_count = parents.size();
+
+    // 3). select subset from parents
+    double a;
+    int child_m = 0;
+    int tmpm = 1;
+    int tmptau = parents(0);
+    int temp;
+    do{
+      a = runif(1)[0];
+      if(a > 0.5){
+        child_m = child_m + 1;
+        child(plen+child_m) = tmptau;
+        tmptau = tmptau + 2*minDist;
+        if(tmptau >= n-minDist){break;} // boundary changepoints limits
+      }
+
+      if(tmpm >= parents_count-1){break;} // if the number of changepoints of child is larger than parents, break
+
+      temp = parents(tmpm);
+
+      if(tmptau < temp){
+        tmptau = temp;
+      }else{
+        tmpm = tmpm + 1;
+        if(tmpm >= child_mmax){break;}
+        tmptau = parents(tmpm);
+      }
+
+      tmpm = tmpm + 1;
+      if(tmptau >= n-minDist){break;}
+    }
+    while(1<2);
+
+    child(0) = child_m;
+    child(plen+child_m+1) = n+1;
+  }
 
   return(child);
 }
