@@ -49,7 +49,7 @@ ga_operators = list(population = "random_population_cpp",
                     mutation   = "mutation")
 
 tim1 = Sys.time()
-tmp1 = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
+tmp1 = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
 tim2 = Sys.time()
 ```
 
@@ -98,7 +98,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           mutation   = "mutation")
 
 tim3 = Sys.time()
-tmp2 = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+tmp2 = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 tim4 = Sys.time()
 
 
@@ -128,7 +128,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           mutation   = "mutation")
 
 tim5 = Sys.time()
-tmp3 = IslandGA(BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+tmp3 = IslandGA(BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 tim6 = Sys.time()
 
 tim4 - tim3
@@ -187,7 +187,7 @@ ga_operators = list(population = "random_population_cpp",
                     mutation   = "mutation")
 
 tim1 = Sys.time()
-tmp1 = GA(ObjFunc=ARIMASearch.BIC, n=Ts, GA_param, ga_operators,
+tmp1 = GA(ObjFunc=ARIMASearch.BIC, N=Ts, GA_param, ga_operators,
           p.range=p.range, XMat=XMatT, Xt=myts)
 tim2 = Sys.time()
 
@@ -241,7 +241,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           mutation   = "mutation")
 
 tim3 = Sys.time()
-tmp2 = IslandGA(ObjFunc=ARIMASearch.BIC, n=Ts, IslandGA_param, IslandGA_operators,
+tmp2 = IslandGA(ObjFunc=ARIMASearch.BIC, N=Ts, IslandGA_param, IslandGA_operators,
                 p.range=p.range, XMat=XMatT, Xt=myts)
 tim4 = Sys.time()
 
@@ -271,7 +271,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           mutation   = "mutation")
                           
 tim5 = Sys.time()
-tmp3 = IslandGA(ObjFunc=ARIMASearch.BIC, n=Ts, IslandGA_param, IslandGA_operators,
+tmp3 = IslandGA(ObjFunc=ARIMASearch.BIC, N=Ts, IslandGA_param, IslandGA_operators,
                 p.range=p.range, XMat=XMatT, Xt=myts)
 tim6 = Sys.time()
 
