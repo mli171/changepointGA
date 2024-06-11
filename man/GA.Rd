@@ -4,7 +4,7 @@
 \alias{GA}
 \title{Genetic algorithm}
 \usage{
-GA(ObjFunc, n, GA_param, ga_operators, p.range = NULL, ...)
+GA(ObjFunc, N, GA_param, ga_operators, p.range = NULL, ...)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
@@ -16,7 +16,7 @@ which can be specified via \code{option} in \code{\link{GA_param}}. Once
 \code{option="both"}, the list \code{p.range} must be specified to give the range
 of model orders.}
 
-\item{n}{The sample size of the time series.}
+\item{N}{The sample size of the time series.}
 
 \item{GA_param}{A list contains the hyper-parameters for genetic algorithm.
 See \code{\link{GA_param}} for the details.}
@@ -92,7 +92,7 @@ ga_operators = list(population = "random_population_cpp",
                     crossover  = "offspring_uniformcrossover_cpp",
                     mutation   = "mutation")
 
-GA.res = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
+GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
 # GA.res$overbestfit
 # GA.res$overbestchrom
 }

@@ -4,7 +4,7 @@
 \alias{cptDist}
 \title{Comparing multiple changepoint configurations by pairwise distance}
 \usage{
-cptDist(tau1, tau2, n)
+cptDist(tau1, tau2, N)
 }
 \arguments{
 \item{tau1}{A vector contains the changepoint locations for \eqn{C_{1}}
@@ -13,7 +13,7 @@ for comparison. A value \code{NULL} is required if there is no changepoint detec
 \item{tau2}{A vector contains the changepoint locations for  \eqn{C_{2}}
 for comparison. A value \code{NULL} is required if there is no changepoint detected.}
 
-\item{n}{The simulated time series sample size. Two changepoint configurations
+\item{N}{The simulated time series sample size. Two changepoint configurations
 should have the same \eqn{n} values.}
 }
 \value{
@@ -37,17 +37,17 @@ Note: if one configuration doesn't contain any changepoint (valued \code{NULL}),
 the distance is defined as the \eqn{|m-k|}.
 }
 \examples{
-n = 100
+N = 100
 
 # both tau1 and tau2 has detected changepoints
 tau2 = c(25, 50, 75)
 tau1 = c(20, 35, 70, 80, 90)
-cptDist(tau1=tau1, tau2=tau2, n=n)
+cptDist(tau1=tau1, tau2=tau2, N=N)
 
 # either tau1 or tau2 has zero detected changepoints
-cptDist(tau1=tau1, tau2=NULL, n=n)
-cptDist(tau1=NULL, tau2=tau2, n=n)
-cptDist(tau1=NULL, tau2=NULL, n=n)
+cptDist(tau1=tau1, tau2=NULL, N=N)
+cptDist(tau1=NULL, tau2=tau2, N=N)
+cptDist(tau1=NULL, tau2=NULL, N=N)
 }
 \references{
 {

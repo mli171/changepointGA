@@ -12,7 +12,7 @@ rank_asR <- function(x, decreasing = FALSE) {
 #' The first element of the chromosome represent the number of changepoints
 #' and the last non-zero element always equal to the length of time series + 1.
 #'
-#' @param n The length of time series.
+#' @param N The length of time series.
 #' @param prange A list object containing the possible range for other
 #' pre-defined model parameters, i.e. AR/MA order of ARMA models.
 #' @param minDist The minimum length between two adjacent changepoints.
@@ -21,8 +21,8 @@ rank_asR <- function(x, decreasing = FALSE) {
 #' @param lmax The maximum possible length of the chromosome representation.
 #' @return A single changepoint configuration format as above.
 #' @export
-selectTau_cpp <- function(n, prange, minDist, Pb, mmax, lmax) {
-    .Call('_changepointGA_selectTau_cpp', PACKAGE = 'changepointGA', n, prange, minDist, Pb, mmax, lmax)
+selectTau_cpp <- function(N, prange, minDist, Pb, mmax, lmax) {
+    .Call('_changepointGA_selectTau_cpp', PACKAGE = 'changepointGA', N, prange, minDist, Pb, mmax, lmax)
 }
 
 #' Random population generation
@@ -35,7 +35,7 @@ selectTau_cpp <- function(n, prange, minDist, Pb, mmax, lmax) {
 #' \code{prange} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
 #' order parameters must be equal to the length of \code{prange}.
-#' @param n The length of time series.
+#' @param N The length of time series.
 #' @param minDist The minimum length between two adjacent changepoints.
 #' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
 #' @param mmax The maximum possible number of changepoints in the data set.
@@ -45,8 +45,8 @@ selectTau_cpp <- function(n, prange, minDist, Pb, mmax, lmax) {
 #' represent the number of changepoints and the last non-zero element always equal
 #' to the length of time series + 1.
 #' @export
-random_population_cpp <- function(popsize, prange, n, minDist, Pb, mmax, lmax) {
-    .Call('_changepointGA_random_population_cpp', PACKAGE = 'changepointGA', popsize, prange, n, minDist, Pb, mmax, lmax)
+random_population_cpp <- function(popsize, prange, N, minDist, Pb, mmax, lmax) {
+    .Call('_changepointGA_random_population_cpp', PACKAGE = 'changepointGA', popsize, prange, N, minDist, Pb, mmax, lmax)
 }
 
 #' Uniform crossover to produce offsprings
@@ -69,12 +69,12 @@ random_population_cpp <- function(popsize, prange, n, minDist, Pb, mmax, lmax) {
 #' order parameters must be equal to the length of \code{prange}.
 #' @param minDist The minimum length between two adjacent changepoints.
 #' @param lmax The maximum possible length of the chromosome representation.
-#' @param n The length of time series.
+#' @param N The length of time series.
 #' @return The child chromosome that produced from \code{mom} and \code{dad} for
 #' next generation.
 #' @export
-offspring_uniformcrossover_cpp <- function(mom, dad, prange, minDist, lmax, n) {
-    .Call('_changepointGA_offspring_uniformcrossover_cpp', PACKAGE = 'changepointGA', mom, dad, prange, minDist, lmax, n)
+offspring_uniformcrossover_cpp <- function(mom, dad, prange, minDist, lmax, N) {
+    .Call('_changepointGA_offspring_uniformcrossover_cpp', PACKAGE = 'changepointGA', mom, dad, prange, minDist, lmax, N)
 }
 
 #' The selection genetic algorithm oeprator

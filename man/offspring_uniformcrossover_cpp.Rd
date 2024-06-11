@@ -4,7 +4,7 @@
 \alias{offspring_uniformcrossover_cpp}
 \title{Uniform crossover to produce offsprings}
 \usage{
-offspring_uniformcrossover_cpp(mom, dad, prange, minDist, lmax, n)
+offspring_uniformcrossover_cpp(mom, dad, prange, minDist, lmax, N)
 }
 \arguments{
 \item{mom}{Among two selected individuals, \code{mom} represents the selected
@@ -22,7 +22,7 @@ order parameters must be equal to the length of \code{prange}.}
 
 \item{lmax}{The maximum possible length of the chromosome representation.}
 
-\item{n}{The length of time series.}
+\item{N}{The length of time series.}
 }
 \value{
 The child chromosome that produced from \code{mom} and \code{dad} for

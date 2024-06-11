@@ -24,7 +24,7 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' The first element of the chromosome represent the number of changepoints
 //' and the last non-zero element always equal to the length of time series + 1.
 //'
-//' @param n The length of time series.
+//' @param N The length of time series.
 //' @param prange A list object containing the possible range for other
 //' pre-defined model parameters, i.e. AR/MA order of ARMA models.
 //' @param minDist The minimum length between two adjacent changepoints.
@@ -34,7 +34,7 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' @return A single changepoint configuration format as above.
 //' @export
 // [[Rcpp::export]]
-arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, int lmax){
+arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, int lmax){
 
   m = 0;
   double a;
@@ -42,7 +42,6 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
   arma::vec tau(lmax, fill::zeros);
 
   if(plen > 0){
-    double Pp=1/plen;
     for(k=0; k<plen; k++){
       arma::vec tmp = prange[k];
       tau(k+1) = randi(distr_param(tmp[0],tmp[1]));
@@ -50,7 +49,7 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
   }
 
   i = 1 + minDist;
-  while(i < n - minDist){
+  while(i < N - minDist){
     a = runif(1)[0];
     if(a <= Pb){
       m = m + 1;
@@ -62,7 +61,7 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
   }
 
   tau(0) = m;
-  tau(plen+m+1) = n+1;
+  tau(plen+m+1) = N+1;
   return(tau);
 }
 
@@ -76,7 +75,7 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
 //' \code{prange} is specified as a list object, which contains the range of
 //' each model order parameters for order selection (integers). The number of
 //' order parameters must be equal to the length of \code{prange}.
-//' @param n The length of time series.
+//' @param N The length of time series.
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
 //' @param mmax The maximum possible number of changepoints in the data set.
@@ -87,12 +86,12 @@ arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, in
 //' to the length of time series + 1.
 //' @export
 // [[Rcpp::export]]
-arma::mat random_population_cpp(int popsize, List prange, int n, int minDist, double Pb, int mmax, int lmax){
+arma::mat random_population_cpp(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax){
 
   arma::mat pop(lmax, popsize, fill::zeros);
 
   for(j=0;j<popsize;j++){
-    pop.col(j) = selectTau_cpp(n, prange, minDist, Pb, mmax, lmax);
+    pop.col(j) = selectTau_cpp(N, prange, minDist, Pb, mmax, lmax);
   }
 
   return(pop);
@@ -118,12 +117,12 @@ arma::mat random_population_cpp(int popsize, List prange, int n, int minDist, do
 //' order parameters must be equal to the length of \code{prange}.
 //' @param minDist The minimum length between two adjacent changepoints.
 //' @param lmax The maximum possible length of the chromosome representation.
-//' @param n The length of time series.
+//' @param N The length of time series.
 //' @return The child chromosome that produced from \code{mom} and \code{dad} for
 //' next generation.
 //' @export
 // [[Rcpp::export]]
-arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int n){
+arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N){
 
   // Rcout << "mom:" << mom << std::endl;
   // Rcout << "dad:" << dad << std::endl;
@@ -146,7 +145,7 @@ arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List pr
   if(child_mmax == 0){
     // no changepoint for both mom and dad
     child(0) = 0;
-    child(1+plen) = n+1;
+    child(1+plen) = N+1;
   }else{
     // 3). combine dad's and mom's changepoints
     int mom_m = mom(0);
@@ -175,7 +174,7 @@ arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List pr
         child_m = child_m + 1;
         child(plen+child_m) = tmptau;
         tmptau = tmptau + 2*minDist;
-        if(tmptau >= n-minDist){break;} // boundary changepoints limits
+        if(tmptau >= N-minDist){break;} // boundary changepoints limits
       }
 
       if(tmpm >= parents_count-1){break;} // if the number of changepoints of child is larger than parents, break
@@ -191,12 +190,12 @@ arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List pr
       }
 
       tmpm = tmpm + 1;
-      if(tmptau >= n-minDist){break;}
+      if(tmptau >= N-minDist){break;}
     }
     while(1<2);
 
     child(0) = child_m;
-    child(plen+child_m+1) = n+1;
+    child(plen+child_m+1) = N+1;
   }
 
   return(child);

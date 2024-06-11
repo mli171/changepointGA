@@ -11,7 +11,7 @@
 #' which can be specified via \code{option} in \code{\link{GA_param}}. Once
 #' \code{option="both"}, the list \code{p.range} must be specified to give the range
 #' of model orders.
-#' @param n The sample size of the time series.
+#' @param N The sample size of the time series.
 #' @param GA_param A list contains the hyper-parameters for genetic algorithm.
 #' See \code{\link{GA_param}} for the details.
 #' @param ga_operators A list includes the functions for population initialization,
@@ -84,10 +84,10 @@
 #'                     crossover  = "offspring_uniformcrossover_cpp",
 #'                     mutation   = "mutation")
 #'
-#' GA.res = GA(ObjFunc=BinSearch.BIC, n=Ts, GA_param, ga_operators, Xt=myts)
+#' GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
 #' # GA.res$overbestfit
 #' # GA.res$overbestchrom
-GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
+GA = function(ObjFunc, N, GA_param, ga_operators, p.range=NULL, ... ){
 
   call = match.call()
 
@@ -120,7 +120,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
   { stop("Probability of mutation must be between 0 and 1.") }
   if(Pchangepoint < 0 | Pchangepoint > 1)
   { stop("Probability of changepoint must be between 0 and 1.") }
-  if(minDist >= n | minDist <= 1)
+  if(minDist >= N | minDist <= 1)
   { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
   { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
@@ -144,7 +144,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
   }else{
     if(!is.function(ga_operators$population)) population = get(ga_operators$population)
     # generate by function
-    pop = population(popsize, p.range, n, minDist, Pchangepoint, mmax, lmax)
+    pop = population(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
   }
 
   ## evaluate the fitness (Parallel or NOT)
@@ -162,6 +162,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
       popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, ...)))
       # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, Xt)))
       # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, XMat, Xt)))
+      # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, XMat, Xt, logL0)))
     }
   }
 
@@ -181,7 +182,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
     ##### step 3: crossover
     a1 = runif(1)
     if(a1 <= Pcrossover){
-      child = crossover(mom, dad, p.range, minDist, lmax, n)
+      child = crossover(mom, dad, p.range, minDist, lmax, N)
     }else{
       child = dad
       flag[1] = 1
@@ -190,7 +191,7 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
     ##### step 4: mutation
     a2 = runif(1)
     if(a2 <= Pmutation){
-      child = mutation(child, p.range, minDist, Pchangepoint, lmax, mmax, n)
+      child = mutation(child, p.range, minDist, Pchangepoint, lmax, mmax, N)
     }else{
       flag[2] = 1
     }
@@ -202,8 +203,8 @@ GA = function(ObjFunc, n, GA_param, ga_operators, p.range=NULL, ... ){
 
     if (flagsum<2){
       # flagsum < 2 indicating new individual produced and fitness evaluation needed
-      fitChild = do.call(ObjFunc, c(list(child[1:(child[1,]+plen+2),], plen, ...)))
-      # fitChild = do.call(ObjFunc, c(list(child[1:(child[1,]+plen+2),], plen, XMat, Xt)))
+      fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, ...)))
+      # fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, XMat, Xt)))
       leastfit = max(popFit) # with largest fitness value
 
       if (fitChild < leastfit) {

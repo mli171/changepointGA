@@ -1,6 +1,6 @@
 
 #--------------------------
-SelectTau <- function(n, minDist, Pb, mmax){
+SelectTau <- function(N, minDist, Pb, mmax){
   # this subroutine is used to select the changepoint locations with changepoint probability of Pb
   # some inputs ++++++++++++++++++
   #   n= sample size
@@ -22,12 +22,12 @@ SelectTau <- function(n, minDist, Pb, mmax){
       m = m + 1
       tau[m] = i
       i = i + minDist
-      if(i >= n - minDist) {
+      if(i >= N - minDist) {
         break
       }
     }else{
       i <- i+1
-      if(i >= n - minDist){
+      if(i >= N - minDist){
         break
       }
     }
@@ -38,7 +38,7 @@ SelectTau <- function(n, minDist, Pb, mmax){
 # SelectTau(n=100, minDist=3, Pb=0.06, mmax=6)
 
 #--------------------------
-Initial_pop = function(popsize, n, minDist, Pb, mmax, lmax){
+Initial_pop = function(popsize, N, minDist, Pb, mmax, lmax){
   # This function is used to generate initial populations for the GA
   # some inputs ++++++++++++++++++
   #   popsize = number of individual in each island
@@ -52,14 +52,14 @@ Initial_pop = function(popsize, n, minDist, Pb, mmax, lmax){
 
   pop = matrix(0, nrow=lmax, ncol=popsize)
   for(j in 1:popsize){
-    resTau = SelectTau(n, minDist, Pb, mmax)
+    resTau = SelectTau(N, minDist, Pb, mmax)
     tmpm = resTau$m
     tmptau = rep(NA, tmpm+1)
     if(tmpm == 0){
-      tmptau[1] = n+1
+      tmptau[1] = N+1
     }else{
       tmptau[1:tmpm] = resTau$tau
-      tmptau[tmpm+1] = n+1
+      tmptau[tmpm+1] = N+1
     }
     pop[1,j] = tmpm            # number of changepoints
     pop[2:(2+tmpm),j] = tmptau # location of changepoints
@@ -67,10 +67,10 @@ Initial_pop = function(popsize, n, minDist, Pb, mmax, lmax){
 
   return(pop)
 }
-# Initial_pop(popsize=30, n=100, minDist=3, Pb=0.06, mmax=100/2 - 1, lmax=2+(100/2 - 1))
+# Initial_pop(popsize=30, N=100, minDist=3, Pb=0.06, mmax=100/2 - 1, lmax=2+(100/2 - 1))
 
 #--------------------------
-SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, n){
+SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, N){
   # This function is used to produce child
   # some inputs ++++++++++++++++++
   #   mom= selected chromosome representation with lower fitness function value
@@ -78,7 +78,7 @@ SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, n){
   #   minDist = minimum distances between two adjacent changepoints
   #   lmax= max length of chromosome
   #   child_mmax= maximum number of available changepoints for child
-  #   n= sample size
+  #   N= sample size
   # outputs ++++++++++++++++++
   #   child  = the chromosome representation produced for offspring
 
@@ -87,9 +87,9 @@ SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, n){
   mdad = dad[1]
   parents = c(mom[2:(2+mmom-1)], dad[2:(2+mdad-1)])
 
-  # 2). remove same/0/n+1 changepoints and sort
+  # 2). remove same/0/N+1 changepoints and sort
   parents = sort(unique(parents))
-  parents = parents[!parents %in% c(0,n+1)]
+  parents = parents[!parents %in% c(0,N+1)]
   parents_count = length(parents)
 
   # 3). select subset from parents
@@ -104,7 +104,7 @@ SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, n){
       mChild = mChild + 1
       tauChild[mChild] = tmptau
       tmptau = tmptau + 2*minDist
-      if(tmptau >= n-minDist){break} # boundary changepoints limits
+      if(tmptau >= N-minDist){break} # boundary changepoints limits
     }
     if(tmpm >= parents_count){break} # if the number of changepoints of child is larger than parents, break
 
@@ -118,24 +118,24 @@ SelectTauChild = function(mom, dad, minDist, lmax, child_mmax, n){
     }
 
     tmpm = tmpm + 1
-    if(tmptau >= n-minDist){break}
+    if(tmptau >= N-minDist){break}
   }
 
-  tauChild[mChild+1] = n+1
+  tauChild[mChild+1] = N+1
 
   return(list(tauChild=tauChild, mChild=mChild))
 }
-# SelectTauChild(mom, dad, minDist, lmax, child_mmax, n)
+# SelectTauChild(mom, dad, minDist, lmax, child_mmax, N)
 
 #--------------------------
-offspring = function(mom, dad, minDist, lmax, n){
+offspring = function(mom, dad, minDist, lmax, N){
   # This function is used to produce offspring
   # some inputs ++++++++++++++++++
   #   mom= selected chromosome representation with lower fitness function value
   #   dad= selected chromosome representation with larger fitness function value
   #   minDist = minimum distances between two adjacent changepoints
   #   lmax= max length of chromosome
-  #   n= sample size
+  #   N= sample size
   # outputs ++++++++++++++++++
   #   child  = the chromosome representation produced for offspring
 
@@ -149,7 +149,7 @@ offspring = function(mom, dad, minDist, lmax, n){
     child[1] = 0
     child[2] = dad[2]
   }else{
-    restauchild = SelectTauChild(mom, dad, minDist, lmax, child_mmax, n)
+    restauchild = SelectTauChild(mom, dad, minDist, lmax, child_mmax, N)
     mChild = restauchild$mChild
     tauChild = restauchild$tauChild
     child[1] = mChild
@@ -160,7 +160,7 @@ offspring = function(mom, dad, minDist, lmax, n){
 }
 
 #--------------------------
-Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, monitoring, ...){
+Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, monitoring, ...){
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -173,7 +173,7 @@ Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, P
   #   Pm= prob of mutation
   #   Pb= prob of changepoints for every time series
   #   maxgen= for each subpopulation, after maxgen then apply migration
-  #   n= sample size
+  #   N= sample size
   #   X_hour= categorical time series
   #   XMat= Design matrix including covariate other than changepoint
   #   penalty= selection criterion to choose
@@ -205,7 +205,7 @@ Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, P
     ## step 4-1: single point crossover
     a1 = runif(1)
     if(a1 <= Pc){
-      child = offspring(mom, dad, minDist, lmax, n)
+      child = offspring(mom, dad, minDist, lmax, N)
     }else{
       child = dad
       flag[1] = 1
@@ -214,7 +214,7 @@ Newpopulation = function(ObjFunc1, pop, fit, popsize, minDist, lmax, mmax, Pc, P
     ## step 4-2: mutation
     a2 = runif(1)
     if(a2 <= Pm){
-      child = mutation(minDist, Pb, lmax, mmax, n)
+      child = mutation(minDist, Pb, lmax, mmax, N)
     }else{
       flag[2] = 1
     }
@@ -286,7 +286,7 @@ checkConv = function(a, maxconv, tol){
 }
 
 #--------------------------
-offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
+offspring_uniformcrossover = function(mom, dad, minDist, lmax, N){
   # This function is used to produce offspring
   # some inputs ++++++++++++++++++
   #   mom= selected chromosome representation with lower fitness function value
@@ -307,7 +307,7 @@ offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
     child[1] = 0
     child[2] = dad[2]
   }else{
-    restauchild = SelectTauChild(mom, dad, minDist, lmax, child_mmax, n)
+    restauchild = SelectTauChild(mom, dad, minDist, lmax, child_mmax, N)
     mChild = restauchild$mChild
     tauChild = restauchild$tauChild
     child[1] = mChild
@@ -318,7 +318,7 @@ offspring_uniformcrossover = function(mom, dad, minDist, lmax, n){
 }
 
 #--------------------------
-mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
+mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, N){
   # This function is used to generate a new individual as the mutated child (could be customized if other parameter involved)
   # some inputs ++++++++++++++++++
   #   prange= The range of the model order
@@ -326,7 +326,7 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
   #   Pb= prob of changepoints for every time series
   #   lmax= max length of chromosome
   #   mmax= max number of changepoints
-  #   n= sample size
+  #   N= sample size
   # outputs ++++++++++++++++++
   #   childMut  = the chromosome representation produced from mutation
 
@@ -335,7 +335,7 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
   a = runif(1)
   if(a > 0.5){
     # order from child (p.range=NULL)
-    tmpchildMut = selectTau_cpp(n=n, prange=NULL, minDist=minDist, Pb=Pb,
+    tmpchildMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
                              mmax=mmax, lmax=lmax)
     if(plen>0){
       childMut = matrix(0, nrow=lmax, 1)
@@ -348,10 +348,10 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
   }else{
     # order from new generation
     if(plen>0){
-      childMut = selectTau_cpp(n=n, prange=p.range, minDist=minDist, Pb=Pb,
+      childMut = selectTau_cpp(N=N, prange=p.range, minDist=minDist, Pb=Pb,
                                mmax=mmax, lmax=lmax)
     }else{
-      childMut = selectTau_cpp(n=n, prange=NULL, minDist=minDist, Pb=Pb,
+      childMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
                                mmax=mmax, lmax=lmax)
     }
   }
@@ -359,7 +359,7 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, n){
   return(childMut)
 }
 
-NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, n, p.range, ...){
+NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, p.range, ...){
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -372,7 +372,7 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
   #   Pm= prob of mutation
   #   Pb= prob of changepoints for every time series
   #   maxgen= for each subpopulation, after maxgen then apply migration
-  #   n= sample size
+  #   N= sample size
   #   X_hour= categorical time series
   #   XMat= Design matrix including covariate other than changepoint
   #   penalty= selection criterion to choose
@@ -398,7 +398,7 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
     ##### step 3: crossover
     a1 = runif(1)
     if(a1 <= Pc){
-      child = crossover(mom, dad, p.range, minDist, lmax, n)
+      child = crossover(mom, dad, p.range, minDist, lmax, N)
     }else{
       child = dad
       flag[1] = 1
@@ -407,7 +407,7 @@ NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit
     ## step 4-2: mutation
     a2 = runif(1)
     if(a2 <= Pm){
-      child = mutation(child, p.range, minDist, Pb, lmax, mmax, n)
+      child = mutation(child, p.range, minDist, Pb, lmax, mmax, N)
     }else{
       flag[2] = 1
     }

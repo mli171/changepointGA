@@ -24,41 +24,41 @@ BEGIN_RCPP
 END_RCPP
 }
 // selectTau_cpp
-arma::vec selectTau_cpp(int n, List prange, int minDist, double Pb, int mmax, int lmax);
-RcppExport SEXP _changepointGA_selectTau_cpp(SEXP nSEXP, SEXP prangeSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
+arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, int lmax);
+RcppExport SEXP _changepointGA_selectTau_cpp(SEXP NSEXP, SEXP prangeSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
     Rcpp::traits::input_parameter< List >::type prange(prangeSEXP);
     Rcpp::traits::input_parameter< int >::type minDist(minDistSEXP);
     Rcpp::traits::input_parameter< double >::type Pb(PbSEXP);
     Rcpp::traits::input_parameter< int >::type mmax(mmaxSEXP);
     Rcpp::traits::input_parameter< int >::type lmax(lmaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(selectTau_cpp(n, prange, minDist, Pb, mmax, lmax));
+    rcpp_result_gen = Rcpp::wrap(selectTau_cpp(N, prange, minDist, Pb, mmax, lmax));
     return rcpp_result_gen;
 END_RCPP
 }
 // random_population_cpp
-arma::mat random_population_cpp(int popsize, List prange, int n, int minDist, double Pb, int mmax, int lmax);
-RcppExport SEXP _changepointGA_random_population_cpp(SEXP popsizeSEXP, SEXP prangeSEXP, SEXP nSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
+arma::mat random_population_cpp(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax);
+RcppExport SEXP _changepointGA_random_population_cpp(SEXP popsizeSEXP, SEXP prangeSEXP, SEXP NSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type popsize(popsizeSEXP);
     Rcpp::traits::input_parameter< List >::type prange(prangeSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
     Rcpp::traits::input_parameter< int >::type minDist(minDistSEXP);
     Rcpp::traits::input_parameter< double >::type Pb(PbSEXP);
     Rcpp::traits::input_parameter< int >::type mmax(mmaxSEXP);
     Rcpp::traits::input_parameter< int >::type lmax(lmaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(random_population_cpp(popsize, prange, n, minDist, Pb, mmax, lmax));
+    rcpp_result_gen = Rcpp::wrap(random_population_cpp(popsize, prange, N, minDist, Pb, mmax, lmax));
     return rcpp_result_gen;
 END_RCPP
 }
 // offspring_uniformcrossover_cpp
-arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int n);
-RcppExport SEXP _changepointGA_offspring_uniformcrossover_cpp(SEXP momSEXP, SEXP dadSEXP, SEXP prangeSEXP, SEXP minDistSEXP, SEXP lmaxSEXP, SEXP nSEXP) {
+arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N);
+RcppExport SEXP _changepointGA_offspring_uniformcrossover_cpp(SEXP momSEXP, SEXP dadSEXP, SEXP prangeSEXP, SEXP minDistSEXP, SEXP lmaxSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,8 +67,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type prange(prangeSEXP);
     Rcpp::traits::input_parameter< int >::type minDist(minDistSEXP);
     Rcpp::traits::input_parameter< int >::type lmax(lmaxSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(offspring_uniformcrossover_cpp(mom, dad, prange, minDist, lmax, n));
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(offspring_uniformcrossover_cpp(mom, dad, prange, minDist, lmax, N));
     return rcpp_result_gen;
 END_RCPP
 }

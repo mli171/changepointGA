@@ -7,7 +7,7 @@
 #' functions as the fitness function with setting input as potential solution to
 #' the optimization problem and returning a numerical value as the output/fitness.
 #'
-#' @param n The sample size of the time series.
+#' @param N The sample size of the time series.
 #' @param IslandGA_param A list contains the hyper-parameters for IslandGA.
 #' See \code{\link{IslandGA_param}} for the details.
 #' @param IslandGA_operators A list includes the functions for population initialization,
@@ -78,11 +78,11 @@
 #'                           crossover  = "offspring_uniformcrossover_cpp",
 #'                           mutation   = "mutation")
 #'
-#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 #' # IslandGA.res$bestfit
 #' # IslandGA.res$bestchrom
 #-------------------------- Genetic Algorithm Main Function is to minimize
-IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL, ... ){
+IslandGA = function(ObjFunc, N, IslandGA_param, IslandGA_operators, p.range=NULL, ... ){
 
   call = match.call()
   plen = length(p.range)
@@ -115,7 +115,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL
   { stop("Probability of mutation must be between 0 and 1.") }
   if(Pchangepoint < 0 | Pchangepoint > 1)
   { stop("Probability of changepoint must be between 0 and 1.") }
-  if(minDist >= n | minDist <= 1)
+  if(minDist >= N | minDist <= 1)
   { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
   { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
@@ -144,7 +144,7 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL
     # generate by function
     Island = array(0, dim=c(lmax, popsize, Islandsize))
     for(k in 1:Islandsize){
-      Island[,,k] = population(popsize, p.range, n, minDist, Pchangepoint, mmax, lmax)
+      Island[,,k] = population(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
     }
   }
 
@@ -178,13 +178,13 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL
         #                     pop=Island[,,k], fit=IslandFit[,k],
         #                     popsize, minDist, lmax, mmax,
         #                     Pcrossover, Pmutation, Pchangepoint,
-        #                     maxgen, n, p.range, XMat, Xt)
+        #                     maxgen, N, p.range, XMat, Xt)
         NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                             crossover=crossover, mutation=mutation,
                             pop=Island[,,k], fit=IslandFit[,k],
                             popsize, minDist, lmax, mmax,
                             Pcrossover, Pmutation, Pchangepoint,
-                            maxgen, n, p.range, ...)
+                            maxgen, N, p.range, ...)
       )
       for(k in 1:Islandsize){
         tmpfit = resNewpop[[k]][1,]
@@ -201,13 +201,13 @@ IslandGA = function(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range=NULL
         #                                 pop=Island[,,k], fit=IslandFit[,k],
         #                                 popsize, minDist, lmax, mmax,
         #                                 Pc=Pcrossover, Pm=Pmutation, Pb=Pchangepoint,
-        #                                 maxgen, n, p.range, XMat, Xt)
+        #                                 maxgen, N, p.range, XMat, Xt)
         resNewpop = NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                                         crossover=crossover, mutation=mutation,
                                         pop=Island[,,k], fit=IslandFit[,k],
                                         popsize, minDist, lmax, mmax,
                                         Pcrossover, Pmutation, Pchangepoint,
-                                        maxgen, n, p.range, ...)
+                                        maxgen, N, p.range, ...)
         tmpfit = resNewpop[1,]
         tmppop = resNewpop[-1,]
         # update bestfit in each island

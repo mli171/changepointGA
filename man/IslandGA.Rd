@@ -4,14 +4,14 @@
 \alias{IslandGA}
 \title{Island model based genetic algorithm}
 \usage{
-IslandGA(ObjFunc, n, IslandGA_param, IslandGA_operators, p.range = NULL, ...)
+IslandGA(ObjFunc, N, IslandGA_param, IslandGA_operators, p.range = NULL, ...)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
 functions as the fitness function with setting input as potential solution to
 the optimization problem and returning a numerical value as the output/fitness.}
 
-\item{n}{The sample size of the time series.}
+\item{N}{The sample size of the time series.}
 
 \item{IslandGA_param}{A list contains the hyper-parameters for IslandGA.
 See \code{\link{IslandGA_param}} for the details.}
@@ -86,7 +86,7 @@ IslandGA_operators = list(population = "random_population_cpp",
                           crossover  = "offspring_uniformcrossover_cpp",
                           mutation   = "mutation")
 
-IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, n=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
 # IslandGA.res$bestfit
 # IslandGA.res$bestchrom
 }

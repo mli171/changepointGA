@@ -18,7 +18,7 @@
 #' for comparison. A value \code{NULL} is required if there is no changepoint detected.
 #' @param tau2 A vector contains the changepoint locations for  \eqn{C_{2}}
 #' for comparison. A value \code{NULL} is required if there is no changepoint detected.
-#' @param n The simulated time series sample size. Two changepoint configurations
+#' @param N The simulated time series sample size. Two changepoint configurations
 #' should have the same \eqn{n} values.
 #' @return
 #' \item{dist}{The calculated distance.}
