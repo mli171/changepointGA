@@ -1,8 +1,8 @@
-\name{ga_operators}
-\alias{ga_operators}
+\name{GA_operators}
+\alias{GA_operators}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-ga_operators
+GA_operators
 }
 \description{
 A list object contains the GA operators function names.
@@ -45,7 +45,7 @@ A list object contains the GA operators function names.
 \references{Lu, Q., Lund, R., & Lee, T. C. (2010). An MDL approach to the climate segmentation problem.
 \emph{Ann. Appl. Stat.} 4 (1) 299 - 319.}
 \examples{
-ga_operators = list(population = "random_population_cpp",
+GA_operators = list(population = "random_population_cpp",
                     selection  = "selection_linearrank",
                     crossover  = "offspring",
                     mutation   = "mutation")

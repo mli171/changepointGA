@@ -4,7 +4,7 @@
 \alias{GA}
 \title{Genetic algorithm}
 \usage{
-GA(ObjFunc, N, GA_param, ga_operators, p.range = NULL, ...)
+GA(ObjFunc, N, GA_param, GA_operators, p.range = NULL, ...)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
@@ -21,9 +21,9 @@ of model orders.}
 \item{GA_param}{A list contains the hyper-parameters for genetic algorithm.
 See \code{\link{GA_param}} for the details.}
 
-\item{ga_operators}{A list includes the functions for population initialization,
+\item{GA_operators}{A list includes the functions for population initialization,
 new individual selection, and genetic operator of crossover and mutation.
-See \code{\link{ga_operators}} for the details.}
+See \code{\link{GA_operators}} for the details.}
 
 \item{p.range}{Default is \code{NULL} for only changepoint detection. If
 \code{p.range} is specified as a list object, which contains the range of
@@ -87,12 +87,12 @@ GA_param = list(
   tol          = 1e-5,
   seed         = NULL
 )
-ga_operators = list(population = "random_population_cpp",
+GA_operators = list(population = "random_population_cpp",
                     selection  = "selection_linearrank_cpp",
                     crossover  = "offspring_uniformcrossover_cpp",
                     mutation   = "mutation")
 
-GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
+GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, GA_operators, Xt=myts)
 # GA.res$overbestfit
 # GA.res$overbestchrom
 }

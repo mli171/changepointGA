@@ -14,9 +14,9 @@
 #' @param N The sample size of the time series.
 #' @param GA_param A list contains the hyper-parameters for genetic algorithm.
 #' See \code{\link{GA_param}} for the details.
-#' @param ga_operators A list includes the functions for population initialization,
+#' @param GA_operators A list includes the functions for population initialization,
 #' new individual selection, and genetic operator of crossover and mutation.
-#' See \code{\link{ga_operators}} for the details.
+#' See \code{\link{GA_operators}} for the details.
 #' @param p.range Default is \code{NULL} for only changepoint detection. If
 #' \code{p.range} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
@@ -79,15 +79,15 @@
 #'   tol          = 1e-5,
 #'   seed         = NULL
 #' )
-#' ga_operators = list(population = "random_population_cpp",
+#' GA_operators = list(population = "random_population_cpp",
 #'                     selection  = "selection_linearrank_cpp",
 #'                     crossover  = "offspring_uniformcrossover_cpp",
 #'                     mutation   = "mutation")
 #'
-#' GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
+#' GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, GA_operators, Xt=myts)
 #' # GA.res$overbestfit
 #' # GA.res$overbestchrom
-GA = function(ObjFunc, N, GA_param, ga_operators, p.range=NULL, ... ){
+GA = function(ObjFunc, N, GA_param, GA_operators, p.range=NULL, ... ){
 
   call = match.call()
 
@@ -132,17 +132,17 @@ GA = function(ObjFunc, N, GA_param, ga_operators, p.range=NULL, ... ){
   # set seed for reproducibility
   if(!is.null(seed)) set.seed(seed)
 
-  if(!is.function(ga_operators$selection))  selection  = get(ga_operators$selection)
-  if(!is.function(ga_operators$crossover))  crossover  = get(ga_operators$crossover)
-  if(!is.function(ga_operators$mutation))   mutation   = get(ga_operators$mutation)
+  if(!is.function(GA_operators$selection))  selection  = get(GA_operators$selection)
+  if(!is.function(GA_operators$crossover))  crossover  = get(GA_operators$crossover)
+  if(!is.function(GA_operators$mutation))   mutation   = get(GA_operators$mutation)
 
   ###### step 1: Initialize population
-  if(class(ga_operators$population)[1] == "matrix"){
+  if(class(GA_operators$population)[1] == "matrix"){
     # from input
-    if(all(is.na(ga_operators$population))){stop("NA's in provided population matrix")}
-    pop = ga_operators$population
+    if(all(is.na(GA_operators$population))){stop("NA's in provided population matrix")}
+    pop = GA_operators$population
   }else{
-    if(!is.function(ga_operators$population)) population = get(ga_operators$population)
+    if(!is.function(GA_operators$population)) population = get(GA_operators$population)
     # generate by function
     pop = population(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
   }
