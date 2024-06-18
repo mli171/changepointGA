@@ -29,11 +29,15 @@ order parameters must be equal to the length of \code{p.range}.}
 }
 \value{
 Returns a list that has the following components.
-\item{bestfit}{The obtained minimum value of the objective function after
+\item{overbestfit}{The obtained minimum value of the objective function after
 the final iteration.}
-\item{bestchrom}{The locations of the detected changepoints associating
-with the \code{bestfit} the after the final iteration.}
+\item{overbestchrom}{The locations of the detected changepoints associating
+with the \code{overbestfit} the after the final iteration.}
+\item{bestfit}{The minimized fitness function values at each iteration.}
+\item{bestchrom}{The detected changepoints at each iteration.}
 \item{countMig}{The number of migrations undertaken by the IslandGA.}
+\item{count}{The number of iterations (generations) undertaken by the island
+genetic algorithm model.}
 \item{convg}{An integer code indicate convergence.}
 \itemize{
  \item{0} indicates the algorithm successful completion.
@@ -87,6 +91,6 @@ IslandGA_operators = list(population = "random_population_cpp",
                           mutation   = "mutation")
 
 IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
-# IslandGA.res$bestfit
-# IslandGA.res$bestchrom
+# IslandGA.res$overbestfit
+# IslandGA.res$overbestchrom
 }
