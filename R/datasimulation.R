@@ -201,7 +201,7 @@ TsPlotCheck = function(Z, tau=NULL, mu=NULL){
   }
 
   if(is.null(mu)){
-    cat("\n Need to calculate sample mean of each segment.\n")
+    # cat("\n Need to calculate sample mean of each segment.\n")
     # calculate the segment mean
     tauclc = c(1, tau, Ts+1)
     seg.len = diff(tauclc)
