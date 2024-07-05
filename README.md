@@ -24,7 +24,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 GA_param = list(
   popsize      = 200,
@@ -69,7 +69,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 
 ## No parallel computing
@@ -158,7 +158,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
 
@@ -212,7 +212,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
 

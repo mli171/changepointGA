@@ -58,7 +58,7 @@
 #'
 #' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
 #'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(myts, tau=CpLocT)
+#' TsPlotCheck(Y=myts, tau=CpLocT)
 #'
 #' ##### M2: ARMA(2,1) model with constant mean
 #' Ts = 1000
@@ -74,7 +74,7 @@
 #'
 #' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
 #'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(myts, tau=CpLocT)
+#' TsPlotCheck(Y=myts, tau=CpLocT)
 #'
 #' ##### M3: ARMA(2,1) model with seasonality
 #' Ts = 1000
@@ -91,7 +91,7 @@
 #'
 #' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
 #'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(myts, tau=CpLocT)
+#' TsPlotCheck(Y=myts, tau=CpLocT)
 #'
 #'
 #' ##### M4: ARMA(2,1) model with seasonality and trend
@@ -110,7 +110,7 @@
 #'
 #' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
 #'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(myts, tau=CpLocT)
+#' TsPlotCheck(Y=myts, tau=CpLocT)
 ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NULL, seed=NULL){
 
   if(!is.null(seed)){set.seed(seed)}
@@ -166,9 +166,14 @@ ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NUL
 #'
 #' This is a function to plot the simulated time series with segmentation visualization
 #' by provided changepoint locations.
-#' @param Z The simulated time series.
+#' @param X The time series time index, which could be specified as years, months, days, or others.
+#' The default value is NULL and the vector from 1 to the time series length will be applied.
+#' @param Xat The values from \code{X} that will be used as the X axis tick marks.
+#' @param Y The time series data.
 #' @param tau The provided changepoint locations.
 #' @param mu The provided meam values for each time \eqn{t}.
+#' @param XLAB A descriptive label for X axis.
+#' @param YLAB A descriptive label for Y axis.
 #' @import Rcpp
 #' @import stats
 #' @import graphics
@@ -185,13 +190,21 @@ ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NUL
 #' CpLocT = floor(Ts*Cp.prop)
 #'
 #' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(myts, tau=CpLocT)
-TsPlotCheck = function(Z, tau=NULL, mu=NULL){
+#' TsPlotCheck(X=1:Ts, Xat=seq(from=1, to=Ts, length=10), Y=myts, tau=CpLocT)
+TsPlotCheck = function(X=NULL, Xat=NULL, Y, tau=NULL, mu=NULL, XLAB=NULL, YLAB=NULL){
 
-  Ts = length(Z)
+  Ts = length(Y)
 
-  plot(x=1:Ts, y=Z, type="l", xlab="Time", ylab="Z")
+  if(is.null(XLAB)){XLAB = "Time"}
+  if(is.null(YLAB)){YLAB = "Y"}
 
+  plot(x=1:Ts, y=Y, type="l", xlab=XLAB, ylab=YLAB, xaxt = "n")
+  if (!is.null(Xat)){
+    p = match(Xat, X)
+    axis(1, at=p, labels=X[p])
+  }else{
+    axis(1, at=1:Ts, labels=1:Ts)
+  }
   m = length(tau)
 
   if(!is.null(tau)){
@@ -206,13 +219,13 @@ TsPlotCheck = function(Z, tau=NULL, mu=NULL){
     tauclc = c(1, tau, Ts+1)
     seg.len = diff(tauclc)
     ff = rep(0:m, times=seg.len)
-    Xseg = split(Z, ff)
+    Xseg = split(Y, ff)
     mu.seg = unlist(lapply(Xseg,mean), use.names=F)
     for(i in 1:(m+1)){
       segments(x0=tauclc[i], y0=mu.seg[i], x1=tauclc[i+1], y1=mu.seg[i], col="red", lty="dashed", lwd=2)
     }
   }else{
-    lines(x=1:Ts, y=mu, col="red", lty="dashed", lwd=2)
+    lines(x=X, y=mu, col="red", lty="dashed", lwd=2)
   }
 
 }

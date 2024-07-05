@@ -81,7 +81,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 ##### M2: ARMA(2,1) model with constant mean
 Ts = 1000
@@ -97,7 +97,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 ##### M3: ARMA(2,1) model with seasonality
 Ts = 1000
@@ -114,7 +114,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 
 ##### M4: ARMA(2,1) model with seasonality and trend
@@ -133,5 +133,5 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 }

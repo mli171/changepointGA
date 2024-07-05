@@ -4,14 +4,31 @@
 \alias{TsPlotCheck}
 \title{Plot the simulated time series}
 \usage{
-TsPlotCheck(Z, tau = NULL, mu = NULL)
+TsPlotCheck(
+  X = NULL,
+  Xat = NULL,
+  Y,
+  tau = NULL,
+  mu = NULL,
+  XLAB = NULL,
+  YLAB = NULL
+)
 }
 \arguments{
-\item{Z}{The simulated time series.}
+\item{X}{The time series time index, which could be specified as years, months, days, or others.
+The default value is NULL and the vector from 1 to the time series length will be applied.}
+
+\item{Xat}{The values from \code{X} that will be used as the X axis tick marks.}
+
+\item{Y}{The time series data.}
 
 \item{tau}{The provided changepoint locations.}
 
 \item{mu}{The provided meam values for each time \eqn{t}.}
+
+\item{XLAB}{A descriptive label for X axis.}
+
+\item{YLAB}{A descriptive label for Y axis.}
 }
 \description{
 This is a function to plot the simulated time series with segmentation visualization
@@ -28,5 +45,5 @@ Cp.prop = c(1/4, 3/4)
 CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(X=1:Ts, Xat=seq(from=1, to=Ts, length=10), Y=myts, tau=CpLocT)
 }

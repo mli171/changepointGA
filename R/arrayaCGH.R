@@ -1,0 +1,23 @@
+#' Glioblastoma array aCGH data
+#'
+#' Glioblastoma multiforme (GBM) can cause chromosomal aberrations during DNA
+#' replication. Array comparative genomic hybridization (aCGH) experiments analyze
+#' these aberrations using fluorescence intensity ratios, which indicate DNA copy
+#' number variations.
+#'
+#' @docType data
+#'
+#' @usage data(arrayaCGH)
+#'
+#' @keywords datasets
+#'
+#' @references Lai, W. R., Johnson, M. D., Kucherlapati, R., & Park, P. J. (2005).
+#' Comparative analysis of algorithms for identifying amplifications and deletions
+#' in array CGH data. *Bioinformatics*, 21(19), 3763-3770.
+#' @references Killick, R., & Eckley, I. A. (2014). changepoint: An R package for
+#' changepoint analysis. *Journal of statistical software*, 58, 1-19.
+#'
+#' @examples
+#' data(arrayaCGH)
+#' \donttest{Xt = arrayaCGH[,5]}
+"arrayaCGH"

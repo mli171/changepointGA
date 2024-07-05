@@ -64,7 +64,7 @@ CpLocT = floor(Ts*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(myts, tau=CpLocT)
+TsPlotCheck(Y=myts, tau=CpLocT)
 
 IslandGA_param = list(
   popsize      = 40,

@@ -332,28 +332,42 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, N){
 
   plen = length(p.range)
 
-  a = runif(1)
-  if(a > 0.5){
-    # order from child (p.range=NULL)
-    tmpchildMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
-                             mmax=mmax, lmax=lmax)
-    if(plen>0){
-      childMut = matrix(0, nrow=lmax, 1)
-      childMut[1,] = tmpchildMut[1]
+  if(plen>0){
+    childMut = matrix(0, nrow=lmax, 1)
+    a1 = runif(1)
+    if(a1 > 0.5){
+      # 1. order from child
       childMut[2:(plen+1),] = child[2:(plen+1)]
+      # 1.1 cpt from new
+      tmpchildMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
+                                  mmax=mmax, lmax=lmax)
+      childMut[1,] = tmpchildMut[1]
       childMut[(plen+2):(plen+tmpchildMut[1]+2),] = tmpchildMut[2:(tmpchildMut[1]+2)]
     }else{
-      childMut = tmpchildMut
+      # 2. order from new
+      new.p.range = rep(NA, plen)
+      for(ii in 1:plen){
+        tmp.p.range = setdiff(p.range[[ii]][1]:p.range[[ii]][2], child[2+ii-1])
+        new.p.range[ii] = sample(tmp.p.range, 1)
+      }
+      childMut[2:(plen+1),] = new.p.range
+      a2 = runif(1)
+      if(a2 > 0.5){
+        # 2.1 cpt from new
+        tmpchildMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
+                                    mmax=mmax, lmax=lmax)
+        childMut[1,] = tmpchildMut[1]
+        childMut[(plen+2):(plen+tmpchildMut[1]+2),] = tmpchildMut[2:(tmpchildMut[1]+2)]
+      }else{
+        # 2.2 cpt from child
+        childMut[1,] = child[1]
+        childMut[(plen+2):(plen+child[1]+2),] = child[(plen+2):(plen+child[1]+2)]
+      }
     }
   }else{
-    # order from new generation
-    if(plen>0){
-      childMut = selectTau_cpp(N=N, prange=p.range, minDist=minDist, Pb=Pb,
-                               mmax=mmax, lmax=lmax)
-    }else{
-      childMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
-                               mmax=mmax, lmax=lmax)
-    }
+    tmpchildMut = selectTau_cpp(N=N, prange=NULL, minDist=minDist, Pb=Pb,
+                                mmax=mmax, lmax=lmax)
+    childMut = tmpchildMut
   }
 
   return(childMut)
