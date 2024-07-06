@@ -225,7 +225,7 @@ TsPlotCheck = function(X=NULL, Xat=NULL, Y, tau=NULL, mu=NULL, XLAB=NULL, YLAB=N
       segments(x0=tauclc[i], y0=mu.seg[i], x1=tauclc[i+1], y1=mu.seg[i], col="red", lty="dashed", lwd=2)
     }
   }else{
-    lines(x=X, y=mu, col="red", lty="dashed", lwd=2)
+    lines(x=1:Ts, y=mu, col="red", lty="dashed", lwd=2)
   }
 
 }
