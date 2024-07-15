@@ -17,5 +17,8 @@ LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/mli171/changepointGA
 BugReports: https://github.com/mli171/changepointGA/issues
 Suggests: 
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr

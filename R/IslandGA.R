@@ -58,35 +58,11 @@
 #'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 #' TsPlotCheck(Y=myts, tau=CpLocT)
 #'
-#' IslandGA_param = list(
-#'   popsize      = 40,
-#'   Islandsize   = 5,
-#'   Pcrossover   = 0.95,
-#'   Pmutation    = 0.15,
-#'   Pchangepoint = 10/Ts,
-#'   minDist      = 2,
-#'   mmax         = Ts/2 - 1,
-#'   lmax         = 2 + Ts/2 - 1,
-#'   maxMig       = 500,
-#'   maxgen       = 100,
-#'   maxconv      = 100,
-#'   option       = "cp",
-#'   monitoring   = FALSE,
-#'   parallel     = FALSE,
-#'   nCore        = NULL,
-#'   tol          = 1e-5,
-#'   seed         = NULL
-#' )
-#' IslandGA_operators = list(population = "random_population_cpp",
-#'                           selection  = "selection_linearrank_cpp",
-#'                           crossover  = "offspring_uniformcrossover_cpp",
-#'                           mutation   = "mutation")
-#'
-#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, Xt=myts)
 #' # IslandGA.res$overbestfit
 #' # IslandGA.res$overbestchrom
 #-------------------------- Genetic Algorithm Main Function is to minimize
-IslandGA = function(ObjFunc, N, IslandGA_param, IslandGA_operators, p.range=NULL, ... ){
+IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA_operators=.default.IslandGA_operators, p.range=NULL, ... ){
 
   call = match.call()
   plen = length(p.range)

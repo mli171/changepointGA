@@ -4,7 +4,14 @@
 \alias{GA}
 \title{Genetic algorithm}
 \usage{
-GA(ObjFunc, N, GA_param, GA_operators, p.range = NULL, ...)
+GA(
+  ObjFunc,
+  N,
+  GA_param = .default.GA_param,
+  GA_operators = .default.GA_operators,
+  p.range = NULL,
+  ...
+)
 }
 \arguments{
 \item{ObjFunc}{The fitness function to be minimized. Users can specify any R or Rcpp
@@ -70,29 +77,7 @@ myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 TsPlotCheck(Y=myts, tau=CpLocT)
 
-GA_param = list(
-  popsize      = 200,
-  Pcrossover   = 0.95,
-  Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
-  minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
-  maxgen       = 100000,
-  maxconv      = 1000,
-  option       = "cp",
-  monitoring   = FALSE,
-  parallel     = FALSE,
-  nCore        = NULL,
-  tol          = 1e-5,
-  seed         = NULL
-)
-GA_operators = list(population = "random_population_cpp",
-                    selection  = "selection_linearrank_cpp",
-                    crossover  = "offspring_uniformcrossover_cpp",
-                    mutation   = "mutation")
-
-GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, GA_operators, Xt=myts)
+GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, Xt=myts)
 # GA.res$overbestfit
 # GA.res$overbestchrom
 }

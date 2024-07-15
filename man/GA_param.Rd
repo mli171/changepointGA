@@ -11,10 +11,18 @@ A list object contains the hyperparameters for GA running.
   \item{popsize}{An integer represents the number of individual in each population.}
   \item{Pcrossover}{The probability that the crossover operator applies on two individual chromosomes.}
   \item{Pmutation}{The probability that the mutation operator applies on one individual chromosome.}
-  \item{Pchangepoint}{The probability that a changepoint has occurred.}
+  \item{Pchangepoint}{The probability that a changepoint has occurred. User
+  could change this probability based on domain knowledge and the time series
+  length.}
   \item{minDist}{The minimum length between two adjacent changepoints.}
-  \item{mmax}{The maximum possible number of changepoints in the data set.}
-  \item{lmax}{The maximum possible length of the chromosome representation.}
+  \item{mmax}{The maximum possible number of changepoints in the data set.
+  For a time series of length 1000, the default value is 499. The suggested
+  value should be based on the length of the time series. For instance, if a
+  time series has length N, the recommended \code{mmax} should be N/2-1.}
+  \item{lmax}{The maximum possible length of the chromosome representation. For
+  a time series of length 1000, the default value is 501. The suggested value
+  should be based on the length of the time series. For instance, if a time
+  series has length N, the recommended \code{lmax} should be 2+N/2-1.}
   \item{maxgen}{The maximum number of generation that the GA can last.}
   \item{maxconv}{If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the island-based GA algorithm stops.}
   \item{option}{A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.}
