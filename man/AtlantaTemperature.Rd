@@ -3,7 +3,7 @@
 \docType{data}
 \name{AtlantaTemperature}
 \alias{AtlantaTemperature}
-\title{Atlanta airport yearly average temperatures dataset}
+\title{Atlanta airport yearly average temperatures data}
 \format{
 An object of class \code{data.frame} with 134 rows and 2 columns.
 }
@@ -16,13 +16,10 @@ Hartsfield International Airport weather station.
 }
 \examples{
 data(AtlantaTemperature)
-\donttest{Xt = AtlantaTemperature[,2]
-    N = length(Xt)
-    XMat = matrix(1, nrow=N, ncol=1)}
 }
 \references{
 Lund, R. B., Beaulieu, C., Killick, R., Lu, Q., & Shi, X. (2023).
 Good practices and common pitfalls in climate time series changepoint techniques:
-A review. *Journal of Climate*, 36(23), 8041-8057.
+A review. \emph{Journal of Climate}, 36(23), 8041-8057.
 }
 \keyword{datasets}

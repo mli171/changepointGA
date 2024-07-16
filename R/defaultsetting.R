@@ -16,11 +16,6 @@
   seed         = NULL
 )
 
-.default.GA_operators = list(population = "random_population_cpp",
-                            selection  = "selection_linearrank_cpp",
-                            crossover  = "offspring_uniformcrossover_cpp",
-                            mutation   = "mutation")
-
 
 .default.IslandGA_param = list(
   popsize      = 40,
@@ -42,7 +37,7 @@
   seed         = NULL
 )
 
-.default.IslandGA_operators = list(population = "random_population_cpp",
-                                   selection  = "selection_linearrank_cpp",
-                                   crossover  = "offspring_uniformcrossover_cpp",
-                                   mutation   = "mutation")
+.default.operators = list(population = "random_population_cpp",
+                          selection  = "selection_linearrank_cpp",
+                          crossover  = "offspring_uniformcrossover_cpp",
+                          mutation   = "mutation")

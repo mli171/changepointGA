@@ -69,6 +69,7 @@ arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, in
 //'
 //' Randomly generate the individuals' chromosomes (changepoint confirgurations)
 //' to construct a population.
+//'
 //' @param popsize An integer represents the number of individual in each
 //' population for GA (or subpopulation for IslandGA).
 //' @param prange Default is \code{NULL} for only changepoint detection. If

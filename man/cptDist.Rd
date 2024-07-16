@@ -20,21 +20,26 @@ should have the same \eqn{n} values.}
 \item{dist}{The calculated distance.}
 }
 \description{
-Given a true changepoint configuration, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}},
-for time series simulation, we want to compare an estimated multiple
-changepoint configuration, \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{k}\}}, to \eqn{C_{1}} to
-examine the detection algorithm performance.
+This function is to calculate the distance metric (Shi et al., 2022) between
+two changepoint configurations, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}}
+and \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{k}\}}, where \eqn{\tau}'s are the
+changepoint locations.
 }
 \details{
 The pairwise distance was proposed by Shi et al. (2022),
-\deqn{d(C_{1}, C_{2})=|m-k|+ min(A(C_{1}, C_{2})),}
+\deqn{d(C_{1}, C_{2})=|m-k|+ \min(A(C_{1}, C_{2})),}
 where \eqn{m} is the number of changepoints in configuration \eqn{C_{1}} and
 \eqn{k} is the number of changepoints in configuration \eqn{C_{2}}.
-The term \eqn{min(A(C_{1}, C_{2}))} reflects the cost that matches
-changepoint locations between \eqn{C_{1}} and \eqn{C_{2}} and cloud be calculated
-by linear assignment method. Details can be found in Shi et al. (2022).
-Note: if one configuration doesn't contain any changepoint (valued \code{NULL}),
-the distance is defined as the \eqn{|m-k|}.
+The term \eqn{\min(A(C_{1}, C_{2}))} reflects the cost of matching
+changepoint locations between \eqn{C_{1}} and \eqn{C_{2}} and can be calculated
+using the linear assignment method. Details can be found in Shi et al. (2022).
+Note: if one configuration doesn't contain any changepoints (valued \code{NULL}),
+the distance is defined as \eqn{|m-k|}. The function can also be used
+to examine changepoint detection performance in simulation studies. Given the
+true changepoint configuration, \eqn{C_{true}}, used in generating the time
+series, the calculated distance between the estimated multiple changepoint
+configuration, \eqn{C_{est}=\{\eta_{1}, \ldots, \eta_{k}\}}, and \eqn{C_{true}}
+can be used to evaluate the performance of the detection algorithm.
 }
 \examples{
 N = 100
@@ -47,6 +52,8 @@ cptDist(tau1=tau1, tau2=tau2, N=N)
 # either tau1 or tau2 has zero detected changepoints
 cptDist(tau1=tau1, tau2=NULL, N=N)
 cptDist(tau1=NULL, tau2=tau2, N=N)
+
+# both tau1 and tau2 has zero detected changepoints
 cptDist(tau1=NULL, tau2=NULL, N=N)
 }
 \references{

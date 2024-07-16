@@ -26,16 +26,10 @@ A list object contains the hyperparameters for island-based GA running.
   \item{tol}{The tolerance level for deciding GA to stop.}
   \item{seed}{An single integer allows function produce reproducible results.}
 }
-\details{TBD
-%%  ~~ If necessary, more details than the description above ~~
-}
-\references{TBD
-%% ~put references to the literature/web site here ~
-}
 \author{Mo Li}
 \examples{
 # time series length
-Ts = 1000
+N = 1000
 
 IslandGA_param = list(
   popsize      = 40,
@@ -44,8 +38,8 @@ IslandGA_param = list(
   Pmutation    = 0.15,
   Pchangepoint = 0.1,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 100,

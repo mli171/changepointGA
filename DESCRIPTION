@@ -3,9 +3,7 @@ Type: Package
 Title: Changepoint detection via modified genetic algorithm
 Version: 0.1.0
 Date: 2024-03-21
-Author: c(
-    person("Mo", "Li", role = c("aut", "cre"), email = "mo.li@louisiana.edu")
-    )
+Author: Mo Li <mo.li@louisiana.edu>
 Maintainer: Mo Li <mo.li@louisiana.edu>
 Description: Modified genetic algorithm special for changepoint detection in time series.
     Use four spaces when indenting paragraphs within the Description.

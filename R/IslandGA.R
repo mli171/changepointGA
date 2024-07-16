@@ -9,10 +9,11 @@
 #'
 #' @param N The sample size of the time series.
 #' @param IslandGA_param A list contains the hyper-parameters for IslandGA.
+#' The default values for these hyper-parameters are included in \code{.default.IslandGA_param}.
 #' See \code{\link{IslandGA_param}} for the details.
 #' @param IslandGA_operators A list includes the functions for population initialization,
 #' new individual selection, and genetic operator of crossover and mutation.
-#' See \code{\link{IslandGA_operators}} for the details.
+#' See \code{\link{operators}} for the details and default functions.
 #' @param p.range Default is \code{NULL} for only changepoint detection. If
 #' \code{p.range} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
@@ -28,11 +29,12 @@
 #' \item{countMig}{The number of migrations undertaken by the IslandGA.}
 #' \item{count}{The number of iterations (generations) undertaken by the island
 #' genetic algorithm model.}
-#' \item{convg}{An integer code indicate convergence.}
-#' \itemize{
-#'  \item{0} indicates the algorithm successful completion.
-#'  \item{1} indicates the the total number of migrations exceeds the
-#'  pre-specified \item{\code{maxMig}} limit.
+#' \item{convg}{An integer code.
+#'  \itemize{
+#'    \item{0} indicates the algorithm successful completion.
+#'    \item{1} indicates the the total number of generations exceeds the
+#'             prespecified \code{maxgen} limit.
+#'  }
 #'  }
 #' @import stats
 #' @import Rcpp
@@ -43,26 +45,17 @@
 #' @useDynLib changepointGA
 #' @export
 #' @examples
-#' Ts = 1000
-#' betaT = c(0.5) # intercept
-#' XMatT = matrix(1, nrow=Ts, ncol=1)
-#' colnames(XMatT) = "intercept"
-#' sigmaT = 1
-#' phiT = c(0.5, -0.5)
-#' thetaT = c(0.8)
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' N = 1000
+#' XMatT = matrix(1, nrow=N, ncol=1)
+#' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+#'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+#' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
-#'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(Y=myts, tau=CpLocT)
-#'
-#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, Xt=myts)
-#' # IslandGA.res$overbestfit
-#' # IslandGA.res$overbestchrom
+#' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
+#' IslandGA.res$overbestfit
+#' IslandGA.res$overbestchrom
 #-------------------------- Genetic Algorithm Main Function is to minimize
-IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA_operators=.default.IslandGA_operators, p.range=NULL, ... ){
+IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA_operators=.default.operators, p.range=NULL, ... ){
 
   call = match.call()
   plen = length(p.range)

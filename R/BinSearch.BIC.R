@@ -1,18 +1,24 @@
-#' Example1
+#' Example function: Calculating BIC for AR(1) model
 #'
-#' The example objective function for changepoint search in First order Gaussian
-#' autoregressions (AR(1)) via Bayesian Information Criterion (BIC).
-#'
-#' The AR order here is fixed to be 1 and we only want to conduct changepoint
-#' detection in this example.
+#' The example objective function for changepoint search via Bayesian
+#' Information Criterion (BIC) for simple AR(1) model from Shi et al. (2022).
+#' The model is expressed as \eqn{X_{t}=\kappa_{t}+\epsilon_{t}}, where
+#' \eqn{\epsilon_{t}} follows a stationary AR(1) process, and \eqn{\kappa_{t}}
+#' denotes the regimen mean.
 #'
 #' @param chromosome The chromosome consists of the number of changepoints, their
-#' locations, and a value of time series length plus 1 indicating the end of the
-#' chromosome.
-#' @param plen Since we only want to perform the changepoint detection task,
-#' \code{plen} has to be set as 0.
+#' locations, and a value of time series length plus 1 (N+1) indicating the end
+#' of the chromosome.
+#' @param plen The number of model order parameters that need to be selected.
+#' Since we don't need model order selection in this example, \code{plen} equals
+#' to 0.
 #' @param Xt The simulated AR(1) time series from \code{ts.sim} function.
-#' @return Returned the value of the obejctive function (i.e. BIC).
+#' @return The BIC value of the objective function.
+#' @references{
+#'   Shi, X., Gallagher, C., Lund, R., & Killick, R. (2022).
+#'   A comparison of single and multiple changepoint techniques for time series data.
+#'   \emph{Computational Statistics & Data Analysis}, 170, 107433.
+#' }
 #' @import stats
 #' @importFrom utils tail
 #' @useDynLib changepointGA

@@ -32,16 +32,10 @@ A list object contains the hyperparameters for GA running.
   \item{tol}{The tolerance level for deciding GA to stop.}
   \item{seed}{An single integer allows function produce reproducible results.}
 }
-\details{TBD
-%%  ~~ If necessary, more details than the description above ~~
-}
-\references{TBD
-%% ~put references to the literature/web site here ~
-}
 \author{Mo Li}
 \examples{
 # time series length
-Ts = 1000
+N = 1000
 
 GA_param = list(
   popsize      = 40,
@@ -49,8 +43,8 @@ GA_param = list(
   Pmutation    = 0.1,
   Pchangepoint = 0.06,
   minDist      = 3,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxgen       = 1000,
   maxconv      = 100,
   monitoring   = FALSE,

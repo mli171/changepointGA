@@ -1,22 +1,24 @@
 #' Genetic algorithm
 #'
-#' Perform the modified genetic algorithm for multiple changepoint detection.
-#' Minimization of an objective function using genetic algorithm (GA).
-#' The algorithm can be run sequentially or in explicit parallelisation.
+#' Perform the modified genetic algorithm for changepoint detection.
+#' This involves the minimization of an objective function using a genetic algorithm (GA).
+#' The algorithm can be run sequentially or with explicit parallelization.
+#'
 #' @param ObjFunc The fitness function to be minimized. Users can specify any R or Rcpp
-#' functions as the fitness function with setting input as potential solution to
+#' function as the fitness function, setting the input as the potential solution to
 #' the optimization problem and returning a numerical value as the output/fitness.
-#' Depends on the user-specified chromosome representation, the optimization task
-#' will be changepoint detection only or changepoint detection + model order selection,
-#' which can be specified via \code{option} in \code{\link{GA_param}}. Once
+#' Depending on the user-specified chromosome representation, the optimization task
+#' can be changepoint detection only or changepoint detection plus model order selection,
+#' which can be specified via the \code{option} parameter in \code{\link{GA_param}}. When
 #' \code{option="both"}, the list \code{p.range} must be specified to give the range
 #' of model orders.
 #' @param N The sample size of the time series.
 #' @param GA_param A list contains the hyper-parameters for genetic algorithm.
+#' The default values for these hyper-parameters are included in \code{.default.GA_param}.
 #' See \code{\link{GA_param}} for the details.
 #' @param GA_operators A list includes the functions for population initialization,
 #' new individual selection, and genetic operator of crossover and mutation.
-#' See \code{\link{GA_operators}} for the details.
+#' See \code{\link{operators}} for the details and default functions.
 #' @param p.range Default is \code{NULL} for only changepoint detection. If
 #' \code{p.range} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
@@ -31,10 +33,10 @@
 #' \item{bestchrom}{The detected changepoints at each iteration.}
 #' \item{count}{The number of iterations undertaken by the genetic algorithm.}
 #' \item{convg}{An integer code.
-#' \itemize{
-#'  \item{0} indicates the algorithm successful completion.
-#'  \item{1} indicates the the total number of generations exceeds the
-#'  prespecified \item{\code{maxgen}} limit.
+#'  \itemize{
+#'    \item{0} indicates the algorithm successful completion.
+#'    \item{1} indicates the the total number of generations exceeds the
+#'             prespecified \code{maxgen} limit.
 #'  }
 #' }
 #'
@@ -47,25 +49,16 @@
 #' @useDynLib changepointGA
 #' @export
 #' @examples
-#' Ts = 1000
-#' betaT = c(0.5) # intercept
-#' XMatT = matrix(1, nrow=Ts, ncol=1)
-#' colnames(XMatT) = "intercept"
-#' sigmaT = 1
-#' phiT = c(0.5, -0.5)
-#' thetaT = c(0.8)
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' N = 1000
+#' XMatT = matrix(1, nrow=N, ncol=1)
+#' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+#'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+#' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
-#'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-#' TsPlotCheck(Y=myts, tau=CpLocT)
-#'
-#' GA.res = GA(ObjFunc=BinSearch.BIC, N=Ts, Xt=myts)
-#' # GA.res$overbestfit
-#' # GA.res$overbestchrom
-GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.GA_operators, p.range=NULL, ... ){
+#' GA.res = GA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
+#' GA.res$overbestfit
+#' GA.res$overbestchrom
+GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.operators, p.range=NULL, ...){
 
   call = match.call()
 

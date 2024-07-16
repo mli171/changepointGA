@@ -18,14 +18,13 @@ number variations.
 }
 \examples{
 data(arrayaCGH)
-\donttest{Xt = arrayaCGH[,5]}
 }
 \references{
 Lai, W. R., Johnson, M. D., Kucherlapati, R., & Park, P. J. (2005).
 Comparative analysis of algorithms for identifying amplifications and deletions
-in array CGH data. *Bioinformatics*, 21(19), 3763-3770.
+in array CGH data. \emph{Bioinformatics}, 21(19), 3763-3770.
 
 Killick, R., & Eckley, I. A. (2014). changepoint: An R package for
-changepoint analysis. *Journal of statistical software*, 58, 1-19.
+changepoint analysis. \emph{Journal of statistical software}, 58, 1-19.
 }
 \keyword{datasets}

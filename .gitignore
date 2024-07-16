@@ -10,3 +10,5 @@ src/*.dll
 .DS_Store
 .quarto
 inst/doc
+/doc/
+/Meta/
