@@ -37,7 +37,7 @@
   seed         = NULL
 )
 
-.default.operators = list(population = "random_population_cpp",
-                          selection  = "selection_linearrank_cpp",
-                          crossover  = "offspring_uniformcrossover_cpp",
+.default.operators = list(population = "random_population",
+                          selection  = "selection_linearrank",
+                          crossover  = "uniformcrossover",
                           mutation   = "mutation")

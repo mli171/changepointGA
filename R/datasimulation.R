@@ -26,7 +26,7 @@
 #' @param Delta The parameter vector contains the changepoint parameters for time series mean function.
 #' @param CpLoc A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}.
 #' @param seed The random seed for simulation reproducibility.
-#' @return Returns the simulated time series with attributes:
+#' @return The simulated time series with attributes:
 #' \item{\code{Z}}{The simulated time series.}
 #' \item{Attributes}{
 #' \itemize{

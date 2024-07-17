@@ -33,7 +33,7 @@ ts.sim(
 \item{seed}{The random seed for simulation reproducibility.}
 }
 \value{
-Returns the simulated time series with attributes:
+The simulated time series with attributes:
 \item{\code{Z}}{The simulated time series.}
 \item{Attributes}{
 \itemize{

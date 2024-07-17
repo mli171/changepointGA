@@ -34,7 +34,7 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' @return A single changepoint configuration format as above.
 //' @export
 // [[Rcpp::export]]
-arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, int lmax){
+arma::vec selectTau(int N, List prange, int minDist, double Pb, int mmax, int lmax){
 
   m = 0;
   double a;
@@ -65,10 +65,10 @@ arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, in
   return(tau);
 }
 
-//' Random population generation
+//' Random population initialization
 //'
 //' Randomly generate the individuals' chromosomes (changepoint confirgurations)
-//' to construct a population.
+//' to construct the first generation population.
 //'
 //' @param popsize An integer represents the number of individual in each
 //' population for GA (or subpopulation for IslandGA).
@@ -81,18 +81,22 @@ arma::vec selectTau_cpp(int N, List prange, int minDist, double Pb, int mmax, in
 //' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
 //' @param mmax The maximum possible number of changepoints in the data set.
 //' @param lmax The maximum possible length of the chromosome representation.
-//' @return A matrix that contains each individual's chromosome. Each column
-//' represent an chromosome of an individual. The first element of every chromosome
-//' represent the number of changepoints and the last non-zero element always equal
-//' to the length of time series + 1.
+//' @details
+//' The default population initialization uses \code{\link{selectTau}} to
+//' select the chromosome for the first generation population. Each column from
+//' the produced population matrix represent an chromosome of an individual.
+//' The first element of every chromosome represent the number of changepoints
+//' and the last non-zero element always equal to the length of time series
+//' plus one (N+1).
+//' @return A matrix that contains each individual's chromosome.
 //' @export
 // [[Rcpp::export]]
-arma::mat random_population_cpp(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax){
+arma::mat random_population(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax){
 
   arma::mat pop(lmax, popsize, fill::zeros);
 
   for(j=0;j<popsize;j++){
-    pop.col(j) = selectTau_cpp(N, prange, minDist, Pb, mmax, lmax);
+    pop.col(j) = selectTau(N, prange, minDist, Pb, mmax, lmax);
   }
 
   return(pop);
@@ -106,27 +110,25 @@ arma::mat random_population_cpp(int popsize, List prange, int N, int minDist, do
 //' other. In a uniform crossover, we don’t divide the chromosome into segments,
 //' rather we treat each gene separately. In this, we essentially flip a coin
 //' for each chromosome to decide whether or not it will be included in the
-//' off-spring.
-//'
+//' off-spring. If model order selection is requested, each child's model order
+//' has the equal probability (0.5) from \code{dad} and \code{mom}.
 //' @param mom Among two selected individuals, \code{mom} represents the selected
 //' chromosome representation with lower fitness function value.
 //' @param dad Among two selected individuals, \code{dad} represents the selected
 //' chromosome representation with larger fitness function value.
-//' @param prange Default is \code{NULL} for only changepoint detection. If
+//' @param prange Default value is \code{NULL} for only changepoint detection. If
 //' \code{prange} is specified as a list object, which contains the range of
 //' each model order parameters for order selection (integers). The number of
 //' order parameters must be equal to the length of \code{prange}.
-//' @param minDist The minimum length between two adjacent changepoints.
-//' @param lmax The maximum possible length of the chromosome representation.
+//' @param minDist The required minimum distance between two adjacent changepoints.
+//' @param lmax The user specified maximum number of changepoints, by default,
+//' as \code{N/2 - 1}.
 //' @param N The length of time series.
 //' @return The child chromosome that produced from \code{mom} and \code{dad} for
 //' next generation.
 //' @export
 // [[Rcpp::export]]
-arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N){
-
-  // Rcout << "mom:" << mom << std::endl;
-  // Rcout << "dad:" << dad << std::endl;
+arma::vec uniformcrossover(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N){
 
   int plen = prange.length();
 
@@ -203,23 +205,24 @@ arma::vec offspring_uniformcrossover_cpp(arma::vec& mom, arma::vec& dad, List pr
 }
 
 
-//' The selection genetic algorithm oeprator
+//' The default parents selection genetic algorithm operator
 //'
-//' Select a pair of individuals for the crossover operator to produce offspring
-//' (individual for next generation). According to each individual's fittness in
-//' \code{popFit}, the objective function values for each changepoint
-//' configuration, the pair of individuals are selected via the linear rank method.
-//' Among the pair of individuals, we assume that dad has better fit (smaller
-//' objective value or larger rank) than mom.
+//' The genetic algorithm require to select a pair of chromosomes, representing
+//' \code{dad} and \code{mom}, for the \code{crossover} operator to
+//' produce offspring (individual for next generation). The parents chromosomes
+//' are randomly selectd from the initialized population by a linear ranking
+//' method according to each individual's fittness in the input argument
+//' \code{popFit}. By default, the dad has better fit/smaller fitness function
+//' value/larger rank than \code{mom}.
 //' @param pop A matrix contains the chromosomes for all individuals. The number of
 //' rows is equal to \code{lmax} and the number of columns is equal to the
 //' \code{popsize}.
 //' @param popFit A vector contains the objective function value (population fit)
 //' being associated to each individual chromosome from above.
-//' @return A list contains the chromosomes for dad and mom.
+//' @return A list contains the chromosomes for \code{dad} and \code{mom}.
 //' @export
 // [[Rcpp::export]]
-List selection_linearrank_cpp(arma::mat& pop, arma::vec& popFit){
+List selection_linearrank(arma::mat& pop, arma::vec& popFit){
 
   popsize = popFit.size();
   arma::vec myorder = arma::conv_to<arma::vec>::from(arma::sort_index(arma::sort_index(popFit))+1);
