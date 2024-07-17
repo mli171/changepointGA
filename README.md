@@ -11,29 +11,30 @@ devtools::install_github(repo = "mli171/changepointGA")
 ### An example of using the GA 
 ```{r}
 ##### Stationary time series with autocorrelation
-Ts = 1000
-betaT = c(0.5) # intercept
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
+N = 1000
+betaT = c(0.5, -0.5, 0.3) # intercept, B, D
+period = 30
+XMatT = cbind(rep(1, N), cos(2*pi*(1:N)/period), sin(2*pi*(1:N)/period))
+colnames(XMatT) = c("intercept", "Bvalue", "DValue")
 sigmaT = 1
 phiT = c(0.5, -0.5)
 thetaT = c(0.8)
 DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+CpLocT = floor(N*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(Y=myts, tau=CpLocT)
+Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 GA_param = list(
   popsize      = 200,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxgen       = 100000,
   maxconv      = 1000,
   option       = "cp",
@@ -43,33 +44,28 @@ GA_param = list(
   tol          = 1e-5,
   seed         = NULL
 )
-ga_operators = list(population = "random_population_cpp",
-                    selection  = "selection_linearrank_cpp",
-                    crossover  = "offspring_uniformcrossover_cpp",
-                    mutation   = "mutation")
 
 tim1 = Sys.time()
-tmp1 = GA(ObjFunc=BinSearch.BIC, N=Ts, GA_param, ga_operators, Xt=myts)
+tmp1 = GA(ObjFunc=BinSearch.BIC, N=N, GA_param=GA_param, Xt=Xt)
 tim2 = Sys.time()
 ```
 
 ### An example of using the island-based GA 
 ```{r}
 ##### Stationary time series with autocorrelation
-Ts = 1000
+N = 1000
 betaT = c(0.5) # intercept
-XMatT = matrix(1, nrow=Ts, ncol=1)
+XMatT = matrix(1, nrow=N, ncol=1)
 colnames(XMatT) = "intercept"
 sigmaT = 1
 phiT = c(0.5, -0.5)
 thetaT = c(0.8)
 DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+CpLocT = floor(N*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(Y=myts, tau=CpLocT)
+Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 
 ## No parallel computing
@@ -78,27 +74,23 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 100,
   option       = "cp",
-  monitoring   = TRUE,
+  monitoring   = FALSE,
   parallel     = FALSE, ###
   nCore        = NULL,
   tol          = 1e-5,
   seed         = NULL
 )
-IslandGA_operators = list(population = "random_population_cpp",
-                          selection  = "selection_linearrank_cpp",
-                          crossover  = "offspring_uniformcrossover_cpp",
-                          mutation   = "mutation")
 
 tim3 = Sys.time()
-tmp2 = IslandGA(ObjFunc=BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+tmp2 = IslandGA(ObjFunc=BinSearch.BIC, N=N, IslandGA_param, Xt=Xt)
 tim4 = Sys.time()
 
 
@@ -108,87 +100,76 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 100,
   option       = "cp",
-  monitoring   = TRUE,
+  monitoring   = FALSE,
   parallel     = TRUE, ###
   nCore        = 10,
   tol          = 1e-5,
   seed         = NULL
 )
-IslandGA_operators = list(population = "random_population_cpp",
-                          selection  = "selection_linearrank_cpp",
-                          crossover  = "offspring_uniformcrossover_cpp",
-                          mutation   = "mutation")
 
 tim5 = Sys.time()
-tmp3 = IslandGA(BinSearch.BIC, N=Ts, IslandGA_param, IslandGA_operators, Xt=myts)
+tmp3 = IslandGA(BinSearch.BIC, N=N, IslandGA_param, Xt=Xt)
 tim6 = Sys.time()
 
 tim4 - tim3
 tim6 - tim5
 
-tmp2$bestfit
-tmp3$bestfit
-tmp2$bestchrom
-tmp3$bestchrom
+tmp2$overbestfit
+tmp3$overbestfit
+
+tmp2$overbestchrom
+tmp3$overbestchrom
 ```
 
 ## Changepoint Detection + Model order selection
 
 ### An example of using the GA 
 ```{r}
-Ts = 1000
+N = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
 period = 30
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
+XMatT = cbind(rep(1, N), cos(2*pi*(1:N)/period), sin(2*pi*(1:N)/period))
 colnames(XMatT) = c("intercept", "Bvalue", "DValue")
 sigmaT = 1
 phiT = c(0.5, -0.5)
 thetaT = c(0.8)
 DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+CpLocT = floor(N*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(Y=myts, tau=CpLocT)
+Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
-
 
 GA_param = list(
   popsize      = 200,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxgen       = 10000,
   maxconv      = 1000,
   option       = "both",
-  monitoring   = TRUE,
+  monitoring   = FALSE,
   parallel     = TRUE,
   nCore        = 10,
   tol          = 1e-5,
   seed         = NULL
 )
 
-ga_operators = list(population = "random_population_cpp",
-                    selection  = "selection_linearrank_cpp",
-                    crossover  = "offspring_uniformcrossover_cpp",
-                    mutation   = "mutation")
-
 tim1 = Sys.time()
-tmp1 = GA(ObjFunc=ARIMASearch.BIC, N=Ts, GA_param, ga_operators,
-          p.range=p.range, XMat=XMatT, Xt=myts)
+tmp1 = GA(ObjFunc=ARIMA.BIC.Order, N=N, GA_param, p.range=p.range, XMat=XMatT, Xt=Xt)
 tim2 = Sys.time()
 
 tim2 - tim1
@@ -198,21 +179,20 @@ tmp1$overbestchrom
 
 ### An example of using the island-based GA 
 ```{r}
-Ts = 1000
+N = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
 period = 30
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
+XMatT = cbind(rep(1, N), cos(2*pi*(1:N)/period), sin(2*pi*(1:N)/period))
 colnames(XMatT) = c("intercept", "Bvalue", "DValue")
 sigmaT = 1
 phiT = c(0.5, -0.5)
 thetaT = c(0.8)
 DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+CpLocT = floor(N*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-TsPlotCheck(Y=myts, tau=CpLocT)
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
 
@@ -221,28 +201,23 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 50,
   option       = "both",
-  monitoring   = TRUE,
+  monitoring   = FALSE,
   parallel     = FALSE,
   nCore        = NULL,
   tol          = 1e-5,
   seed         = NULL
 )
-IslandGA_operators = list(population = "random_population_cpp",
-                          selection  = "selection_linearrank_cpp",
-                          crossover  = "offspring_uniformcrossover_cpp",
-                          mutation   = "mutation")
 
 tim3 = Sys.time()
-tmp2 = IslandGA(ObjFunc=ARIMASearch.BIC, N=Ts, IslandGA_param, IslandGA_operators,
-                p.range=p.range, XMat=XMatT, Xt=myts)
+tmp2 = IslandGA(ObjFunc=ARIMA.BIC.Order, N=N, IslandGA_param, p.range=p.range, XMat=XMatT, Xt=Xt)
 tim4 = Sys.time()
 
 
@@ -251,37 +226,32 @@ IslandGA_param = list(
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
-  Pchangepoint = 10/Ts,
+  Pchangepoint = 10/N,
   minDist      = 2,
-  mmax         = Ts/2 - 1,
-  lmax         = 2 + Ts/2 - 1,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
   maxMig       = 500,
   maxgen       = 100,
   maxconv      = 50,
   option       = "both",
-  monitoring   = TRUE,
+  monitoring   = FALSE,
   parallel     = TRUE,
   nCore        = 5,
   tol          = 1e-5,
   seed         = NULL
 )
-IslandGA_operators = list(population = "random_population_cpp",
-                          selection  = "selection_linearrank_cpp",
-                          crossover  = "offspring_uniformcrossover_cpp",
-                          mutation   = "mutation")
-                          
+
 tim5 = Sys.time()
-tmp3 = IslandGA(ObjFunc=ARIMASearch.BIC, N=Ts, IslandGA_param, IslandGA_operators,
-                p.range=p.range, XMat=XMatT, Xt=myts)
+tmp3 = IslandGA(ObjFunc=ARIMA.BIC.Order, N=N, IslandGA_param, p.range=p.range, XMat=XMatT, Xt=Xt)
 tim6 = Sys.time()
 
 
 tim4 - tim3
 tim6 - tim5
 
-tmp2$bestfit
-tmp3$bestfit
+tmp2$overbestfit
+tmp3$overbestfit
 
-tmp2$bestchrom
-tmp3$bestchrom
+tmp2$overbestchrom
+tmp3$overbestchrom
 ```

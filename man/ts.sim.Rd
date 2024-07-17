@@ -49,7 +49,11 @@ The simulated time series with attributes:
 }
 }
 \description{
-This is a function to simulate time series \eqn{Z_{t}, t=1,\ldots,T_{s}} from a class of models,
+This is a function to simulate time series with changepoint effects. See
+details below.
+}
+\details{
+The simulated time series \eqn{Z_{t}, t=1,\ldots,T_{s}} is from a class of models,
  \deqn{Z_{t}=\mu_{t}+e_{t}.}
 \itemize{
  \item{Time series observations are IID} \cr \eqn{\mu_{t}} is a constant

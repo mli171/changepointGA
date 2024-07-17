@@ -1,6 +1,18 @@
 #' Time series simulation with changepoint effects
 #'
-#' This is a function to simulate time series \eqn{Z_{t}, t=1,\ldots,T_{s}} from a class of models,
+#' This is a function to simulate time series with changepoint effects. See
+#' details below.
+#'
+#' @param beta A parameter vector contains other mean function parameters without changepoint parameters.
+#' @param XMat The covairates for time series mean function without changepoint indicators.
+#' @param sigma The standard deviation for time series residuals \eqn{\epsilon_{t}}.
+#' @param phi A vector for the autoregressive (AR) parameters for AR part.
+#' @param theta A vector for the moving average (MA) parameters for MA part.
+#' @param Delta The parameter vector contains the changepoint parameters for time series mean function.
+#' @param CpLoc A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}.
+#' @param seed The random seed for simulation reproducibility.
+#' @details
+#' The simulated time series \eqn{Z_{t}, t=1,\ldots,T_{s}} is from a class of models,
 #'  \deqn{Z_{t}=\mu_{t}+e_{t}.}
 #' \itemize{
 #'  \item{Time series observations are IID} \cr \eqn{\mu_{t}} is a constant
@@ -18,14 +30,6 @@
 #' where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}} are the changepoint locations and
 #' \eqn{\Delta_{1},\ldots,\Delta_{m}} are the changepoint parameter that need to be estimated.
 #' }
-#' @param beta A parameter vector contains other mean function parameters without changepoint parameters.
-#' @param XMat The covairates for time series mean function without changepoint indicators.
-#' @param sigma The standard deviation for time series residuals \eqn{\epsilon_{t}}.
-#' @param phi A vector for the autoregressive (AR) parameters for AR part.
-#' @param theta A vector for the moving average (MA) parameters for MA part.
-#' @param Delta The parameter vector contains the changepoint parameters for time series mean function.
-#' @param CpLoc A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}.
-#' @param seed The random seed for simulation reproducibility.
 #' @return The simulated time series with attributes:
 #' \item{\code{Z}}{The simulated time series.}
 #' \item{Attributes}{
