@@ -6,7 +6,6 @@ Date: 2024-03-21
 Author: Mo Li <mo.li@louisiana.edu>
 Maintainer: Mo Li <mo.li@louisiana.edu>
 Description: Modified genetic algorithm special for changepoint detection in time series.
-    Use four spaces when indenting paragraphs within the Description.
 License: MIT + file LICENSE
 RoxygenNote: 7.3.1
 Depends: R (>= 4.3.0)
