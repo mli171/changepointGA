@@ -18,7 +18,7 @@
 
 
 .default.IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,

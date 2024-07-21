@@ -115,12 +115,11 @@ mutation = function(child, p.range=NULL, minDist, Pb, lmax, mmax, N){
   return(childMut)
 }
 
-NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, popsize, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, p.range, ...){
+NewpopulationIsland = function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, p.range, ...){
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
   #   fit= fitness evaluated for population
-  #   popsize= size of each island/subpop
   #   minDist= minimum distances between two adjacent changepoints
   #   lmax= max length of chromosome
   #   mmax= max number of changepoints

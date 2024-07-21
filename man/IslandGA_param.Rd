@@ -8,7 +8,7 @@ IslandGA_param
 A list object contains the hyperparameters for island-based GA running.
 }
 \arguments{
-  \item{popsize}{An integer represents the number of individual in each subpopulation (island).}
+  \item{subpopsize}{An integer represents the number of individual in each sub-population (island).}
   \item{Islandsize}{The number of subpopulation (island).}
   \item{Pcrossover}{The probability that the crossover operator applies on two individual chromosomes.}
   \item{Pmutation}{The probability that the mutation operator applies on one individual chromosome.}
@@ -32,7 +32,7 @@ A list object contains the hyperparameters for island-based GA running.
 N = 1000
 
 IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,

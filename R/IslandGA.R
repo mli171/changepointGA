@@ -60,7 +60,7 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
   call = match.call()
   plen = length(p.range)
 
-  popsize      = IslandGA_param$popsize
+  subpopsize   = IslandGA_param$subpopsize
   Islandsize   = IslandGA_param$Islandsize
   Pcrossover   = IslandGA_param$Pcrossover
   Pmutation    = IslandGA_param$Pmutation
@@ -115,9 +115,9 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
   }else{
     if(!is.function(IslandGA_operators$population)) population = get(IslandGA_operators$population)
     # generate by function
-    Island = array(0, dim=c(lmax, popsize, Islandsize))
+    Island = array(0, dim=c(lmax, subpopsize, Islandsize))
     for(k in 1:Islandsize){
-      Island[,,k] = population(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
+      Island[,,k] = population(subpopsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
     }
   }
 
@@ -132,7 +132,7 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
         # apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, XMat, Xt))))
       )
   }else{
-    IslandFit = matrix(0, nrow=popsize, ncol=Islandsize)
+    IslandFit = matrix(0, nrow=subpopsize, ncol=Islandsize)
     for(k in 1:Islandsize){
       IslandFit[,k] = apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, ...))))
       # IslandFit[,k] = apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, XMat, Xt))))
@@ -149,13 +149,13 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
         # NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
         #                     crossover=crossover, mutation=mutation,
         #                     pop=Island[,,k], fit=IslandFit[,k],
-        #                     popsize, minDist, lmax, mmax,
+        #                     minDist, lmax, mmax,
         #                     Pcrossover, Pmutation, Pchangepoint,
         #                     maxgen, N, p.range, XMat, Xt)
         NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                             crossover=crossover, mutation=mutation,
                             pop=Island[,,k], fit=IslandFit[,k],
-                            popsize, minDist, lmax, mmax,
+                            minDist, lmax, mmax,
                             Pcrossover, Pmutation, Pchangepoint,
                             maxgen, N, p.range, ...)
       )
@@ -172,13 +172,13 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
         # resNewpop = NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
         #                                 crossover=crossover, mutation=mutation,
         #                                 pop=Island[,,k], fit=IslandFit[,k],
-        #                                 popsize, minDist, lmax, mmax,
+        #                                 minDist, lmax, mmax,
         #                                 Pc=Pcrossover, Pm=Pmutation, Pb=Pchangepoint,
         #                                 maxgen, N, p.range, XMat, Xt)
         resNewpop = NewpopulationIsland(ObjFunc=ObjFunc, selection=selection,
                                         crossover=crossover, mutation=mutation,
                                         pop=Island[,,k], fit=IslandFit[,k],
-                                        popsize, minDist, lmax, mmax,
+                                        minDist, lmax, mmax,
                                         Pcrossover, Pmutation, Pchangepoint,
                                         maxgen, N, p.range, ...)
         tmpfit = resNewpop[1,]

@@ -8,7 +8,7 @@ GA_param
 A list object contains the hyperparameters for GA running.
 }
 \arguments{
-  \item{popsize}{An integer represents the number of individual in each population.}
+  \item{popsize}{An integer represents the number of individuals in each population.}
   \item{Pcrossover}{The probability that the crossover operator applies on two individual chromosomes.}
   \item{Pmutation}{The probability that the mutation operator applies on one individual chromosome.}
   \item{Pchangepoint}{The probability that a changepoint has occurred. User
