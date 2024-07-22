@@ -41,9 +41,9 @@ ARIMA.BIC.Order = function(chromosome, plen=2, XMat, Xt){
                 optim.control = list(maxit = 50))
   }else{
     tau = tau[tau>1 & tau<N+1] #keep CPT locations only
-    tmptau = unique(c(tau, N+1))
+    tmptau = unique(c(tau, N))
     CpMat = matrix(0, nrow=N, ncol=length(tmptau)-1)
-    for(i in 1:NCOL(CpMat)){CpMat[tmptau[i]:(tmptau[i+1]-1),i] = 1}
+    for(i in 1:NCOL(CpMat)){CpMat[(tmptau[i]+1):tmptau[i+1],i] = 1}
     DesignX = cbind(XMat, CpMat)
     fit = arima(Xt, order=c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
                 optim.control = list(maxit = 50))
