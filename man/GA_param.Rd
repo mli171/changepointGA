@@ -24,7 +24,7 @@ A list object contains the hyperparameters for GA running.
   should be based on the length of the time series. For instance, if a time
   series has length N, the recommended \code{lmax} should be 2+N/2-1.}
   \item{maxgen}{The maximum number of generation that the GA can last.}
-  \item{maxconv}{If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the island-based GA algorithm stops.}
+  \item{maxconv}{If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.}
   \item{option}{A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.}
   \item{monitoring}{A binary interger 0 or 1, indicating whether print out middle results for each iterations of GA.}
   \item{parallel}{Whether use multiple threads to parallel compute the individual fittness function values.}
@@ -45,8 +45,8 @@ GA_param = list(
   minDist      = 3,
   mmax         = N/2 - 1,
   lmax         = 2 + N/2 - 1,
-  maxgen       = 1000,
-  maxconv      = 100,
+  maxgen       = 50000,
+  maxconv      = 5000,
   monitoring   = FALSE,
   parallel     = FALSE,
   nCore        = NULL,
