@@ -47,6 +47,7 @@ GA_param = list(
   lmax         = 2 + N/2 - 1,
   maxgen       = 50000,
   maxconv      = 5000,
+  option       = "cp",
   monitoring   = FALSE,
   parallel     = FALSE,
   nCore        = NULL,

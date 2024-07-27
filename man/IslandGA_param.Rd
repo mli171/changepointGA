@@ -43,6 +43,7 @@ IslandGA_param = list(
   maxMig       = 1000,
   maxgen       = 50,
   maxconv      = 100,
+  option       = "cp",
   monitoring   = FALSE,
   parallel     = FALSE, ###
   nCore        = NULL,
