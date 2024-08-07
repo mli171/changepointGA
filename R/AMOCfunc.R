@@ -88,7 +88,8 @@ AMOCselection = function(pop, popFit){
 #' @export
 AMOCcrossover = function(mom, dad, p.range=NULL, minDist, lmax, N){
 
-  child = 1
+  child = matrix(0, nrow=lmax, 1)
+  child[1] = 1
   child[2] = round((dad[2]+mom[2])/2)
   child[3] = N + 1
 
