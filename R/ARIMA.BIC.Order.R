@@ -37,19 +37,27 @@ ARIMA.BIC.Order = function(chromosome, plen=2, XMat, Xt){
   if(m == 0){
     ##Case 1, Zero Changepoint
     DesignX = XMat
-    fit = arima(Xt, order = c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
-                optim.control = list(maxit = 50))
+    fit = try(arima(Xt, order = c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
+                    optim.control = list(maxit = 50)))
+    if(class(fit) == "try-error"){
+      BIC.obj = NA
+    }else{
+      BIC.obj = BIC(fit)
+    }
   }else{
     tau = tau[tau>1 & tau<N+1] #keep CPT locations only
     tmptau = unique(c(tau, N))
     CpMat = matrix(0, nrow=N, ncol=length(tmptau)-1)
     for(i in 1:NCOL(CpMat)){CpMat[(tmptau[i]+1):tmptau[i+1],i] = 1}
     DesignX = cbind(XMat, CpMat)
-    fit = arima(Xt, order=c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
-                optim.control = list(maxit = 50))
+    fit = try(arima(Xt, order=c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
+                    optim.control = list(maxit = 50)))
+    if(class(fit) == "try-error"){
+      BIC.obj = NA
+    }else{
+      BIC.obj = BIC(fit)
+    }
   }
-
-  BIC.obj = BIC(fit)
 
   return(BIC.obj)
 }
