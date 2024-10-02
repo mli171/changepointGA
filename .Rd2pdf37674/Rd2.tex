@@ -1,0 +1,1240 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `changepointGA'}}
+\par\bigskip{\large \today}
+\end{center}
+\inputencoding{utf8}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {changepointGA: Changepoint detection via modified genetic algorithm}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Changepoint detection via modified genetic algorithm}
+\item[Version]\AsIs{0.1.0}
+\item[Date]\AsIs{2024-03-21}
+\item[Author]\AsIs{Mo Li }\email{mo.li@louisiana.edu}\AsIs{}
+\item[Maintainer]\AsIs{Mo Li }\email{mo.li@louisiana.edu}\AsIs{}
+\item[Description]\AsIs{Modified genetic algorithm special for changepoint detection in time series.}
+\item[License]\AsIs{MIT + file LICENSE}
+\item[RoxygenNote]\AsIs{7.3.1}
+\item[Depends]\AsIs{R (>= 4.3.0)}
+\item[Imports]\AsIs{foreach, doMC, Rcpp, RcppArmadillo, clue, stats}
+\item[LinkingTo]\AsIs{Rcpp, RcppArmadillo}
+\item[URL]\AsIs{}\url{https://github.com/mli171/changepointGA}\AsIs{}
+\item[BugReports]\AsIs{}\url{https://github.com/mli171/changepointGA/issues}\AsIs{}
+\item[Suggests]\AsIs{knitr,
+rmarkdown}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{true}
+\item[VignetteBuilder]\AsIs{knitr}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{AMOCcrossover}{Average crossover operator to produce offspring for AMOC problem}{AMOCcrossover}
+%
+\begin{Description}
+In this crossover operator designed for AMOC problem, the new child is
+produced by taking the average of the changepoint locations from \code{dad}
+and \code{mom} and round to an integer. Note, every chromosome has at most
+one candidate changepoint location.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+AMOCcrossover(mom, dad, p.range = NULL, minDist, lmax, N)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{mom}] Among two selected individuals, \code{mom} represents the selected
+chromosome representation with lower fitness function value.
+
+\item[\code{dad}] Among two selected individuals, \code{dad} represents the selected
+chromosome representation with larger fitness function value.
+
+\item[\code{p.range}] The default value is \code{NULL}. If there is no requirement
+on model order selection, such an auxiliary argument is needed for \code{GA}
+and \code{IslandGA} functions.
+
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+
+\item[\code{lmax}] The maximum possible length of the chromosome representation.
+
+\item[\code{N}] The length of time series.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The child chromosome that produced from \code{mom} and \code{dad} for
+next generation.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{AMOCmutation}{Jump mutation operator to produce offspring for AMOC problem}{AMOCmutation}
+%
+\begin{Description}
+In a certain probability, the \code{mutation} genetic operator can be applied
+to generate a new \code{child}. In this AMOC mutation operator, the new child
+changepoint location can be down via a "jump" method. The child changepoint
+location will jump \code{minDist} time units either to the left or right to
+produce the changepoint location for the mutated child. The jump direction is
+randomly decided with 0.5 probability.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+AMOCmutation(
+  child,
+  p.range = NULL,
+  minDist,
+  Pchangepoint = NULL,
+  lmax = NULL,
+  mmax = NULL,
+  N = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{child}] The child chromosome resulting from the \code{crossover} genetic
+operator.
+
+\item[\code{p.range}] The default value is \code{NULL}. If there is no requirement
+on model order selection, such an auxiliary argument is needed for \code{GA}
+and \code{IslandGA} functions.
+
+\item[\code{minDist}] The minimum length between two adjacent changepoints in
+\code{\LinkA{AMOCselection}{AMOCselection}} operator, which is also the jump magnitude in the
+\code{AMOCmutation} operator.
+
+\item[\code{Pchangepoint}] An auxiliary argument is needed for \code{GA}
+and \code{IslandGA} functions.
+
+\item[\code{lmax}] An auxiliary argument is needed for \code{GA} and \code{IslandGA}
+functions.
+
+\item[\code{mmax}] An auxiliary argument is needed for \code{GA} and \code{IslandGA}
+functions.
+
+\item[\code{N}] An auxiliary argument is needed for \code{GA} and \code{IslandGA}
+functions.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The resulting child chromosome representation.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{AMOCpopulation}{Random population initialization for AMOC problem}{AMOCpopulation}
+%
+\begin{Description}
+Randomly generate the individuals' chromosomes (changepoint configurations)
+to construct the first generation population for the at most one changepoint
+(AMOC) problem.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+AMOCpopulation(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{popsize}] An integer represents the number of individual in each
+population for GA (or subpopulation for IslandGA).
+
+\item[\code{p.range}] Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.
+
+\item[\code{N}] The length of time series.
+
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+
+\item[\code{Pchangepoint}] The probability that a changepoint can occur.
+
+\item[\code{mmax}] The maximum possible number of changepoints in the data set.
+
+\item[\code{lmax}] The maximum possible length of the chromosome representation.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Given the possible candidate changepoint location set, each chromosome in the
+first generation population can be obtained by randomly sampling one location
+from the candidate set. The first element of every chromosome represent the
+number of changepoints and the last non-zero element always equal to the
+length of time series plus one (N+1).
+\end{Details}
+%
+\begin{Value}
+A matrix that contains each individual's chromosome.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{AMOCselection}{The parents selection genetic algorithm operator for AMOC problem}{AMOCselection}
+%
+\begin{Description}
+The genetic algorithm require to select a pair of chromosomes, representing
+\code{dad} and \code{mom}, for the \code{crossover} operator to
+produce offspring (individual for next generation). Here, the same linear
+ranking method in \code{\LinkA{selection\_linearrank}{selection.Rul.linearrank}} is used to select a pair
+of chromosomes for \code{dad} and \code{mom} in the at most one changepoint
+(AMOC) problem. By default, the dad has better fit/smaller fitness function
+value/larger rank than \code{mom}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+AMOCselection(pop, popFit)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{pop}] A matrix contains the chromosomes for all individuals. The number of
+rows is equal to \code{lmax} and the number of columns is equal to the
+\code{popsize}.
+
+\item[\code{popFit}] A vector contains the objective function value (population fit)
+being associated to each individual chromosome from above.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list contains the chromosomes for \code{dad} and \code{mom}.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{ARIMA.BIC.Order}{Calculating BIC for Multiple changepoint detection with model order selection}{ARIMA.BIC.Order}
+%
+\begin{Description}
+The objective function for changepoint search in Autoregressive
+moving average with model order selection via Bayesian Information Criterion
+(BIC).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ARIMA.BIC.Order(chromosome, plen = 2, XMat, Xt)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{chromosome}] The chromosome consists of the number of changepoints, the
+order of AR part, the order of MA part, the changepoint locations, and a
+value of time series length plus 1 (N+1) indicating the end of the chromosome.
+
+\item[\code{plen}] The number of model order parameters that need to be selected.
+If model order selection needs to be performed simultaneously with the
+changepoint detection task, \code{plen} should be nonzero.
+
+\item[\code{XMat}] A matrix contains the covariates, but not includes changepoint
+effects, for time series regression.
+
+\item[\code{Xt}] The simulated ARMA time series from \code{ts.sim} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The BIC value of the objective function.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+N = 1000
+XMatT = matrix(1, nrow=N, ncol=1)
+Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=0.8,
+            Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+
+# one chromosome representation
+chromosome = c(2, 1, 1, 250, 750, 1001)
+ARIMA.BIC.Order(chromosome, plen=2, XMat=XMatT, Xt=Xt)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{arrayaCGH}{Glioblastoma array aCGH data}{arrayaCGH}
+\keyword{datasets}{arrayaCGH}
+%
+\begin{Description}
+Glioblastoma multiforme (GBM) can cause chromosomal aberrations during DNA
+replication. Array comparative genomic hybridization (aCGH) experiments analyze
+these aberrations using fluorescence intensity ratios, which indicate DNA copy
+number variations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(arrayaCGH)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+An object of class \code{data.frame} with 193 rows and 5 columns.
+\end{Format}
+%
+\begin{References}
+Lai, W. R., Johnson, M. D., Kucherlapati, R., \& Park, P. J. (2005).
+Comparative analysis of algorithms for identifying amplifications and deletions
+in array CGH data. \emph{Bioinformatics}, 21(19), 3763-3770.
+
+Killick, R., \& Eckley, I. A. (2014). changepoint: An R package for
+changepoint analysis. \emph{Journal of statistical software}, 58, 1-19.
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(arrayaCGH)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{AtlantaTemperature}{Atlanta airport yearly average temperatures data}{AtlantaTemperature}
+\keyword{datasets}{AtlantaTemperature}
+%
+\begin{Description}
+The annual mean temperature data from 1879 to 2013 at Atlanta, Georgia’s
+Hartsfield International Airport weather station.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(AtlantaTemperature)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+An object of class \code{data.frame} with 134 rows and 2 columns.
+\end{Format}
+%
+\begin{References}
+Lund, R. B., Beaulieu, C., Killick, R., Lu, Q., \& Shi, X. (2023).
+Good practices and common pitfalls in climate time series changepoint techniques:
+A review. \emph{Journal of Climate}, 36(23), 8041-8057.
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+data(AtlantaTemperature)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{BinSearch.BIC}{Example function: Calculating BIC for AR(1) model}{BinSearch.BIC}
+%
+\begin{Description}
+The example objective function for changepoint search via Bayesian
+Information Criterion (BIC) for simple AR(1) model from Shi et al. (2022).
+The model is expressed as \eqn{X_{t}=\kappa_{t}+\epsilon_{t}}{}, where
+\eqn{\epsilon_{t}}{} follows a stationary AR(1) process, and \eqn{\kappa_{t}}{}
+denotes the regimen mean.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+BinSearch.BIC(chromosome, plen = 0, Xt)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{chromosome}] The chromosome consists of the number of changepoints, their
+locations, and a value of time series length plus 1 (N+1) indicating the end
+of the chromosome.
+
+\item[\code{plen}] The number of model order parameters that need to be selected.
+Since we don't need model order selection in this example, \code{plen} equals
+to 0.
+
+\item[\code{Xt}] The simulated AR(1) time series from \code{ts.sim} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The BIC value of the objective function.
+\end{Value}
+%
+\begin{References}
+
+Shi, X., Gallagher, C., Lund, R., \& Killick, R. (2022).
+A comparison of single and multiple changepoint techniques for time series data.
+\emph{Computational Statistics \& Data Analysis}, 170, 107433.
+
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+Ts = 1000
+betaT = c(0.5) # intercept
+XMatT = matrix(1, nrow=Ts, ncol=1)
+colnames(XMatT) = "intercept"
+sigmaT = 1
+phiT = c(0.5)
+thetaT = NULL
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
+              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+
+# candidate changepoint configuration
+chromosome = c(2, 250, 750, 1001)
+BinSearch.BIC(chromosome, Xt=myts)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{cptDist}{Comparing multiple changepoint configurations by pairwise distance}{cptDist}
+%
+\begin{Description}
+This function is to calculate the distance metric (Shi et al., 2022) between
+two changepoint configurations, \eqn{C_{1}=\{\tau_{1}, \ldots, \tau_{m}\}}{}
+and \eqn{C_{2}=\{\eta_{1}, \ldots, \eta_{k}\}}{}, where \eqn{\tau}{}'s are the
+changepoint locations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+cptDist(tau1, tau2, N)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{tau1}] A vector contains the changepoint locations for \eqn{C_{1}}{}
+for comparison. A value \code{NULL} is required if there is no changepoint detected.
+
+\item[\code{tau2}] A vector contains the changepoint locations for  \eqn{C_{2}}{}
+for comparison. A value \code{NULL} is required if there is no changepoint detected.
+
+\item[\code{N}] The simulated time series sample size. Two changepoint configurations
+should have the same \eqn{n}{} values.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+The pairwise distance was proposed by Shi et al. (2022),
+\deqn{d(C_{1}, C_{2})=|m-k|+ \min(A(C_{1}, C_{2})),}{}
+where \eqn{m}{} is the number of changepoints in configuration \eqn{C_{1}}{} and
+\eqn{k}{} is the number of changepoints in configuration \eqn{C_{2}}{}.
+The term \eqn{\min(A(C_{1}, C_{2}))}{} reflects the cost of matching
+changepoint locations between \eqn{C_{1}}{} and \eqn{C_{2}}{} and can be calculated
+using the linear assignment method. Details can be found in Shi et al. (2022).
+Note: if one configuration doesn't contain any changepoints (valued \code{NULL}),
+the distance is defined as \eqn{|m-k|}{}. The function can also be used
+to examine changepoint detection performance in simulation studies. Given the
+true changepoint configuration, \eqn{C_{true}}{}, used in generating the time
+series, the calculated distance between the estimated multiple changepoint
+configuration, \eqn{C_{est}=\{\eta_{1}, \ldots, \eta_{k}\}}{}, and \eqn{C_{true}}{}
+can be used to evaluate the performance of the detection algorithm.
+\end{Details}
+%
+\begin{Value}
+\begin{ldescription}
+\item[\code{dist}] The calculated distance.
+\end{ldescription}
+\end{Value}
+%
+\begin{References}
+
+Shi, X., Gallagher, C., Lund, R., \& Killick, R. (2022).
+A comparison of single and multiple changepoint techniques for time series data.
+\emph{Computational Statistics \& Data Analysis}, 170, 107433.
+
+\end{References}
+%
+\begin{Examples}
+\begin{ExampleCode}
+N = 100
+
+# both tau1 and tau2 has detected changepoints
+tau2 = c(25, 50, 75)
+tau1 = c(20, 35, 70, 80, 90)
+cptDist(tau1=tau1, tau2=tau2, N=N)
+
+# either tau1 or tau2 has zero detected changepoints
+cptDist(tau1=tau1, tau2=NULL, N=N)
+cptDist(tau1=NULL, tau2=tau2, N=N)
+
+# both tau1 and tau2 has zero detected changepoints
+cptDist(tau1=NULL, tau2=NULL, N=N)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{GA}{Genetic algorithm}{GA}
+%
+\begin{Description}
+Perform the modified genetic algorithm for changepoint detection.
+This involves the minimization of an objective function using a genetic algorithm (GA).
+The algorithm can be run sequentially or with explicit parallelization.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+GA(
+  ObjFunc,
+  N,
+  GA_param = .default.GA_param,
+  GA_operators = .default.operators,
+  p.range = NULL,
+  ...
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{ObjFunc}] The fitness function to be minimized. Users can specify any R or Rcpp
+function as the fitness function, setting the input as the potential solution to
+the optimization problem and returning a numerical value as the output/fitness.
+Depending on the user-specified chromosome representation, the optimization task
+can be changepoint detection only or changepoint detection plus model order selection,
+which can be specified via the \code{option} parameter in \code{\LinkA{GA\_param}{GA.Rul.param}}. When
+\code{option="both"}, the list \code{p.range} must be specified to give the range
+of model orders.
+
+\item[\code{N}] The sample size of the time series.
+
+\item[\code{GA\_param}] A list contains the hyper-parameters for genetic algorithm.
+The default values for these hyper-parameters are included in \code{.default.GA\_param}.
+See \code{\LinkA{GA\_param}{GA.Rul.param}} for the details.
+
+\item[\code{GA\_operators}] A list includes the functions for population initialization,
+new individual selection, and genetic operator of crossover and mutation.
+See \code{\LinkA{operators}{operators}} for the details and default functions.
+
+\item[\code{p.range}] Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.
+
+\item[\code{...}] additional arguments that will be passed to the fitness function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns a list that has components:
+\begin{ldescription}
+\item[\code{overbestfit}] The obtained minimum value of the objective function after
+the final iteration.
+\item[\code{overbestchrom}] The locations of the detected changepoints associating
+with the \code{overbestfit} the after the final iteration.
+\item[\code{bestfit}] The minimized fitness function values at each iteration.
+\item[\code{bestchrom}] The detected changepoints at each iteration.
+\item[\code{count}] The number of iterations undertaken by the genetic algorithm.
+\item[\code{convg}] An integer code.
+\begin{itemize}
+
+\item{} 0 indicates the algorithm successful completion.
+\item{} 1 indicates the the total number of generations exceeds the
+prespecified \code{maxgen} limit.
+
+\end{itemize}
+
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+N = 1000
+XMatT = matrix(1, nrow=N, ncol=1)
+Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+            Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
+
+GA.res = GA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
+GA.res$overbestfit
+GA.res$overbestchrom
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{GA\_param}{GA\_param}{GA.Rul.param}
+%
+\begin{Description}
+A list object contains the hyperparameters for GA running.
+\end{Description}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{popsize}] An integer represents the number of individuals in each population.
+\item[\code{Pcrossover}] The probability that the crossover operator applies on two individual chromosomes.
+\item[\code{Pmutation}] The probability that the mutation operator applies on one individual chromosome.
+\item[\code{Pchangepoint}] The probability that a changepoint has occurred. User
+could change this probability based on domain knowledge and the time series
+length.
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+\item[\code{mmax}] The maximum possible number of changepoints in the data set.
+For a time series of length 1000, the default value is 499. The suggested
+value should be based on the length of the time series. For instance, if a
+time series has length N, the recommended \code{mmax} should be N/2-1.
+\item[\code{lmax}] The maximum possible length of the chromosome representation. For
+a time series of length 1000, the default value is 501. The suggested value
+should be based on the length of the time series. For instance, if a time
+series has length N, the recommended \code{lmax} should be 2+N/2-1.
+\item[\code{maxgen}] The maximum number of generation that the GA can last.
+\item[\code{maxconv}] If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.
+\item[\code{option}] A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.
+\item[\code{monitoring}] A binary interger 0 or 1, indicating whether print out middle results for each iterations of GA.
+\item[\code{parallel}] Whether use multiple threads to parallel compute the individual fittness function values.
+\item[\code{nCore}] An integer represents the number of cores used in parallel computing.
+\item[\code{tol}] The tolerance level for deciding GA to stop.
+\item[\code{seed}] An single integer allows function produce reproducible results.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Author}
+Mo Li
+\end{Author}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# time series length
+N = 1000
+
+GA_param = list(
+  popsize      = 40,
+  Pcrossover   = 0.95,
+  Pmutation    = 0.1,
+  Pchangepoint = 0.06,
+  minDist      = 3,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
+  maxgen       = 50000,
+  maxconv      = 5000,
+  option       = "cp",
+  monitoring   = FALSE,
+  parallel     = FALSE,
+  nCore        = NULL,
+  tol          = 1e-5,
+  seed         = NULL
+)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{IslandGA}{Island model based genetic algorithm}{IslandGA}
+%
+\begin{Description}
+Perform the modified island-based genetic algorithm (IslandGA) for multiple changepoint detection.
+Minimization of an objective function using genetic algorithm (GA).
+The algorithm can be run sequentially or in explicit parallelisation.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+IslandGA(
+  ObjFunc,
+  N,
+  IslandGA_param = .default.IslandGA_param,
+  IslandGA_operators = .default.operators,
+  p.range = NULL,
+  ...
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{ObjFunc}] The fitness function to be minimized. Users can specify any R or Rcpp
+functions as the fitness function with setting input as potential solution to
+the optimization problem and returning a numerical value as the output/fitness.
+
+\item[\code{N}] The sample size of the time series.
+
+\item[\code{IslandGA\_param}] A list contains the hyper-parameters for IslandGA.
+The default values for these hyper-parameters are included in \code{.default.IslandGA\_param}.
+See \code{\LinkA{IslandGA\_param}{IslandGA.Rul.param}} for the details.
+
+\item[\code{IslandGA\_operators}] A list includes the functions for population initialization,
+new individual selection, and genetic operator of crossover and mutation.
+See \code{\LinkA{operators}{operators}} for the details and default functions.
+
+\item[\code{p.range}] Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.
+
+\item[\code{...}] additional arguments that will be passed to the fitness function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns a list that has the following components.
+\begin{ldescription}
+\item[\code{overbestfit}] The obtained minimum value of the objective function after
+the final iteration.
+\item[\code{overbestchrom}] The locations of the detected changepoints associating
+with the \code{overbestfit} the after the final iteration.
+\item[\code{bestfit}] The minimized fitness function values at each iteration.
+\item[\code{bestchrom}] The detected changepoints at each iteration.
+\item[\code{countMig}] The number of migrations undertaken by the IslandGA.
+\item[\code{count}] The number of iterations (generations) undertaken by the island
+genetic algorithm model.
+\item[\code{convg}] An integer code.
+\begin{itemize}
+
+\item{} 0 indicates the algorithm successful completion.
+\item{} 1 indicates the the total number of generations exceeds the
+prespecified \code{maxgen} limit.
+
+\end{itemize}
+
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+N = 1000
+XMatT = matrix(1, nrow=N, ncol=1)
+Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+            Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
+
+IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
+IslandGA.res$overbestfit
+IslandGA.res$overbestchrom
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{IslandGA\_param}{IslandGA\_param}{IslandGA.Rul.param}
+%
+\begin{Description}
+A list object contains the hyperparameters for island-based GA running.
+\end{Description}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{subpopsize}] An integer represents the number of individual in each sub-population (island).
+\item[\code{Islandsize}] The number of subpopulation (island).
+\item[\code{Pcrossover}] The probability that the crossover operator applies on two individual chromosomes.
+\item[\code{Pmutation}] The probability that the mutation operator applies on one individual chromosome.
+\item[\code{Pchangepoint}] The probability that a changepoint has occurred.
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+\item[\code{mmax}] The maximum possible number of changepoints in the data set.
+\item[\code{lmax}] The maximum possible length of the chromosome representation.
+\item[\code{maxMig}] The maximum number of migrations. After \code{maxMig} migrations, the island-based GA algorithm stops.
+\item[\code{maxgen}] The maximum number of generations that each subpopulation (island) has. The migration will apply after \code{maxgen} generations for each subpopulation(island).
+\item[\code{maxconv}] If the overall best fitted value doesn't change after  \code{maxconv} consecutive migrations, the island-based GA algorithm stops.
+\item[\code{option}] A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.
+\item[\code{monitoring}] A binary interger 0 or 1, indicating whether print out middle results for each iterations of GA.
+\item[\code{parallel}] Whether use multiple threads to parallel compute the individual fittness function values.
+\item[\code{nCore}] An integer represents the number of cores used in parallel computing.
+\item[\code{tol}] The tolerance level for deciding GA to stop.
+\item[\code{seed}] An single integer allows function produce reproducible results.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Author}
+Mo Li
+\end{Author}
+%
+\begin{Examples}
+\begin{ExampleCode}
+# time series length
+N = 1000
+
+IslandGA_param = list(
+  subpopsize   = 40,
+  Islandsize   = 5,
+  Pcrossover   = 0.95,
+  Pmutation    = 0.15,
+  Pchangepoint = 0.1,
+  minDist      = 2,
+  mmax         = N/2 - 1,
+  lmax         = 2 + N/2 - 1,
+  maxMig       = 1000,
+  maxgen       = 50,
+  maxconv      = 100,
+  option       = "cp",
+  monitoring   = FALSE,
+  parallel     = FALSE, ###
+  nCore        = NULL,
+  tol          = 1e-5,
+  seed         = NULL
+)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{mutation}{The default mutation operator in genetic algorithm}{mutation}
+%
+\begin{Description}
+In a certain probability, the \code{mutation} genetic operator can be applied
+to generate a new \code{child}. By default, the new child selection can be
+down by the similar individual selection method in population initialization,
+\code{\LinkA{selectTau}{selectTau}}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+mutation(child, p.range = NULL, minDist, Pb, lmax, mmax, N)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{child}] The child chromosome resulting from the \code{crossover} genetic
+operator.
+
+\item[\code{p.range}] Default is \code{NULL} for only changepoint detection. If
+\code{p.range} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{p.range}.
+
+\item[\code{minDist}] The required minimum distance between two adjacent changepoints.
+
+\item[\code{Pb}] The probability of changepoints for every time series.
+
+\item[\code{lmax}] The user specified maximum number of changepoints, by default,
+as \code{N/2 - 1}.
+
+\item[\code{mmax}] The user specified maximum length of individual chromosome,
+by default, as \code{2+N/2 + 1}.
+
+\item[\code{N}] The sample size of the time series.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+A function can apply mutation to the produced child with the specified
+probability \code{Pmutation} in \code{\LinkA{GA\_param}{GA.Rul.param}} and
+\code{\LinkA{IslandGA\_param}{IslandGA.Rul.param}}. If order selection is not requested
+(\code{option = "cp"} in \code{GA\_param} and \code{Island\_GA}), the default
+\code{\LinkA{mutation}{mutation}} operator function uses \code{selectTau} to select
+a completely new individual with a new chromosome as the mutated child.
+For details, see \code{\LinkA{selectTau}{selectTau}}. If order selection is needed
+(\code{option = "both"} in \code{GA\_param} and \code{Island\_GA}), we first
+decide whether to keep the produced child's model order with a probability
+of 0.5. If the child's model order is retained, the \code{selectTau}
+function is used to select a completely new individual with a new chromosome
+as the mutated child. If a new model order is selected from the candidate
+model order set, there is a 0.5 probability to either select a completely new
+individual with new changepoint locations or retain the original child's
+changepoint locations for the mutated child. Note that the current model
+orders in the child's chromosome are excluded from the set to avoid redundant
+objective function evaluation. Finally, the function returns a vector
+containing the modified chromosomes for mutated \code{child}.
+\end{Details}
+%
+\begin{Value}
+The resulting child chromosome representation.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{operators}{operators}{operators}
+%
+\begin{Description}
+A list object contains the GA or IslandGA operators function names.
+\end{Description}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{population}] It could be a function or a matrix. The function should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\LinkA{random\_population}{random.Rul.population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome.
+\item[\code{selection}] A function can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\LinkA{selection\_linearrank}{selection.Rul.linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.
+\item[\code{crossover}] A function can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\LinkA{uniformcrossover}{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.
+\item[\code{mutation}] A function can apply mutation to the produced child with the specified probability \code{Pmutation} in \code{\LinkA{GA\_param}{GA.Rul.param}} and \code{\LinkA{IslandGA\_param}{IslandGA.Rul.param}}. See \code{\LinkA{mutation}{mutation}} for details in the default mutation operator.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{References}
+Lu, Q., Lund, R., \& Lee, T. C. (2010). An MDL approach to the climate segmentation problem.
+\emph{Ann. Appl. Stat.} 4 (1) 299 - 319.
+\end{References}
+%
+\begin{SeeAlso}
+See Also as \code{\LinkA{GA}{GA}}.
+\end{SeeAlso}
+%
+\begin{Examples}
+\begin{ExampleCode}
+operators = list(population = "random_population",
+                 selection  = "selection_linearrank",
+                 crossover  = "uniformcrossover",
+                 mutation   = "mutation")
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{random\_population}{Random population initialization}{random.Rul.population}
+%
+\begin{Description}
+Randomly generate the individuals' chromosomes (changepoint confirgurations)
+to construct the first generation population.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+random_population(popsize, prange, N, minDist, Pb, mmax, lmax)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{popsize}] An integer represents the number of individual in each
+population for GA (or subpopulation for IslandGA).
+
+\item[\code{prange}] Default is \code{NULL} for only changepoint detection. If
+\code{prange} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{prange}.
+
+\item[\code{N}] The length of time series.
+
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+
+\item[\code{Pb}] Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
+
+\item[\code{mmax}] The maximum possible number of changepoints in the data set.
+
+\item[\code{lmax}] The maximum possible length of the chromosome representation.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+The default population initialization uses \code{\LinkA{selectTau}{selectTau}} to
+select the chromosome for the first generation population. Each column from
+the produced population matrix represent an chromosome of an individual.
+The first element of every chromosome represent the number of changepoints
+and the last non-zero element always equal to the length of time series
+plus one (N+1).
+\end{Details}
+%
+\begin{Value}
+A matrix that contains each individual's chromosome.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{selection\_linearrank}{The default parents selection genetic algorithm operator}{selection.Rul.linearrank}
+%
+\begin{Description}
+The genetic algorithm require to select a pair of chromosomes, representing
+\code{dad} and \code{mom}, for the \code{crossover} operator to
+produce offspring (individual for next generation). The parents chromosomes
+are randomly selectd from the initialized population by a linear ranking
+method according to each individual's fittness in the input argument
+\code{popFit}. By default, the dad has better fit/smaller fitness function
+value/larger rank than \code{mom}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+selection_linearrank(pop, popFit)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{pop}] A matrix contains the chromosomes for all individuals. The number of
+rows is equal to \code{lmax} and the number of columns is equal to the
+\code{popsize}.
+
+\item[\code{popFit}] A vector contains the objective function value (population fit)
+being associated to each individual chromosome from above.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list contains the chromosomes for \code{dad} and \code{mom}.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{selectTau}{Randomly select the chromosome}{selectTau}
+%
+\begin{Description}
+Randomly select the changepoint configuration for population initialization.
+The selected changepoint configuration represents a changepoint chromosome.
+The first element of the chromosome represent the number of changepoints
+and the last non-zero element always equal to the length of time series + 1.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+selectTau(N, prange, minDist, Pb, mmax, lmax)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{N}] The length of time series.
+
+\item[\code{prange}] A list object containing the possible range for other
+pre-defined model parameters, i.e. AR/MA order of ARMA models.
+
+\item[\code{minDist}] The minimum length between two adjacent changepoints.
+
+\item[\code{Pb}] Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
+
+\item[\code{mmax}] The maximum possible number of changepoints in the data set.
+
+\item[\code{lmax}] The maximum possible length of the chromosome representation.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A single changepoint configuration format as above.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{ts.sim}{Time series simulation with changepoint effects}{ts.sim}
+%
+\begin{Description}
+This is a function to simulate time series with changepoint effects. See
+details below.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ts.sim(
+  beta,
+  XMat,
+  sigma,
+  phi = NULL,
+  theta = NULL,
+  Delta = NULL,
+  CpLoc = NULL,
+  seed = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{beta}] A parameter vector contains other mean function parameters without changepoint parameters.
+
+\item[\code{XMat}] The covairates for time series mean function without changepoint indicators.
+
+\item[\code{sigma}] The standard deviation for time series residuals \eqn{\epsilon_{t}}{}.
+
+\item[\code{phi}] A vector for the autoregressive (AR) parameters for AR part.
+
+\item[\code{theta}] A vector for the moving average (MA) parameters for MA part.
+
+\item[\code{Delta}] The parameter vector contains the changepoint parameters for time series mean function.
+
+\item[\code{CpLoc}] A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}{}.
+
+\item[\code{seed}] The random seed for simulation reproducibility.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+The simulated time series \eqn{Z_{t}, t=1,\ldots,T_{s}}{} is from a class of models,
+\deqn{Z_{t}=\mu_{t}+e_{t}.}{}
+\begin{itemize}
+
+\item{} Time series observations are IID \\{} \eqn{\mu_{t}}{} is a constant
+and \eqn{e_{t}}{}'s are independent and identically distributed as \eqn{N(0,\sigma)}{}.
+\item{} ARMA(p,q) model with constant mean \\{} \eqn{\mu_{t}}{} is a constant,
+and \eqn{e_{t}}{} follows an ARMA(p,q) process.
+\item{} ARMA(p,q) model with seasonality \\{} \eqn{\mu_{t}}{} is not a constant,
+\deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}),}{}
+and \eqn{e_{t}}{} follows an ARMA(p,q) process.
+\item{} ARMA(p,q) model with seasonality and trend \\{} \eqn{\mu_{t}}{} is not a constant,
+\deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha t,}{}
+and \eqn{e_{t}}{} follows an ARMA(p,q) process.
+The changepoint effects could be introduced through the \eqn{\mu_{t}}{} as
+\deqn{\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},}{}
+where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}}{} are the changepoint locations and
+\eqn{\Delta_{1},\ldots,\Delta_{m}}{} are the changepoint parameter that need to be estimated.
+
+\end{itemize}
+
+\end{Details}
+%
+\begin{Value}
+The simulated time series with attributes:
+\begin{ldescription}
+\item[\code{\code{Z}}] The simulated time series.
+\item[\code{Attributes}] 
+\begin{itemize}
+
+\item{} \code{DesignX} The covariates include all changepoint indicators.
+\item{} \code{mu} A vector includes the mean values for simulated time series sequences.
+\item{} \code{theta} The true parameter vector (including changepoint effects).
+\item{} \code{CpEff} The true changepoint magnitudes.
+\item{} \code{CpLoc} The true changepoint locations where we introduce the mean changing effects.
+\item{} \code{arEff} A vector givies the AR coefficients.
+\item{} \code{maEff} A vector givies the MA coefficients.
+\item{} \code{seed} The random seed used for this simulation.
+
+\end{itemize}
+
+
+\end{ldescription}
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+##### M1: Time series observations are IID
+Ts = 1000
+betaT = c(0.5) # intercept
+XMatT = matrix(1, nrow=Ts, ncol=1)
+colnames(XMatT) = "intercept"
+sigmaT = 1
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(Y=myts, tau=CpLocT)
+
+##### M2: ARMA(2,1) model with constant mean
+Ts = 1000
+betaT = c(0.5) # intercept
+XMatT = matrix(1, nrow=Ts, ncol=1)
+colnames(XMatT) = "intercept"
+sigmaT = 1
+phiT = c(0.5, -0.5)
+thetaT = c(0.8)
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(Y=myts, tau=CpLocT)
+
+##### M3: ARMA(2,1) model with seasonality
+Ts = 1000
+betaT = c(0.5, -0.5, 0.3) # intercept, B, D
+period = 30
+XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
+colnames(XMatT) = c("intercept", "Bvalue", "DValue")
+sigmaT = 1
+phiT = c(0.5, -0.5)
+thetaT = c(0.8)
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(Y=myts, tau=CpLocT)
+
+
+##### M4: ARMA(2,1) model with seasonality and trend
+# scaled trend if large number of sample size
+Ts = 1000
+betaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
+period = 30
+XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period), 1:Ts)
+colnames(XMatT) = c("intercept", "Bvalue", "DValue", "trend")
+sigmaT = 1
+phiT = c(0.5, -0.5)
+thetaT = c(0.8)
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
+              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(Y=myts, tau=CpLocT)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{TsPlotCheck}{Plot the simulated time series}{TsPlotCheck}
+%
+\begin{Description}
+This is a function to plot the simulated time series with segmentation visualization
+by provided changepoint locations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+TsPlotCheck(
+  X = NULL,
+  Xat = NULL,
+  Y,
+  tau = NULL,
+  mu = NULL,
+  XLAB = NULL,
+  YLAB = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{X}] The time series time index, which could be specified as years, months, days, or others.
+The default value is NULL and the vector from 1 to the time series length will be applied.
+
+\item[\code{Xat}] The values from \code{X} that will be used as the X axis tick marks.
+
+\item[\code{Y}] The time series data.
+
+\item[\code{tau}] The provided changepoint locations.
+
+\item[\code{mu}] The provided meam values for each time \eqn{t}{}.
+
+\item[\code{XLAB}] A descriptive label for X axis.
+
+\item[\code{YLAB}] A descriptive label for Y axis.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Examples}
+\begin{ExampleCode}
+Ts = 1000
+betaT = c(0.5) # intercept
+XMatT = matrix(1, nrow=Ts, ncol=1)
+colnames(XMatT) = "intercept"
+sigmaT = 1
+DeltaT = c(2, -2)
+Cp.prop = c(1/4, 3/4)
+CpLocT = floor(Ts*Cp.prop)
+
+myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+TsPlotCheck(X=1:Ts, Xat=seq(from=1, to=Ts, length=10), Y=myts, tau=CpLocT)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{uniformcrossover}{Uniform crossover to produce offsprings}{uniformcrossover}
+%
+\begin{Description}
+In uniform crossover, typically, each bit is chosen from either parent with
+equal probability. Other mixing ratios are sometimes used, resulting in
+offspring which inherit more genetic information from one parent than the
+other. In a uniform crossover, we don’t divide the chromosome into segments,
+rather we treat each gene separately. In this, we essentially flip a coin
+for each chromosome to decide whether or not it will be included in the
+off-spring. If model order selection is requested, each child's model order
+has the equal probability (0.5) from \code{dad} and \code{mom}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+uniformcrossover(mom, dad, prange, minDist, lmax, N)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{mom}] Among two selected individuals, \code{mom} represents the selected
+chromosome representation with lower fitness function value.
+
+\item[\code{dad}] Among two selected individuals, \code{dad} represents the selected
+chromosome representation with larger fitness function value.
+
+\item[\code{prange}] Default value is \code{NULL} for only changepoint detection. If
+\code{prange} is specified as a list object, which contains the range of
+each model order parameters for order selection (integers). The number of
+order parameters must be equal to the length of \code{prange}.
+
+\item[\code{minDist}] The required minimum distance between two adjacent changepoints.
+
+\item[\code{lmax}] The user specified maximum number of changepoints, by default,
+as \code{N/2 - 1}.
+
+\item[\code{N}] The length of time series.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The child chromosome that produced from \code{mom} and \code{dad} for
+next generation.
+\end{Value}
+\printindex{}
+\end{document}

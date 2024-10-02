@@ -1,0 +1,70 @@
+\begin{theindex}
+
+  \item $*$ {\textbf  {datasets}}
+    \subitem \texttt  {arrayaCGH}, \hyperpage{6}
+    \subitem \texttt  {AtlantaTemperature}, \hyperpage{6}
+
+  \indexspace
+
+  \item \texttt  {AMOCcrossover}, \hyperpage{2}
+  \item \texttt  {AMOCmutation}, \hyperpage{3}
+  \item \texttt  {AMOCpopulation}, \hyperpage{3}
+  \item \texttt  {AMOCselection}, \hyperindexformat{\textit}{3}, 
+		\hyperpage{4}
+  \item \texttt  {ARIMA.BIC.Order}, \hyperpage{5}
+  \item \texttt  {arrayaCGH}, \hyperpage{6}
+  \item \texttt  {AtlantaTemperature}, \hyperpage{6}
+
+  \indexspace
+
+  \item \texttt  {BinSearch.BIC}, \hyperpage{7}
+
+  \indexspace
+
+  \item \texttt  {cptDist}, \hyperpage{8}
+
+  \indexspace
+
+  \item \texttt  {GA}, \hyperpage{9}, \hyperindexformat{\textit}{16}
+  \item \texttt  {GA\_param}, \hyperindexformat{\textit}{9}, 
+		\hyperpage{10}, \hyperindexformat{\textit}{15, 16}
+
+  \indexspace
+
+  \item \texttt  {IslandGA}, \hyperpage{12}
+  \item \texttt  {IslandGA\_param}, \hyperindexformat{\textit}{12}, 
+		\hyperpage{13}, \hyperindexformat{\textit}{15, 16}
+
+  \indexspace
+
+  \item \texttt  {mutation}, \hyperpage{14}, 
+		\hyperindexformat{\textit}{15, 16}
+
+  \indexspace
+
+  \item \texttt  {operators}, \hyperindexformat{\textit}{10}, 
+		\hyperindexformat{\textit}{12}, \hyperpage{15}
+
+  \indexspace
+
+  \item \texttt  {random\_population}, \hyperindexformat{\textit}{15}, 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item \texttt  {selection\_linearrank}, \hyperindexformat{\textit}{4}, 
+		\hyperindexformat{\textit}{16}, \hyperpage{17}
+  \item \texttt  {selectTau}, \hyperindexformat{\textit}{14, 15}, 
+		\hyperindexformat{\textit}{17}, \hyperpage{18}
+
+  \indexspace
+
+  \item \texttt  {ts.sim}, \hyperpage{18}
+  \item \texttt  {TsPlotCheck}, \hyperpage{21}
+
+  \indexspace
+
+  \item \texttt  {uniformcrossover}, \hyperindexformat{\textit}{16}, 
+		\hyperpage{22}
+
+\end{theindex}
