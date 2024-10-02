@@ -19,6 +19,6 @@ A list object contains the GA or IslandGA operators function names.
 \examples{
 operators = list(population = "random_population",
                  selection  = "selection_linearrank",
-                 crossover  = "offspring",
+                 crossover  = "uniformcrossover",
                  mutation   = "mutation")
 }
