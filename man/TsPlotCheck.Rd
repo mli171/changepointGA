@@ -30,6 +30,9 @@ The default value is NULL and the vector from 1 to the time series length will b
 
 \item{YLAB}{A descriptive label for Y axis.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 This is a function to plot the simulated time series with segmentation visualization
 by provided changepoint locations.

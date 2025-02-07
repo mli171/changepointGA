@@ -63,6 +63,7 @@ This involves the minimization of an objective function using a genetic algorith
 The algorithm can be run sequentially or with explicit parallelization.
 }
 \examples{
+\donttest{
 N = 1000
 XMatT = matrix(1, nrow=N, ncol=1)
 Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
@@ -72,4 +73,5 @@ TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 GA.res = GA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
 GA.res$overbestfit
 GA.res$overbestchrom
+}
 }

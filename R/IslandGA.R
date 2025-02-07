@@ -39,13 +39,13 @@
 #' @import stats
 #' @import Rcpp
 #' @import foreach
-#' @import doMC
+#' @import doParallel
 #' @import RcppArmadillo
 #' @import parallel
 #' @useDynLib changepointGA
 #' @export
 #' @examples
-#' N = 1000
+#' \donttest{N = 1000
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
 #'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
@@ -54,6 +54,7 @@
 #' IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
 #' IslandGA.res$overbestfit
 #' IslandGA.res$overbestchrom
+#' }
 #-------------------------- Genetic Algorithm Main Function is to minimize
 IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA_operators=.default.operators, p.range=NULL, ... ){
 
@@ -125,7 +126,7 @@ IslandGA = function(ObjFunc, N, IslandGA_param=.default.IslandGA_param, IslandGA
   if(parallel){
     nAvaCore = detectCores()
     if(is.null(nCore)){stop(paste0("Missing number of computing cores (", nAvaCore, " cores available)."))}
-    registerDoMC(cores = nCore)
+    registerDoParallel(cores = nCore)
     IslandFit = foreach(k=1:Islandsize, .combine = "cbind") %dopar%
       (
         apply(Island[,,k], 2, function(x) do.call(ObjFunc, c(list(x[1:(x[1]+plen+2)], plen, ...))))

@@ -43,12 +43,13 @@
 #' @import stats
 #' @import Rcpp
 #' @import foreach
-#' @import doMC
+#' @import doParallel
 #' @import RcppArmadillo
 #' @import parallel
 #' @useDynLib changepointGA
 #' @export
 #' @examples
+#' \donttest{
 #' N = 1000
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
@@ -58,6 +59,7 @@
 #' GA.res = GA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
 #' GA.res$overbestfit
 #' GA.res$overbestchrom
+#' }
 GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.operators, p.range=NULL, ...){
 
   call = match.call()
@@ -122,7 +124,7 @@ GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.oper
   if(parallel){
     nAvaCore = detectCores()
     if(is.null(nCore)){stop(paste0("Missing number of computing cores (", nAvaCore, " cores available)."))}
-    registerDoMC(cores = nCore)
+    registerDoParallel(cores = nCore)
     popFit = foreach(i=1:popsize, .combine = "c") %dopar%
       (
         do.call(ObjFunc, c(list(pop[1:(pop[1,i]+plen+2),i], plen, ...)))

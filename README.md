@@ -2,8 +2,17 @@
 Modified genetic algorithm (GA) special for changepoint detection in time series.
 
 ## Installation
+You can install the version of changepointGA from CRAN:
+
 ```{r}
-devtools::install_github(repo = "mli171/changepointGA")
+install.packages("changepointGA")
+```
+
+or the development version from Github:
+
+```{r}
+# install.packages("devtools")
+devtools::install_github("mli171/changepointGA")
 ```
 
 ## Changepoint Detection Only

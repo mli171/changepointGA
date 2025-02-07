@@ -39,7 +39,7 @@ ARIMA.BIC.Order = function(chromosome, plen=2, XMat, Xt){
     DesignX = XMat
     fit = try(arima(Xt, order = c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
                     optim.control = list(maxit = 50)))
-    if(class(fit) == "try-error"){
+    if(inherits(fit, "try-error")){
       BIC.obj = NA
     }else{
       BIC.obj = BIC(fit)
@@ -52,7 +52,7 @@ ARIMA.BIC.Order = function(chromosome, plen=2, XMat, Xt){
     DesignX = cbind(XMat, CpMat)
     fit = try(arima(Xt, order=c(p.order[1],0,p.order[2]), xreg=DesignX, include.mean=F,
                     optim.control = list(maxit = 50)))
-    if(class(fit) == "try-error"){
+    if(inherits(fit, "try-error")){
       BIC.obj = NA
     }else{
       BIC.obj = BIC(fit)

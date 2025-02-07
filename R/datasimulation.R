@@ -183,6 +183,7 @@ ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NUL
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
+#' @return No return value, called for side effects
 #' @examples
 #' Ts = 1000
 #' betaT = c(0.5) # intercept
@@ -214,11 +215,10 @@ TsPlotCheck = function(X=NULL, Xat=NULL, Y, tau=NULL, mu=NULL, XLAB=NULL, YLAB=N
   if(!is.null(tau)){
     abline(v=tau, lty="dashed", col="blue", lwd=2)
   }else{
-    cat("\n ---------- No changepoint specified ----------\n")
+    message("\n ---------- No changepoint specified ----------\n")
   }
 
   if(is.null(mu)){
-    # cat("\n Need to calculate sample mean of each segment.\n")
     # calculate the segment mean
     tauclc = c(1, tau, Ts+1)
     seg.len = diff(tauclc)

@@ -1,15 +1,17 @@
 Package: changepointGA
 Type: Package
-Title: Changepoint detection via modified genetic algorithm
+Title: Changepoint Detection via Modified Genetic Algorithm
 Version: 0.1.0
-Date: 2024-03-21
-Author: Mo Li <mo.li@louisiana.edu>
-Maintainer: Mo Li <mo.li@louisiana.edu>
-Description: Modified genetic algorithm special for changepoint detection in time series.
+Date: 2025-01-21
+Authors@R: person(given = "Mo",
+                  family = "Li",
+                  role = c("aut", "cre"),
+                  email = "mo.li@louisiana.edu")
+Description: The changepointGA R package implements genetic algorithms (GAs) to perform changepoint analysis in time series data. The pacakge also includes the extended island version of GAs describled in the paper of Lu, Lund and Lee (2010, <doi:10.1214/09-AOAS289>). By mimicking the principles of natural selection and evolution, GAs offer a powerful stochastic search technique for addressing combinatorial optimization problems. In changepointGA, each chromosome represents changepoint configurations, including the number and locations of changepoints, hyperparameters, and model parameters. The package uses genetic operators—selection, crossover, and mutation—to iteratively improve solutions based on fitness. Key features of changepointGA include encoding changepoint configurations in an integer format, enabling dynamic and simultaneous estimation of model hyperparameters, changepoint configurations, and associated parameters. This detail algorithm implementation can be found in the pacakge associated vignettes and the paper of Mo (2024, <doi:arXiv:2410.15571>).
 License: MIT + file LICENSE
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Depends: R (>= 4.3.0)
-Imports: foreach, doMC, Rcpp, RcppArmadillo, clue, stats
+Imports: foreach, doParallel, Rcpp, RcppArmadillo, clue, stats
 LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/mli171/changepointGA
 BugReports: https://github.com/mli171/changepointGA/issues
@@ -19,3 +21,4 @@ Suggests:
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
+

@@ -50,7 +50,7 @@ BinSearch.BIC = function(chromosome, plen=0, Xt){
   N = length(Xt) #length of the series
 
   if(tail(tau, 1) != N+1 | length(tau) != m+1){
-    cat("\n Current chromosome representation: \n", "\n", chromosome)
+    message(paste0("\n Current chromosome representation: \n >>>>>>> ", paste0(chromosome, collapse = " ")))
     stop("\n Error in chromosome representations!\n")
   }
 

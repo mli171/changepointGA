@@ -60,7 +60,7 @@ Minimization of an objective function using genetic algorithm (GA).
 The algorithm can be run sequentially or in explicit parallelisation.
 }
 \examples{
-N = 1000
+\donttest{N = 1000
 XMatT = matrix(1, nrow=N, ncol=1)
 Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
@@ -69,4 +69,5 @@ TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 IslandGA.res = IslandGA(ObjFunc=BinSearch.BIC, N=N, Xt=Xt)
 IslandGA.res$overbestfit
 IslandGA.res$overbestchrom
+}
 }
