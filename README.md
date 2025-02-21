@@ -79,7 +79,7 @@ TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 ## No parallel computing
 IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
@@ -105,7 +105,7 @@ tim4 = Sys.time()
 
 ## Parallel computing
 IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
@@ -206,7 +206,7 @@ TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 p.range = list(ar=c(0,2), ma=c(0,2))
 
 IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
@@ -231,7 +231,7 @@ tim4 = Sys.time()
 
 
 IslandGA_param = list(
-  popsize      = 40,
+  subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
