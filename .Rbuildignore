@@ -1,0 +1,6 @@
+^doc$
+^Meta$
+^\.Rproj\.user$
+^00LOCK.*
+^.*\.Rproj$
+
