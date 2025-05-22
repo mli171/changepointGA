@@ -2,7 +2,7 @@ Package: changepointGA
 Type: Package
 Title: Changepoint Detection via Modified Genetic Algorithm
 Version: 0.1.1
-Date: 2025-01-21
+Date: 2025-05-22
 Authors@R: c(
            person(given = "Mo",
                   family = "Li",
