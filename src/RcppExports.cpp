@@ -11,6 +11,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// ARIMA_BIC_changepointGA_rcpp
+double ARIMA_BIC_changepointGA_rcpp(NumericVector chromosome_, NumericMatrix XMat_, NumericVector Xt_);
+RcppExport SEXP _changepointGA_ARIMA_BIC_changepointGA_rcpp(SEXP chromosome_SEXP, SEXP XMat_SEXP, SEXP Xt_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type chromosome_(chromosome_SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type XMat_(XMat_SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Xt_(Xt_SEXP);
+    rcpp_result_gen = Rcpp::wrap(ARIMA_BIC_changepointGA_rcpp(chromosome_, XMat_, Xt_));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rank_asR
 IntegerVector rank_asR(NumericVector x, bool decreasing);
 RcppExport SEXP _changepointGA_rank_asR(SEXP xSEXP, SEXP decreasingSEXP) {
@@ -86,6 +99,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_changepointGA_ARIMA_BIC_changepointGA_rcpp", (DL_FUNC) &_changepointGA_ARIMA_BIC_changepointGA_rcpp, 3},
     {"_changepointGA_rank_asR", (DL_FUNC) &_changepointGA_rank_asR, 2},
     {"_changepointGA_selectTau", (DL_FUNC) &_changepointGA_selectTau, 6},
     {"_changepointGA_random_population", (DL_FUNC) &_changepointGA_random_population, 7},

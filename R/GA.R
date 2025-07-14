@@ -13,111 +13,222 @@
 #' \code{option="both"}, the list \code{p.range} must be specified to give the range
 #' of model orders.
 #' @param N The sample size of the time series.
-#' @param GA_param A list contains the hyper-parameters for genetic algorithm.
-#' The default values for these hyper-parameters are included in \code{.default.GA_param}.
-#' See \code{\link{GA_param}} for the details.
-#' @param GA_operators A list includes the functions for population initialization,
-#' new individual selection, and genetic operator of crossover and mutation.
-#' See \code{\link{operators}} for the details and default functions.
 #' @param p.range Default is \code{NULL} for only changepoint detection. If
 #' \code{p.range} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
 #' order parameters must be equal to the length of \code{p.range}.
+#' @param popSize An integer represents the number of individuals in each population.
+#' @param pcrossover The probability that the crossover operator applies on two individual chromosomes.
+#' @param pmutation The probability that the mutation operator applies on one individual chromosome.
+#' @param pchangepoint The probability that a changepoint has occurred. User could change this probability based on domain knowledge and the time series length.
+#' @param minDist The minimum length between two adjacent changepoints.
+#' @param mmax The maximum possible number of changepoints in the data set. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 499. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{mmax} should be N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
+#' @param lmax The maximum possible length of the chromosome representation. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 501. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{lmax} should be 2+N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
+#' @param maxgen The maximum number of generation that the GA can last.
+#' @param maxconv If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.
+#' @param option A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.
+#' @param monitoring A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether print out middle results for each iterations of GA.
+#' @param parallel A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether use multiple threads to parallel compute the individual fittness function values..
+#' @param nCore An integer. Default value is \code{NULL}. It represents the number of cores used in parallel computing. It must be specified if setting \code{parallel=TRUE}.
+#' @param tol An numerical value. Default is \code{1e-05}. The tolerance level for deciding GA to stop.
+#' @param seed An integer. Default value \code{NULL}. An single integer allows function produce reproducible results.
+#' @param popInitialize A function. It should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome. See \code{\link{random_population}} for details.
+#' @param suggestions A list object. Default value is \code{NULL}. Each element only needs to include the better or more reasonable results of the multiple changepoint locations. Having better \code{suggestions} can help GA converges faster.
+#' @param selection A function. This GA operator can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.
+#' @param crossover A function. This GA operator can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.
+#' @param mutation A function. This GA operator can apply mutation to the produced child with the specified probability \code{pmutation}. See \code{\link{mutation}} for details in the default mutation operator. The function returned object is a vector contain \code{child} chromosome representation.
 #' @param ... additional arguments that will be passed to the fitness function.
-#' @return Returns a list that has components:
-#' \item{overbestfit}{The obtained minimum value of the objective function after
-#' the final iteration.}
-#' \item{overbestchrom}{The locations of the detected changepoints associating
-#' with the \code{overbestfit} the after the final iteration.}
-#' \item{bestfit}{The minimized fitness function values at each iteration.}
-#' \item{bestchrom}{The detected changepoints at each iteration.}
-#' \item{count}{The number of iterations undertaken by the genetic algorithm.}
-#' \item{convg}{An integer code.
-#'  \itemize{
-#'    \item{0} indicates the algorithm successful completion.
-#'    \item{1} indicates the the total number of generations exceeds the
-#'             prespecified \code{maxgen} limit.
-#'  }
-#' }
-#'
+#' @return Return an object class \code{cptga-class}. See \code{\link{cptga-class}} for a more detailed description.
 #' @import stats
 #' @import Rcpp
 #' @import foreach
 #' @import doParallel
 #' @import RcppArmadillo
 #' @import parallel
+#' @importFrom methods new
+#' @importFrom utils str
 #' @useDynLib changepointGA
 #' @export
 #' @examples
 #' \donttest{
+#' ## Multiple changepoint detection without model order selection
 #' N = 1000
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
 #'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
 #' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 #'
+#' # without suggestions
 #' GA.res = GA(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
-#' GA.res$overbestfit
-#' GA.res$overbestchrom
+#' summary(GA.res)
+#' 
+#' # with suggestions
+#' suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
+#' GA.res = GA(ObjFunc=ARIMA.BIC, N=N, suggestions=suggestions, XMat=XMatT, Xt=Xt)
+#' summary(GA.res)
+#' 
+#' 
+#' ## Multiple changepoint detection with model order selection
+#' N = 1000
+#' XMatT = matrix(1, nrow=N, ncol=1)
+#' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+#'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+#' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
+#'
+#' # without suggestions
+#' p.range=list(ar=c(0,3), ma=c(0,3))
+#' GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+#'             option = "both", XMat=XMatT, Xt=Xt)
+#' summary(GA.res)
+#' 
+#' # with suggestions
+#' suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
+#' GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+#'             suggestions=suggestions, option = "both", XMat=XMatT, Xt=Xt)
+#' summary(GA.res)
 #' }
-GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.operators, p.range=NULL, ...){
-
+GA = function(ObjFunc, 
+                    N, 
+                    p.range=NULL,
+                    popSize=200,
+                    pcrossover=0.95,
+                    pmutation=0.15,
+                    pchangepoint=0.01,
+                    minDist=2,
+                    mmax=NULL,
+                    lmax=NULL,
+                    maxgen=50000,
+                    maxconv=5000,
+                    option="cp",
+                    monitoring=FALSE,
+                    parallel=FALSE,
+                    nCore=NULL,
+                    tol=1e-05,
+                    seed=NULL,
+                    popInitialize = "random_population",
+                    suggestions = NULL,
+                    selection  = "selection_linearrank",
+                    crossover  = "uniformcrossover",
+                    mutation   = "mutation",
+                    ...){
+  
   call = match.call()
-
-  i = NULL # add for global variables declare
-  plen = length(p.range)
-
-  popsize      = GA_param$popsize
-  Pcrossover   = GA_param$Pcrossover
-  Pmutation    = GA_param$Pmutation
-  Pchangepoint = GA_param$Pchangepoint
-  minDist      = GA_param$minDist
-  mmax         = GA_param$mmax
-  lmax         = GA_param$lmax
-  maxgen       = GA_param$maxgen
-  maxconv      = GA_param$maxconv
-  option       = GA_param$option
-  monitoring   = GA_param$monitoring
-  parallel     = GA_param$parallel
-  nCore        = GA_param$nCore
-  tol          = GA_param$tol
-  seed         = GA_param$seed
-
+  
+  if(missing(N))
+    { stop("The sample size must be provided") }
+  
+  if (is.null(mmax)) 
+    {mmax <- floor(N/2 - 1)}
+  if (is.null(lmax)) 
+    {lmax <- floor(2 + N/2 - 1)}
+  
   if(missing(ObjFunc))
   { stop("A fitness function must be provided") }
   if(!is.function(ObjFunc))
   { stop("A fitness function must be provided") }
-  if(Pcrossover < 0   | Pcrossover > 1)
-  { stop("Probability of crossover must be between 0 and 1.") }
-  if(Pmutation < 0    | Pmutation > 1)
-  { stop("Probability of mutation must be between 0 and 1.") }
-  if(Pchangepoint < 0 | Pchangepoint > 1)
-  { stop("Probability of changepoint must be between 0 and 1.") }
+  
+  i = NULL # add for global variables declare
+  plen = length(p.range)
+  
+  if(pcrossover < 0   | pcrossover > 1)
+    { stop("Probability of crossover must be between 0 and 1.") }
+  if(pmutation < 0    | pmutation > 1)
+    { stop("Probability of mutation must be between 0 and 1.") }
+  if(pchangepoint < 0 | pchangepoint > 1)
+    { stop("Probability of changepoint must be between 0 and 1.") }
   if(minDist >= N | minDist < 1)
-  { stop("Minimum number of locations between two changepoints invalid.") }
+    { stop("Minimum number of locations between two changepoints invalid.") }
   if(lmax < mmax + 2 )
-  { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
+    { stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).") }
   if(option == "both" & plen == 0)
-  { stop("Opt for changepoint and order search, p.range must be provided.") }
+    { stop("Opt for changepoint and order search, p.range must be provided.") }
   if(option == "cp" & plen != 0)
-  { stop("Opt for changepoint search, p.range must be NULL.") }
-
+    { stop("Opt for changepoint search, p.range must be NULL.") }
+  
   # set seed for reproducibility
-  if(!is.null(seed)) set.seed(seed)
-
-  if(!is.function(GA_operators$selection))  selection  = get(GA_operators$selection)
-  if(!is.function(GA_operators$crossover))  crossover  = get(GA_operators$crossover)
-  if(!is.function(GA_operators$mutation))   mutation   = get(GA_operators$mutation)
-
+  if(!is.null(seed))
+    {set.seed(seed)}
+  if(!is.function(popInitialize))
+    {popInitialize = get(popInitialize)}
+  if(!is.function(selection))
+    {selection = get(selection)}
+  if(!is.function(crossover))
+    {crossover = get(crossover)}
+  if(!is.function(mutation))
+    {mutation = get(mutation)}
+  
+  object = new("cptga", 
+               call=call, 
+               N=N,
+               p.range=p.range,
+               popSize=popSize,
+               pcrossover=pcrossover,
+               pmutation=pmutation,
+               pchangepoint=pchangepoint,
+               minDist=minDist,
+               mmax=mmax,
+               lmax=lmax,
+               maxgen=maxgen,
+               maxconv=maxconv,
+               option=option,
+               monitoring=monitoring,
+               parallel=parallel,
+               nCore=nCore,
+               tol=tol,
+               seed=seed,
+               suggestions=suggestions,
+               population=matrix(),
+               fitness=vector(),
+               overbestchrom=vector(),
+               overbestfit=double(),
+               bestfit=vector(),
+               count=integer(),
+               convg=integer())
+  
   ###### step 1: Initialize population
-  if(class(GA_operators$population)[1] == "matrix"){
-    # from input
-    if(all(is.na(GA_operators$population))){stop("NA's in provided population matrix")}
-    pop = GA_operators$population
+  if(!is.null(suggestions)){
+    if(!is.list(suggestions)){ stop("Suggested changepoints must be a List.") }
+    # 1. with suggestions
+    if (any(sapply(suggestions, function(x) any(is.na(x))))) {stop("NA provided in suggestions list")}
+    n.suggs = length(suggestions)
+    suggestions.mat = matrix(0L, nrow=lmax, ncol=n.suggs)
+    for (i in seq_along(suggestions)) {
+      idx = suggestions[[i]]
+      if (any(idx <= 1 | idx > N)){ stop(paste0("\n No. ", i, "th suggestion is invalid.")) }
+      if (object@option == "cp"){
+        if (is.null(idx)){
+          suggestions.mat[1:2,i] = c(0, N+1)
+        }else{
+          idx = idx[idx > 1 & idx <= N]  # filter valid indices
+          suggestions.mat[1:(length(idx)+2),i] = c(length(idx), idx, N+1)
+        }
+      }else if (object@option == "both"){
+        hyper.param = sapply(p.range, function(x) if (length(x) > 0) sample(min(x):max(x), 1) else NA)
+        if (is.null(idx)){
+          suggestions.mat[1:(2+plen),i] = c(0, hyper.param, N+1)
+        }else{
+          idx = idx[idx > 1 & idx <= N]  # filter valid indices
+          suggestions.mat[1:(length(idx)+plen+2),i] = c(length(idx), hyper.param, idx, N+1)
+        }
+      }
+    }
+    RemainpopSize = popSize - n.suggs
+    if(RemainpopSize > 0){
+      # 1.1 partial from suggestions
+      if(!is.function(popInitialize)) popInitialize = get(popInitialize)
+      pop = popInitialize(RemainpopSize, p.range, N, minDist, pchangepoint, mmax, lmax)  
+      pop = cbind(pop, suggestions.mat)
+    }else if (RemainpopSize == 0){
+      # 1.2 completely from suggestions
+      pop = suggestions.mat
+    }else{
+      # 1.3 some errors
+      stop("Number of suggested chromosome must be less than specified population size.")
+    }
   }else{
-    if(!is.function(GA_operators$population)) population = get(GA_operators$population)
-    # generate by function
-    pop = population(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax)
+    # 2. completely generated by popInitialize
+    if(!is.function(popInitialize)) popInitialize = get(popInitialize)
+    pop = popInitialize(popSize, p.range, N, minDist, pchangepoint, mmax, lmax)
   }
 
   ## evaluate the fitness (Parallel or NOT)
@@ -125,20 +236,23 @@ GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.oper
     nAvaCore = detectCores()
     if(is.null(nCore)){stop(paste0("Missing number of computing cores (", nAvaCore, " cores available)."))}
     registerDoParallel(cores = nCore)
-    popFit = foreach(i=1:popsize, .combine = "c") %dopar%
+    popFit = foreach(i=1:popSize, .combine = "c") %dopar%
       (
         do.call(ObjFunc, c(list(pop[1:(pop[1,i]+plen+2),i], plen, ...)))
       )
   }else{
-    popFit = rep(NA, popsize)
-    for(j in 1:popsize){
+    popFit = rep(NA, popSize)
+    for(j in 1:popSize){
       popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, ...)))
       # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, Xt)))
       # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, XMat, Xt)))
       # popFit[j] = do.call(ObjFunc, c(list(pop[1:(pop[1,j]+plen+2),j], plen, XMat, Xt, logL0)))
     }
   }
-
+  
+  object@population = pop
+  object@fitness = popFit
+  
   count = 0
   bestfit = rep(NA, maxgen)
   bestchrom = matrix(0, nrow=lmax, ncol=maxgen)
@@ -147,39 +261,40 @@ GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.oper
     #     flag[1]=1 indicating no cross-over
     #     flag[2]=1 indicating no mutation
     flag = rep(0, 2)
+    
     ##### step 2: parents selection
     parents = selection(pop, popFit)
     dad = parents$dad
     mom = parents$mom
-
+    
     ##### step 3: crossover
     a1 = runif(1)
-    if(a1 <= Pcrossover){
+    if(a1 <= pcrossover){
       child = crossover(mom, dad, p.range, minDist, lmax, N)
     }else{
       child = dad
       flag[1] = 1
     }
-
+    
     ##### step 4: mutation
     a2 = runif(1)
-    if(a2 <= Pmutation){
-      child = mutation(child, p.range, minDist, Pchangepoint, lmax, mmax, N)
+    if(a2 <= pmutation){
+      child = mutation(child, p.range, minDist, pchangepoint, lmax, mmax, N)
     }else{
       flag[2] = 1
     }
-
+    
     ##### step 5: form new generation
     #  steady state method:
     #     replace the least fit in the current pop with child if child is better.
     flagsum = flag[1] + flag[2]
-
+    
     if (flagsum<2){
       # flagsum < 2 indicating new individual produced and fitness evaluation needed
       fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, ...)))
       # fitChild = do.call(ObjFunc, c(list(child[1:(child[1]+plen+2)], plen, XMat, Xt)))
       leastfit = max(popFit) # with largest fitness value
-
+      
       if (fitChild < leastfit) {
         # indicating child is better than the worst one and replace
         pp = which.max(popFit)
@@ -187,13 +302,18 @@ GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.oper
         popFit[pp] = fitChild
       }
     }
-
+    
+    object@population = pop
+    object@fitness = popFit
+    
     # best popFit with minimized fitness value
     count = count + 1
     genbest = which.min(popFit)
     bestfit[count] = popFit[genbest]
     bestchrom[,count] = pop[,genbest]
-
+    
+    object@bestfit = bestfit
+    
     # check convergence once count >= maxconv
     # if after maxconv consecutive generations, the overall best does not change, then stop
     if(count >= maxconv){
@@ -214,27 +334,30 @@ GA = function(ObjFunc, N, GA_param=.default.GA_param, GA_operators=.default.oper
         pp = which(is.na(bestfit))[1] - 1
         bestfit = bestfit[1:pp]
         bestchrom = bestchrom[,1:pp]
-        convg = 0
-
+        
+        object@count = count
+        object@convg = 0
+        object@bestfit = bestfit
+        
         break
       }
     }
-
-    overbestfit = bestfit[count]
+    
+    object@overbestfit = bestfit[count]
     overbestchrom = bestchrom[,count]
-    overbestchrom = overbestchrom[1:(overbestchrom[1]+plen+2)]
+    object@overbestchrom = overbestchrom[1:(overbestchrom[1]+plen+2)]
     if(monitoring){
       cat("\n==== No.", count, "Generation ====")
       cat("\n overall bestfit =", overbestfit)
       cat("\n overall bestchrom =", overbestchrom, "\n")
     }
-
+    
     if (count >= maxgen){
-      convg = 1
-      break}
+      object@count = count
+      object@convg = 1
+      break
+    }
   }
-
-  return(list(overbestfit=overbestfit, overbestchrom=overbestchrom,
-              bestfit=bestfit, bestchrom=bestchrom,
-              count=count, convg=convg))
+  
+  return(object)
 }

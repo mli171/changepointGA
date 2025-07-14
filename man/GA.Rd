@@ -7,9 +7,27 @@
 GA(
   ObjFunc,
   N,
-  GA_param = .default.GA_param,
-  GA_operators = .default.operators,
   p.range = NULL,
+  popSize = 200,
+  pcrossover = 0.95,
+  pmutation = 0.15,
+  pchangepoint = 0.01,
+  minDist = 2,
+  mmax = NULL,
+  lmax = NULL,
+  maxgen = 50000,
+  maxconv = 5000,
+  option = "cp",
+  monitoring = FALSE,
+  parallel = FALSE,
+  nCore = NULL,
+  tol = 1e-05,
+  seed = NULL,
+  popInitialize = "random_population",
+  suggestions = NULL,
+  selection = "selection_linearrank",
+  crossover = "uniformcrossover",
+  mutation = "mutation",
   ...
 )
 }
@@ -25,37 +43,55 @@ of model orders.}
 
 \item{N}{The sample size of the time series.}
 
-\item{GA_param}{A list contains the hyper-parameters for genetic algorithm.
-The default values for these hyper-parameters are included in \code{.default.GA_param}.
-See \code{\link{GA_param}} for the details.}
-
-\item{GA_operators}{A list includes the functions for population initialization,
-new individual selection, and genetic operator of crossover and mutation.
-See \code{\link{operators}} for the details and default functions.}
-
 \item{p.range}{Default is \code{NULL} for only changepoint detection. If
 \code{p.range} is specified as a list object, which contains the range of
 each model order parameters for order selection (integers). The number of
 order parameters must be equal to the length of \code{p.range}.}
 
+\item{popSize}{An integer represents the number of individuals in each population.}
+
+\item{pcrossover}{The probability that the crossover operator applies on two individual chromosomes.}
+
+\item{pmutation}{The probability that the mutation operator applies on one individual chromosome.}
+
+\item{pchangepoint}{The probability that a changepoint has occurred. User could change this probability based on domain knowledge and the time series length.}
+
+\item{minDist}{The minimum length between two adjacent changepoints.}
+
+\item{mmax}{The maximum possible number of changepoints in the data set. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 499. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{mmax} should be N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).}
+
+\item{lmax}{The maximum possible length of the chromosome representation. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 501. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{lmax} should be 2+N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).}
+
+\item{maxgen}{The maximum number of generation that the GA can last.}
+
+\item{maxconv}{If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.}
+
+\item{option}{A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.}
+
+\item{monitoring}{A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether print out middle results for each iterations of GA.}
+
+\item{parallel}{A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether use multiple threads to parallel compute the individual fittness function values..}
+
+\item{nCore}{An integer. Default value is \code{NULL}. It represents the number of cores used in parallel computing. It must be specified if setting \code{parallel=TRUE}.}
+
+\item{tol}{An numerical value. Default is \code{1e-05}. The tolerance level for deciding GA to stop.}
+
+\item{seed}{An integer. Default value \code{NULL}. An single integer allows function produce reproducible results.}
+
+\item{popInitialize}{A function. It should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome. See \code{\link{random_population}} for details.}
+
+\item{suggestions}{A list object. Default value is \code{NULL}. Each element only needs to include the better or more reasonable results of the multiple changepoint locations. Having better \code{suggestions} can help GA converges faster.}
+
+\item{selection}{A function. This GA operator can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.}
+
+\item{crossover}{A function. This GA operator can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.}
+
+\item{mutation}{A function. This GA operator can apply mutation to the produced child with the specified probability \code{pmutation}. See \code{\link{mutation}} for details in the default mutation operator. The function returned object is a vector contain \code{child} chromosome representation.}
+
 \item{...}{additional arguments that will be passed to the fitness function.}
 }
 \value{
-Returns a list that has components:
-\item{overbestfit}{The obtained minimum value of the objective function after
-the final iteration.}
-\item{overbestchrom}{The locations of the detected changepoints associating
-with the \code{overbestfit} the after the final iteration.}
-\item{bestfit}{The minimized fitness function values at each iteration.}
-\item{bestchrom}{The detected changepoints at each iteration.}
-\item{count}{The number of iterations undertaken by the genetic algorithm.}
-\item{convg}{An integer code.
- \itemize{
-   \item{0} indicates the algorithm successful completion.
-   \item{1} indicates the the total number of generations exceeds the
-            prespecified \code{maxgen} limit.
- }
-}
+Return an object class \code{cptga-class}. See \code{\link{cptga-class}} for a more detailed description.
 }
 \description{
 Perform the modified genetic algorithm for changepoint detection.
@@ -64,14 +100,40 @@ The algorithm can be run sequentially or with explicit parallelization.
 }
 \examples{
 \donttest{
+## Multiple changepoint detection without model order selection
 N = 1000
 XMatT = matrix(1, nrow=N, ncol=1)
 Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
 TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 
+# without suggestions
 GA.res = GA(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
-GA.res$overbestfit
-GA.res$overbestchrom
+summary(GA.res)
+
+# with suggestions
+suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
+GA.res = GA(ObjFunc=ARIMA.BIC, N=N, suggestions=suggestions, XMat=XMatT, Xt=Xt)
+summary(GA.res)
+
+
+## Multiple changepoint detection with model order selection
+N = 1000
+XMatT = matrix(1, nrow=N, ncol=1)
+Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
+            Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
+
+# without suggestions
+p.range=list(ar=c(0,3), ma=c(0,3))
+GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+            option = "both", XMat=XMatT, Xt=Xt)
+summary(GA.res)
+
+# with suggestions
+suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
+GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+            suggestions=suggestions, option = "both", XMat=XMatT, Xt=Xt)
+summary(GA.res)
 }
 }

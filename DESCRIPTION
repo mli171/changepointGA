@@ -1,8 +1,8 @@
 Package: changepointGA
 Type: Package
 Title: Changepoint Detection via Modified Genetic Algorithm
-Version: 0.1.1
-Date: 2025-05-22
+Version: 0.1.2
+Date: 2025-08-01
 Authors@R: c(
            person(given = "Mo",
                   family = "Li",
@@ -17,7 +17,7 @@ Description: The Genetic Algorithm (GA) is used to perform changepoint analysis 
 License: MIT + file LICENSE
 RoxygenNote: 7.3.2
 Depends: R (>= 4.3.0)
-Imports: foreach, doParallel, Rcpp, RcppArmadillo, clue, stats
+Imports: methods, foreach, doParallel, Rcpp, RcppArmadillo, clue, stats, utils
 LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/mli171/changepointGA
 BugReports: https://github.com/mli171/changepointGA/issues

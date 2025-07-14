@@ -82,24 +82,6 @@ The genetic algorithm requires users set up a list object, including all the GA 
 ```{r}
 N = Ts
 p.range = list(ar=c(0,2), ma=c(0,2))
-
-GA_param = list(
-  popsize      = 80,
-  Pcrossover   = 0.95,
-  Pmutation    = 0.3,
-  Pchangepoint = 10/N,
-  minDist      = 1,
-  mmax         = N/2 - 1,
-  lmax         = 2 + N/2 - 1,
-  maxgen       = 5000,
-  maxconv      = 100,
-  option       = "both",
-  monitoring   = FALSE,
-  parallel     = FALSE,
-  nCore        = NULL,
-  tol          = 1e-5,
-  seed         = 1234
-)
 ```
 
 
@@ -108,21 +90,7 @@ GA_param = list(
 The default argument `GA_operators` for the `GA()` function requires four operators, `population`, `selection`, `crossover`, and `mutation`. The `population` operator will provide a matrix like R object that store the randomly generated chromosome representations as the initial population. As with any optimization problem, better initial values can lead to improved and faster-converging results. For convenience, users can specify their preferred solutions in a matrix R object to serve as the initialized population and replace the default operator in `operators`, but the matrix dimensions should be `lmax` rows and `popsize` columns. Each column from this matrix represents an individual chromosome.
 
 ```{r}
-pop = matrix(0, nrow=2 + N/2 - 1, ncol=80)
-# put the two desired candidate solutions into pop matrix
-pop[1:6,1] = c(2, 1, 1, 50, 150, N+1)
-pop[1:7,2] = c(3, 1, 1, 50, 100, 150, N+1)
-
-# fill the remain 38 individuals slot from default generation
-tmppop = random_population(popsize=80, prange=p.range, N=N, minDist=1, Pb=10/N, 
-                           mmax=N/2 - 1, 2 + N/2 - 1)
-pop[,3:80] = tmppop[,3:80]
-pop[1:10, 1:10]
-
-operators.self = list(population = pop,
-                      selection  = "selection_linearrank",
-                      crossover  = "uniformcrossover",
-                      mutation   = "mutation")
+suggestions = list(NULL, c(50), c(50, 150), c(50, 100, 150))
 ```
 
 Since we are trying to estimate the changepoint configurations, it is necessary to set the `XMat` to include all other covariates except the changepoint indicators, as if we are under a changepoint free model.
@@ -134,12 +102,14 @@ XMatEst = matrix(1, nrow=N, ncol=1)
 Then we call function `GA()` for changepoint searching and simultaneously estimate the best fitted model AR and MA orders. The estimated number of changepoints and corresponding changepoint locations could be extracted as below.
 
 ```{r}
-res.changepointGA = suppressWarnings(GA(ObjFunc=ARIMA.BIC.Order, N=N, GA_param, GA_operators = operators.self, 
-                                        p.range=p.range, XMat=XMatEst, Xt=myts))
-fit.changepointGA = res.changepointGA$overbestfit
-fit.changepointGA
-tau.changepointGA = res.changepointGA$overbestchrom
-tau.changepointGA
+res.changepointGA = suppressWarnings(GA(ObjFunc=ARIMA.BIC.Order, 
+                                        N=N, 
+                                        p.range=p.range, 
+                                        suggestions=suggestions,
+                                        option="both",
+                                        XMat=XMatEst, 
+                                        Xt=myts))
+summary(res.changepointGA)
 ```
 
 
