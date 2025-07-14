@@ -4,6 +4,8 @@
 \name{cptga-class}
 \alias{cptga-class}
 \alias{summary,cptga-method}
+\alias{summary,}
+\alias{cptga-method}
 \title{S4 Class Definition for `cptga`}
 \usage{
 \S4method{summary}{cptga}(object, ...)
@@ -11,7 +13,7 @@
 \arguments{
 \item{object}{An object of class \code{cptga}.}
 
-\item{...}{Additional arguments passed to \code{print.summary.cptga}.}
+\item{...}{Additional arguments (ignored).}
 }
 \value{
 An object of class \code{cptga}.

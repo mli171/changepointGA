@@ -1,6 +1,6 @@
 #' Genetic algorithm
 #'
-#' Perform the modified genetic algorithm for changepoint detection.
+#' Perform the genetic algorithm for changepoint detection.
 #' This involves the minimization of an objective function using a genetic algorithm (GA).
 #' The algorithm can be run sequentially or with explicit parallelization.
 #'
@@ -56,16 +56,17 @@
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
 #'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
-#' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 #'
 #' # without suggestions
-#' GA.res = GA(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
+#' GA.res = cptga(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
+#' plot(GA.res, data=Xt)
 #' 
 #' # with suggestions
 #' suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-#' GA.res = GA(ObjFunc=ARIMA.BIC, N=N, suggestions=suggestions, XMat=XMatT, Xt=Xt)
+#' GA.res = cptga(ObjFunc=ARIMA.BIC, N=N, suggestions=suggestions, XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
+#' plot(GA.res, data=Xt)
 #' 
 #' 
 #' ## Multiple changepoint detection with model order selection
@@ -73,21 +74,22 @@
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
 #'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
-#' TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=c(250, 750))
 #'
 #' # without suggestions
 #' p.range=list(ar=c(0,3), ma=c(0,3))
-#' GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+#' GA.res = cptga(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
 #'             option = "both", XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
+#' plot(GA.res, data=Xt)
 #' 
 #' # with suggestions
 #' suggestions = list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-#' GA.res = GA(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
+#' GA.res = cptga(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
 #'             suggestions=suggestions, option = "both", XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
+#' plot(GA.res, data=Xt)
 #' }
-GA = function(ObjFunc, 
+cptga = function(ObjFunc, 
                     N, 
                     p.range=NULL,
                     popSize=200,

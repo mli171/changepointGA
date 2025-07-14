@@ -99,10 +99,10 @@ Since we are trying to estimate the changepoint configurations, it is necessary 
 XMatEst = matrix(1, nrow=N, ncol=1)
 ```
 
-Then we call function `GA()` for changepoint searching and simultaneously estimate the best fitted model AR and MA orders. The estimated number of changepoints and corresponding changepoint locations could be extracted as below.
+Then we call function `cptga()` for changepoint searching and simultaneously estimate the best fitted model AR and MA orders. The estimated number of changepoints and corresponding changepoint locations could be extracted as below.
 
 ```{r}
-res.changepointGA = suppressWarnings(GA(ObjFunc=ARIMA.BIC.Order, 
+res.changepointGA = suppressWarnings(cptga(ObjFunc=ARIMA.BIC.Order, 
                                         N=N, 
                                         p.range=p.range, 
                                         suggestions=suggestions,

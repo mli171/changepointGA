@@ -13,7 +13,6 @@ A list object contains the GA or IslandGA operators function names.
 \item{crossover}{A function can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.}
 \item{mutation}{A function can apply mutation to the produced child with the specified probability \code{Pmutation} in \code{\link{GA_param}} and \code{\link{IslandGA_param}}. See \code{\link{mutation}} for details in the default mutation operator.}
 }
-\seealso{See Also as \code{\link{GA}}.}
 \references{Lu, Q., Lund, R., & Lee, T. C. (2010). An MDL approach to the climate segmentation problem.
 \emph{Ann. Appl. Stat.} 4 (1) 299 - 319.}
 \examples{
