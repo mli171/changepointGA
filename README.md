@@ -10,9 +10,7 @@ evolve toward solutions with enhanced fitness. This paper presents the R package
 changepointGA, which encodes changepoint chromosomes in an integer format. 
 Furthermore, changepointGA facilitates the dynamic and simultaneous estimation 
 of changepoint models hyperparameters, changepoint configurations, and model 
-parameters, leading to more robust and accurate analyses. Several simulation 
-studies and real-world applications are discussed to illustrate the package 
-capabilities.
+parameters, leading to more robust and accurate analyses.
 
 ## Installation
 You can install the version of changepointGA from CRAN:
