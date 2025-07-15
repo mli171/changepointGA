@@ -52,9 +52,10 @@ TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 tim1 = Sys.time()
 tmp1 = cptga(ObjFunc=ARIMA.BIC, N=N, XMat=XMaT, Xt=Xt)
 tim2 = Sys.time()
-tim2 - tim1
 summary(tmp1)
 plot(tmp1)
+
+tim2 - tim1
 ```
 
 ### An example of using the island-based GA 
