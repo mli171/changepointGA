@@ -1,5 +1,18 @@
 # changepointGA
-Modified genetic algorithm (GA) special for changepoint detection in time series.
+Genetic algorithms (GA) are stochastic search techniques designed to address 
+combinatorial optimization problems by mimicking the principles of natural 
+selection and evolution. GAs have proven effective in both single and multiple 
+changepoint analyses within time series data, where each chromosome encodes 
+the hyperparameters, number, and locations of changepoints, along with the 
+associated model parameters. Starting with a population of potential changepoint 
+configurations, GAsutilize genetic operators—selection, crossover, and mutation—to 
+evolve toward solutions with enhanced fitness. This paper presents the R package 
+changepointGA, which encodes changepoint chromosomes in an integer format. 
+Furthermore, changepointGA facilitates the dynamic and simultaneous estimation 
+of changepoint models hyperparameters, changepoint configurations, and model 
+parameters, leading to more robust and accurate analyses. Several simulation 
+studies and real-world applications are discussed to illustrate the package 
+capabilities.
 
 ## Installation
 You can install the version of changepointGA from CRAN:
