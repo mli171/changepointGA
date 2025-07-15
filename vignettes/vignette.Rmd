@@ -109,43 +109,33 @@ res.changepointGA = suppressWarnings(cptga(ObjFunc=ARIMA.BIC.Order,
                                         option="both",
                                         XMat=XMatEst, 
                                         Xt=myts))
+print(res.changepointGA)
 summary(res.changepointGA)
 ```
 
 
 ## Island version of Genetic Algorithm
 
-The island GA model can be implemented by calling R function `IslandGA()` with similar arguments as in `GA()` function. The argument of `IslandGA_param` would be slightly different. Related, the initialized population is a list object, the length of such list should equal to the number of request islands. Here, we use the default operator to initialize the population, but users can also insert in their "reasonable" and "better" initial solutions to the list object as in previous section for improved and faster-converging results. The computational time is also showing below.
+The island GA model can be implemented by calling R function `cptgaisl()` with similar arguments as in `cptga()` function. The argument of `cptgaisl()` would be slightly different. Related, the initialized population is a list object, the length of such list should equal to the number of request islands. Here, we use the default operator to initialize the population, but users can also insert in their "reasonable" and "better" initial solutions to the list object `suggestions` as in previous section for improved and faster-converging results. The associated model orders will be randomly picked based on `p.range`. The computational time is also showing below.
 
 ```{r}
-IslandGA_param = list(
-  subpopsize   = 80,
-  Islandsize   = 2,
-  Pcrossover   = 0.95,
-  Pmutation    = 0.15,
-  Pchangepoint = 10/N,
-  minDist      = 1,
-  mmax         = N/2 - 1,
-  lmax         = 2 + N/2 - 1,
-  maxMig       = 1000,
-  maxgen       = 50,
-  maxconv      = 20,
-  option       = "both",
-  monitoring   = FALSE,
-  parallel     = FALSE, ###
-  nCore        = NULL,
-  tol          = 1e-5,
-  seed         = 1234
-)
 tim1 = Sys.time()
-res.Island.changepointGA = suppressWarnings(IslandGA(ObjFunc=ARIMA.BIC.Order, N=N, IslandGA_param, 
-                                                     p.range=p.range, XMat=XMatEst, Xt=myts))
+res.Island.changepointGA = suppressWarnings(cptgaisl(ObjFunc=ARIMA.BIC.Order, 
+                                                     N=N, 
+                                                     p.range=p.range, 
+                                                     popSize=160,
+                                                     numIslands=2,
+                                                     maxMig=1000,
+                                                     maxgen=50,
+                                                     maxconv=20,
+                                                     option="both",
+                                                     XMat=XMatEst, 
+                                                     Xt=myts))
 tim2 = Sys.time()
 tim2 - tim1
-fit.Island.changepointGA = res.Island.changepointGA$overbestfit
-fit.Island.changepointGA
-tau.Island.changepointGA = res.Island.changepointGA$overbestchrom
-tau.Island.changepointGA
+print(res.Island.changepointGA)
+summary(res.Island.changepointGA)
+plot(res.Island.changepointGA, data=myts)
 ```
 
 ## Parallel computing
@@ -153,36 +143,26 @@ tau.Island.changepointGA
 The default setting for both `GA()` and `IslandGA()` implementations is to evaluate each changepoint configuration sequentially and the initialized population fitness evaluation is computational expensive. In some case, we could use the parallel computing techniques to speed up the fitness evaluation, which requires the R packages **foreach** and **doParallel**. The parallel computing will be more efficient when the island size ad the number of islands is larger (a larger starting population). We then could implement the parallel computing easily by setting `parallel=TRUE` and apply `nCore=2` threads on a single computer as below (set `nCore` equals to the number of island is recommended).
 
 ```{r}
-IslandGA_param = list(
-  subpopsize   = 80,
-  Islandsize   = 2,
-  Pcrossover   = 0.95,
-  Pmutation    = 0.15,
-  Pchangepoint = 10/N,
-  minDist      = 1,
-  mmax         = N/2 - 1,
-  lmax         = 2 + N/2 - 1,
-  maxMig       = 1000,
-  maxgen       = 50,
-  maxconv      = 20,
-  option       = "both",
-  monitoring   = FALSE,
-  parallel     = TRUE, ###
-  nCore        = 2,
-  tol          = 1e-5,
-  seed         = 1234
-)
-
 tim3 = Sys.time()
-res.Island.changepointGA = suppressWarnings(IslandGA(ObjFunc=ARIMA.BIC.Order, N=N, IslandGA_param, 
-                                                     p.range=p.range, XMat=XMatEst, Xt=myts))
+res.Island.changepointGA = suppressWarnings(cptgaisl(ObjFunc=ARIMA.BIC.Order, 
+                                                     N=N,  
+                                                     p.range=p.range, 
+                                                     popSize=160,
+                                                     numIslands=2,
+                                                     maxMig=1000,
+                                                     maxgen=50,
+                                                     maxconv=20,
+                                                     option="both",
+                                                     parallel=TRUE,
+                                                     nCore=2,
+                                                     XMat=XMatEst, 
+                                                     Xt=myts))
 
 tim4 = Sys.time()
 tim4 - tim3
-fit.Island.changepointGA = res.Island.changepointGA$overbestfit
-fit.Island.changepointGA
-tau.Island.changepointGA = res.Island.changepointGA$overbestchrom
-tau.Island.changepointGA
+print(res.Island.changepointGA)
+summary(res.Island.changepointGA)
+plot(res.Island.changepointGA, data=myts)
 ```
 
 ## Changepoint configuration distance calculation
@@ -191,7 +171,8 @@ It is important to measure how different the estimated changepoint configuration
 
 ```{r}
 true.tau = c(50, 150)
-est.tau = c(tau.Island.changepointGA[4:(4+tau.Island.changepointGA[1]-1)])
+tau.Island = res.Island.changepointGA@overbestchrom
+est.tau = c(tau.Island[4:(4+tau.Island[1]-1)])
 cptDist(tau1=true.tau, tau2=est.tau, N=N)
 ```
 

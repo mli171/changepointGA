@@ -1,66 +1,65 @@
-#' S4 Class for Genetic Algorithm-Based Changepoint Detection
+#' S4 Class for Island Model Genetic Algorithm-Based Changepoint Detection
 #'
-#' An object of class \code{cptga} stores results and configuration settings
-#' for changepoint detection using a Genetic Algorithm (GA), optionally with
-#' simultaneous model order selection. This class records GA control parameters,
-#' intermediate population structures, and the optimal solution found.
+#' This class stores results and settings for the island model genetic algorithm (`cptgaisl`)
+#' used in multiple changepoint detection and optional model order selection.
 #'
-#' @name cptga-class
-#' @title S4 Class Definition for `cptga`
+#' @name cptgaisl-class
+#' @title S4 Class Definition for `cptgaisl`
 #'
 #' @slot call The matched call that created the object.
 #' @slot N The sample size of the time series.
-#' @slot p.range A list object. Default is \code{NULL}. If specified, it contains the
-#' ranges for each model order parameter (integers). Required when \code{option = "both"}
-#' is used for joint changepoint and model selection.
-#' @slot popSize An integer representing the number of individuals in each GA population.
-#' @slot pcrossover The probability that the crossover operator is applied to two chromosomes.
-#' @slot pmutation The probability that the mutation operator is applied to a chromosome.
-#' @slot pchangepoint The prior probability that a changepoint has occurred at each location.
-#' @slot minDist The minimum allowed distance between two adjacent changepoints.
-#' @slot mmax The maximum possible number of changepoints. Typically set based on time series length and \code{option}.
-#' @slot lmax The maximum length of the chromosome. Typically set based on time series length and \code{option}.
-#' @slot maxgen The maximum number of generations the GA is allowed to run.
-#' @slot maxconv If the optimal fitness value does not improve over this many generations, GA stops.
-#' @slot option A character string: either \code{"cp"} for changepoint detection only, or \code{"both"} for changepoint detection and model order selection.
-#' @slot monitoring Logical. If \code{TRUE}, prints intermediate GA progress.
-#' @slot parallel Logical. If \code{TRUE}, enables parallel computation for fitness evaluation.
-#' @slot nCore Integer or \code{NULL}. Number of cores used for parallel computation when \code{parallel = TRUE}.
-#' @slot tol Numeric. Tolerance for determining GA convergence. Default is \code{1e-5}.
-#' @slot seed An integer or \code{NULL}. Random seed for reproducibility.
-#' @slot suggestions A list or \code{NULL}. Each element provides suggested changepoint locations
-#' to guide initial population design and potentially accelerate convergence.
-#' @slot population A matrix where each row represents an individual chromosome in the current population.
-#' @slot fitness A numeric vector containing the fitness values of individuals in the current generation.
-#' @slot overbestchrom A vector representing the best chromosome found over all generations.
-#' @slot overbestfit A numeric scalar. The best (smallest) fitness value achieved.
-#' @slot bestfit A numeric vector recording the best fitness value in each generation.
-#' @slot count A numeric value indicating the number of generations the GA actually ran.
-#' @slot convg A numeric vector representing convergence information. A value of \code{0} indicates the algorithm successful completion. A value of \code{1} indicates the the total number of generations exceeds the pre-specified \code{maxgen} limit.
+#' @slot p.range A list or NULL. Ranges for each model order parameter when \code{option = "both"}.
+#' @slot popSize Integer. It represents the total number of individuals in each generation, which equal to the number of islands multiplied by the size of each island (i.e., \code{popSize = numIslands × Islandsize}).
+#' @slot numIslands Integer. The number of islands (sub-populations).
+#' @slot Islandsize Numerical value. The number of individuals in each island.
+#' @slot pcrossover Probability of crossover operation.
+#' @slot pmutation Probability of mutation operation.
+#' @slot pchangepoint Prior probability of changepoint occurrence.
+#' @slot minDist Minimum distance between adjacent changepoints.
+#' @slot mmax Maximum number of changepoints allowed.
+#' @slot lmax Maximum length of chromosome.
+#' @slot maxMig Maximum number of migrations allowed.
+#' @slot maxgen Maximum number of generations per island before migration.
+#' @slot maxconv Number of migrations with no improvement before stopping.
+#' @slot option Either "cp" or "both".
+#' @slot monitoring Logical. If TRUE, prints intermediate output.
+#' @slot parallel Logical. Whether parallel computation is used.
+#' @slot nCore Integer or NULL. Number of cores for parallelization.
+#' @slot tol Tolerance threshold for fitness improvement.
+#' @slot seed Integer or NULL. Seed for reproducibility.
+#' @slot suggestions A list or NULL. Suggested changepoint configurations.
+#' @slot Island A 3D array storing all individual chromosomes in current generation across islands. Dimensions are \code{lmax} × \code{Islandsize} × \code{numIslands}, representing chromosome length, individuals per island, and number of islands, respectively.
+#' @slot IslandFit A matrix of fitness values in current generation with dimensions \code{Islandsize} × \code{numIslands}, where each column corresponds to one island's population.
+#' @slot overbestchrom A vector. The best chromosome ever found.
+#' @slot overbestfit Numeric. The best fitness score obtained.
+#' @slot bestfit Numeric vector recording best fitness per migration.
+#' @slot countMig Integer vector tracking number of migrations.
+#' @slot count Integer vector tracking total generations.
+#' @slot convg Integer vector for convergence diagnostics.
 #'
-#' @return An object of class \code{cptga}.
-#' @seealso \code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
-
-
+#' @return An object of class \code{cptgaisl}
+#' @seealso \code{\link{cptgaisl}}, \code{\link{cptgaisl-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
 
 setClassUnion("numericOrNULL", members = c("numeric", "NULL"))
 setClassUnion("listOrNULL", members = c("list", "NULL"))
 
-
-#' @rdname cptga-class
+#' @rdname cptgaisl-class
 #' @export
-setClass(Class = "cptga", 
+setClass("cptgaisl",
          representation(
            call = "language",
            N = "numeric",
            p.range = "listOrNULL",
            popSize = "numeric",
+           numIslands = "numeric",
+           Islandsize = "numeric",
            pcrossover = "numeric",
            pmutation = "numeric",
            pchangepoint = "numeric",
            minDist = "numeric",
-           mmax = "numericOrNULL",
-           lmax = "numericOrNULL",
+           mmax = "numeric",
+           lmax = "numeric",
+           maxMig = "numeric",
            maxgen = "numeric",
            maxconv = "numeric",
            option = "character",
@@ -70,28 +69,29 @@ setClass(Class = "cptga",
            tol = "numeric",
            seed = "numericOrNULL",
            suggestions = "listOrNULL",
-           population = "matrix",
-           fitness = "vector",
+           Island = "array",
+           IslandFit = "matrix",
            overbestchrom = "vector",
            overbestfit = "numeric",
            bestfit = "vector",
+           countMig = "numeric",
            count = "numeric",
            convg = "numeric"
          ),
          package = "changepointGA"
 )
 
-setMethod("print", "cptga", function(x, ...) str(x))
+setMethod("print", "cptgaisl", function(x, ...) str(x))
 
 
-#' Print Summary for a `cptga` Object
+#' Print Summary for a `cptgaisl` Object
 #'
 #' Displays key information about the settings and results from a changepoint detection
-#' procedure using the Genetic Algorithm (GA) stored in a `cptga` object. This includes
+#' procedure using the Island model Genetic Algorithm (GA) stored in a `cptgaisl` object. This includes
 #' the algorithm configuration, population settings, optimization mode, and final
 #' solution such as the number and location of changepoints and model parameters (if applicable).
 #'
-#' @param x An object of class \code{cptga}, typically produced by a GA-based changepoint detection routine.
+#' @param x An object of class \code{cptgaisl}, typically produced by a GA-based changepoint detection routine.
 #' @param digits Number of digits to print for probabilities and fitness. Default taken from \code{getOption("digits")}.
 #' @param max_display Maximum number of suggested solutions to display if suggestions are provided.
 #' @param ... Additional arguments (currently not used).
@@ -106,18 +106,21 @@ setMethod("print", "cptga", function(x, ...) str(x))
 #'
 #' @return Invisibly returns \code{NULL}. Called for its side effect of printing to the console.
 #'
-#' @seealso \code{\link[=summary,cptga-method]{summary}}, \code{\link{cptga-class}}, \code{\link{plot.cptga}}
+#' @seealso \code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{cptgaisl-class}}, \code{\link{plot.cptgaisl}}
 #'
 #' @exportS3Method
-print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...)
+print.summary.cptgaisl = function(x, digits=getOption("digits"), max_display=5, ...)
 {
   cat("###############################################\n")
-  cat("#         Changepoint Detection via GA        #\n")
+  cat("#    Changepoint Detection via Island GA      #\n")
   cat("###############################################\n")
   
   cat("   Settings: \n")
   cat(paste("   Population size         = ", x@popSize, "\n"))
+  cat(paste("   Number of Island        = ", x@numIslands, "\n"))
+  cat(paste("   Island size             = ", x@Islandsize, "\n"))
   cat(paste("   Number of generations   = ", x@count, "\n"))
+  cat(paste("   Number of migrations    = ", x@countMig, "\n"))
   cat(paste("   Crossover probability   = ", format(x@pcrossover, digits = digits), "\n"))
   cat(paste("   Mutation probability    = ", format(x@pmutation, digits = digits), "\n"))
   cat(paste("   Changepoint probability = ", format(x@pchangepoint, digits = digits), "\n"))
@@ -138,7 +141,7 @@ print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...
       cat("\n")
     }
   }
-  cat("\n##### GA results ##### \n")
+  cat("\n##### Island GA results ##### \n")
   cat(paste("   Optimal Fitness value =", format(x@overbestfit, digits = digits), "\n"))
   cat(paste("   Optimal Solution: \n")) 
   m.sol = x@overbestchrom[1]
@@ -180,26 +183,26 @@ print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...
   invisible()
 }
 
-#' Print method for objects of class \code{cptga}
+#' Print method for objects of class \code{cptgaisl}
 #'
-#' @param object An object of class \code{cptga}.
+#' @param object An object of class \code{cptgaisl}.
 #' @param ... Additional arguments (ignored).
-#' @rdname cptga-class
-#' @aliases summary.cptga, cptga-method
+#' @rdname cptgaisl-class
+#' @aliases summary.cptgaisl, cptgaisl-method
 #' @export
-setMethod("summary", "cptga", function(object, ...) {
-  print.summary.cptga(object, ...)
+setMethod("summary", "cptgaisl", function(object, ...) {
+  print.summary.cptgaisl(object, ...)
 })
 
 
-#' Plot Time Series with Detected Changepoints from a `cptga` Object
+#' Plot Time Series with Detected Changepoints from a `cptgaisl` Object
 #'
 #' This function visualizes a univariate time series along with the changepoints
-#' identified by a Genetic Algorithm, as represented by a `cptga` object. Vertical
+#' identified by a Island model Genetic Algorithm, as represented by a `cptgaisl` object. Vertical
 #' dashed lines mark changepoint locations, and segment means are shown as horizontal
 #' dashed lines. A legend summarizes the optimal fitness value and changepoint locations.
 #'
-#' @param x An object of class \code{cptga}, typically returned by a GA-based
+#' @param x An object of class \code{cptgaisl}, typically returned by a Island GA based
 #' changepoint detection procedure.
 #' @param data A numeric vector representing the observed univariate time series.
 #' @param ... Additional optional graphical arguments, including:
@@ -225,10 +228,10 @@ setMethod("summary", "cptga", function(object, ...) {
 #'
 #' @return A time series plot is displayed. The function returns \code{NULL} invisibly.
 #'
-#' @seealso \code{\link[=summary,cptga-method]{summary}}, \code{\link{print.summary.cptga}}
+#' @seealso \code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{print.summary.cptgaisl}}
 #'
 #' @exportS3Method
-plot.cptga = function(x, data, ..., main = NULL, LegendPos = "topright") {
+plot.cptgaisl = function(x, data, ..., main = NULL, LegendPos = "topright") {
   dots = list(...)
   
   XTickLab = dots$XTickLab

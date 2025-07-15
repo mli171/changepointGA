@@ -6,7 +6,7 @@ checkConv = function(a, maxconv, tol){
   #   maxconv= if maxconv consecutive migrations, the overall best does not change, then stop
   #   tol= tolerance level for iterations
   # outputs ++++++++++++++++++
-  #   decision= 1 means continue and 0 means stop
+  #   decision = 1 means stop and 0 means continue
   i<-1
   repeat{
     diff = abs(a[i+1]-a[i])
@@ -47,13 +47,13 @@ checkConv = function(a, maxconv, tol){
 #' @param N The sample size of the time series.
 #' @details
 #' A function can apply mutation to the produced child with the specified
-#' probability \code{Pmutation} in \code{\link{GA_param}} and
-#' \code{\link{IslandGA_param}}. If order selection is not requested
-#' (\code{option = "cp"} in \code{GA_param} and \code{Island_GA}), the default
+#' probability \code{pmutation} in \code{cptga} and
+#' \code{cptgaisl}. If order selection is not requested
+#' (\code{option = "cp"} in \code{cptga} and \code{cptgaisl}), the default
 #' \code{\link{mutation}} operator function uses \code{selectTau} to select
 #' a completely new individual with a new chromosome as the mutated child.
 #' For details, see \code{\link{selectTau}}. If order selection is needed
-#' (\code{option = "both"} in \code{GA_param} and \code{Island_GA}), we first
+#' (\code{option = "both"} in \code{cptga} and \code{cptgaisl}), we first
 #' decide whether to keep the produced child's model order with a probability
 #' of 0.5. If the child's model order is retained, the \code{selectTau}
 #' function is used to select a completely new individual with a new chromosome

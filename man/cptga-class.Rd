@@ -4,7 +4,7 @@
 \name{cptga-class}
 \alias{cptga-class}
 \alias{summary,cptga-method}
-\alias{summary,}
+\alias{summary.cptga,}
 \alias{cptga-method}
 \title{S4 Class Definition for `cptga`}
 \usage{
@@ -56,8 +56,7 @@ is used for joint changepoint and model selection.}
 
 \item{\code{maxconv}}{If the optimal fitness value does not improve over this many generations, GA stops.}
 
-\item{\code{option}}{A character string: either \code{"cp"} for changepoint detection only,
-or \code{"both"} for changepoint and model order selection.}
+\item{\code{option}}{A character string: either \code{"cp"} for changepoint detection only, or \code{"both"} for changepoint detection and model order selection.}
 
 \item{\code{monitoring}}{Logical. If \code{TRUE}, prints intermediate GA progress.}
 
@@ -88,5 +87,5 @@ to guide initial population design and potentially accelerate convergence.}
 }}
 
 \seealso{
-\code{\link{GA_param}}, \code{\link{random_population}}, \code{\link{cptga-class}}
+\code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
 }

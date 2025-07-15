@@ -9,7 +9,7 @@
 #' the optimization problem and returning a numerical value as the output/fitness.
 #' Depending on the user-specified chromosome representation, the optimization task
 #' can be changepoint detection only or changepoint detection plus model order selection,
-#' which can be specified via the \code{option} parameter in \code{\link{GA_param}}. When
+#' which can be specified via the \code{option} parameter. When
 #' \code{option="both"}, the list \code{p.range} must be specified to give the range
 #' of model orders.
 #' @param N The sample size of the time series.
@@ -21,7 +21,7 @@
 #' @param pcrossover The probability that the crossover operator applies on two individual chromosomes.
 #' @param pmutation The probability that the mutation operator applies on one individual chromosome.
 #' @param pchangepoint The probability that a changepoint has occurred. User could change this probability based on domain knowledge and the time series length.
-#' @param minDist The minimum length between two adjacent changepoints.
+#' @param minDist The minimum length between two adjacent changepoints. Default value equals to one.
 #' @param mmax The maximum possible number of changepoints in the data set. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 499. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{mmax} should be N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
 #' @param lmax The maximum possible length of the chromosome representation. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 501. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{lmax} should be 2+N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
 #' @param maxgen The maximum number of generation that the GA can last.
@@ -51,12 +51,14 @@
 #' @export
 #' @examples
 #' \donttest{
-#' ## Multiple changepoint detection without model order selection
+#'
 #' N = 1000
 #' XMatT = matrix(1, nrow=N, ncol=1)
 #' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
 #'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
 #'
+#' ## Multiple changepoint detection without model order selection
+#' 
 #' # without suggestions
 #' GA.res = cptga(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
@@ -70,13 +72,10 @@
 #' 
 #' 
 #' ## Multiple changepoint detection with model order selection
-#' N = 1000
-#' XMatT = matrix(1, nrow=N, ncol=1)
-#' Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=NULL,
-#'             Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
-#'
-#' # without suggestions
+#' 
 #' p.range=list(ar=c(0,3), ma=c(0,3))
+#' 
+#' # without suggestions
 #' GA.res = cptga(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, 
 #'             option = "both", XMat=XMatT, Xt=Xt)
 #' summary(GA.res)
@@ -96,7 +95,7 @@ cptga = function(ObjFunc,
                     pcrossover=0.95,
                     pmutation=0.15,
                     pchangepoint=0.01,
-                    minDist=2,
+                    minDist=1,
                     mmax=NULL,
                     lmax=NULL,
                     maxgen=50000,
