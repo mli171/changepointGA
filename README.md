@@ -5,10 +5,10 @@ selection and evolution. GAs have proven effective in both single and multiple
 changepoint analyses within time series data, where each chromosome encodes 
 the hyperparameters, number, and locations of changepoints, along with the 
 associated model parameters. Starting with a population of potential changepoint 
-configurations, GAsutilize genetic operators—selection, crossover, and mutation—to 
-evolve toward solutions with enhanced fitness. This paper presents the R package 
-changepointGA, which encodes changepoint chromosomes in an integer format. 
-Furthermore, changepointGA facilitates the dynamic and simultaneous estimation 
+configurations, GAs use genetic operators, selection, crossover, and mutation, 
+to evolve toward solutions with enhanced fitness. This github page presents the 
+R package changepointGA, which encodes changepoint chromosomes in an integer format. 
+Furthermore, changepointGA also can be applied in the dynamic and simultaneous estimation 
 of changepoint models hyperparameters, changepoint configurations, and model 
 parameters, leading to more robust and accurate analyses.
 
