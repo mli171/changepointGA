@@ -78,16 +78,34 @@ arma::vec selectTau(int N, List prange, int minDist, double Pb, int mmax, int lm
 //' order parameters must be equal to the length of \code{prange}.
 //' @param N The length of time series.
 //' @param minDist The minimum length between two adjacent changepoints.
-//' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
+//' @param Pb Same as \code{pchangepoint} from \code{\link{cptga}} or 
+//' \code{\link{cptgaisl}}, the probability that a changepoint has occurred.
 //' @param mmax The maximum possible number of changepoints in the data set.
 //' @param lmax The maximum possible length of the chromosome representation.
 //' @details
-//' The default population initialization uses \code{\link{selectTau}} to
-//' select the chromosome for the first generation population. Each column from
-//' the produced population matrix represent an chromosome of an individual.
-//' The first element of every chromosome represent the number of changepoints
-//' and the last non-zero element always equal to the length of time series
-//' plus one (N+1).
+//' Each population can be stored in a matrix with \code{lmax} rows and 
+//' \code{popSize} columns, where each column represents an individual chromosome
+//' in the format of
+//' \deqn{C = (m, \boldsymbol{s}, \boldsymbol{\tau}, N+1)',} 
+//' in \code{\link{cptga}} or \code{\link{cptgaisl}}. This function can randomly 
+//' initialize the population matrix with some imposed constraints, such as 
+//' ensuring the number of time points between two adjacent changepoints is 
+//' greater than or equal to \code{minDist}. This prevents unrealistic scenario 
+//' of two changepoints being too close to each other and helps reduce the total 
+//' number of admissible solutions in the search space. Users can adjust the 
+//' level of searching space reduction by setting an appropriate value for 
+//' \code{minDist}. During population initialization, each changepoint location 
+//' in \eqn{\boldsymbol{\tau}} can be selected sequentially. With a specified 
+//' probability \code{pchangepoint} denoting the probability of a time point 
+//' being selected as a changepoint, the first changepoint \eqn{\tau_{1}} is 
+//' randomly picked between \eqn{t=1+minDist} and \eqn{t=N}. Then \eqn{\tau_{2}} 
+//' is randomly selected from a smaller range between \eqn{t=\tau_{1}+minDist} 
+//' and \eqn{t=N}. The process is continued until the last admissible changepoint 
+//' \eqn{t=N-minDist} is exceeded, and the number of changepoints \eqn{m} is 
+//' obtained automatically. For added flexibility, users can specify their own 
+//' population initialization function. The default population initialization uses 
+//' \code{\link{selectTau}} to select the chromosome for the first generation 
+//' population.
 //' @return A matrix that contains each individual's chromosome.
 //' @export
 // [[Rcpp::export]]

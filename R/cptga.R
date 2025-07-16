@@ -4,6 +4,27 @@
 #' This involves the minimization of an objective function using a genetic algorithm (GA).
 #' The algorithm can be run sequentially or with explicit parallelization.
 #'
+#' For any pre-specified time series model with a specified set of changepoint locations, 
+#' model fit is evaluated using a fitness function \eqn{Q(\boldsymbol{\theta})}, 
+#' where \eqn{\boldsymbol{\theta}=(\boldsymbol{s},\boldsymbol{\tau},\boldsymbol{\beta})'} 
+#' denotes the full parameter vector. Here, \eqn{\boldsymbol{s}} denotes the set 
+#' of model hyperparameters, potentially including the AR or MA orders, the degree 
+#' of ARIMA differencing, or the periodic AR order for PAR models. The vector 
+#' \eqn{\boldsymbol{\tau}=\{\tau_{1}, \ldots, \tau_{m}\}} specifies the 
+#' changepoint locations, with the number of changepoints \eqn{m} inferred as 
+#' part of the estimation. Each individual chromosome representation is specified as a vector,
+#' \deqn{C = (m, \boldsymbol{s}, \boldsymbol{\tau}, N+1)',}
+#' where \eqn{m} represents the number of changepoints and is also equivalent to 
+#' the length of vector \eqn{\boldsymbol{\tau}} containing all the changepoint 
+#' locations. \eqn{\boldsymbol{s}} contains the integer-valued parameter for time 
+#' series model structure specification, such as AR, MA, or PAR orders. 
+#' If no model order selection is desired, then \eqn{\boldsymbol{s}} is omitted 
+#' and the GA detects changepoints only. The changepoint locations in 
+#' \eqn{\boldsymbol{\tau}} are encoded as interger values between 2 and \eqn{N}, 
+#' allowing the length of \eqn{\boldsymbol{\tau}} to vary dynamically with \eqn{m}. 
+#' The value \eqn{N+1} is appended at the end of \eqn{C} to serve as a delimiter 
+#' marking the boundary of the chromosome.
+#' 
 #' @param ObjFunc The fitness function to be minimized. Users can specify any R or Rcpp
 #' function as the fitness function, setting the input as the potential solution to
 #' the optimization problem and returning a numerical value as the output/fitness.
@@ -13,30 +34,71 @@
 #' \code{option="both"}, the list \code{p.range} must be specified to give the range
 #' of model orders.
 #' @param N The sample size of the time series.
-#' @param p.range Default is \code{NULL} for only changepoint detection. If
-#' \code{p.range} is specified as a list object, which contains the range of
-#' each model order parameters for order selection (integers). The number of
-#' order parameters must be equal to the length of \code{p.range}.
-#' @param popSize An integer represents the number of individuals in each population.
-#' @param pcrossover The probability that the crossover operator applies on two individual chromosomes.
-#' @param pmutation The probability that the mutation operator applies on one individual chromosome.
-#' @param pchangepoint The probability that a changepoint has occurred. User could change this probability based on domain knowledge and the time series length.
+#' @param p.range The default value is \code{NULL} for changepoint detection only task. 
+#' If both model order selection and changepoint detection are required, the \code{p.range} 
+#' argument should be provided as a list. Each element in this list must specify the range 
+#' for a corresponding model order parameter, and the length of the list object of 
+#' \code{p.range} must match the number of order parameters to be estimated.
+#' @param popSize An integer represents the number of individuals/chromosomes in each population.
+#' @param pcrossover The probability that the crossover operator will apply to 
+#' the two selected parents' chromosomes to produce the offspring. The typical 
+#' value is close to 1, with the default setting in this package being 0.95.
+#' @param pmutation The probability that the mutation operator applies on one 
+#' individual chromosome. Similar to the natural mutation process, new genetic 
+#' information is introduced to the offspring chromosome with a relatively small 
+#' probability (close to 0), with a default value of 0.15.
+#' @param pchangepoint The probability that a changepoint has occurred. User 
+#' could change this probability based on domain knowledge and the time series 
+#' length. This probability is used during population initialization and in the 
+#' creation of new chromosomes by the mutation operator. By default, the mutation 
+#' operator function generates a new individual as the mutated offspring.
 #' @param minDist The minimum length between two adjacent changepoints. Default value equals to one.
-#' @param mmax The maximum possible number of changepoints in the data set. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 499. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{mmax} should be N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
-#' @param lmax The maximum possible length of the chromosome representation. For a time series of length 1000 and we only want to detect the changepoint (\code{option="cp"}), the default value is 501. The suggested value should be based on the length of the time series. For instance, if a time series has length N, the recommended \code{lmax} should be 2+N/2-1. It is suggested to add the number of model hyperparameters if both changepoint detection and model order selection tasks are of-interested simultaneously (\code{option="both"}).
-#' @param maxgen The maximum number of generation that the GA can last.
+#' @param mmax The maximum number of changepoints allowed in the time series data 
+#' corresponds to the maximum possible length of \eqn{\boldsymbol{\tau}}. 
+#' For a time series of length 1000 and we only want to detect the changepoint 
+#' (\code{option="cp"}), the default value is 499. The suggested value should be 
+#' based on the length of the time series. For instance, if a time series has 
+#' length \eqn{N}, the recommended \code{mmax} should be \eqn{N/2-1}. It is suggested to 
+#' add the number of model hyperparameters if both changepoint detection and 
+#' model order selection tasks are of-interested simultaneously 
+#' (\code{option="both"}).
+#' @param lmax The maximum possible length of the chromosome representation. 
+#' For a time series of length 1000 and we only want to detect the changepoint 
+#' (\code{option="cp"}), the default value is 501. The suggested value should be 
+#' based on the length of the time series. For instance, if a time series has 
+#' length \eqn{N}, the recommended \code{lmax} should be \eqn{2+N/2-1}. It is suggested to 
+#' add the number of model hyperparameters if both changepoint detection and 
+#' model order selection tasks are of-interested simultaneously (\code{option="both"}).
+#' @param maxgen The maximum number of generations the GA can run before the search is forcibly terminated.
 #' @param maxconv If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.
-#' @param option A string controls the optimization task. ``cp'' indicates the task is changepoint detection only. ``both'' indicates the task will include both changepoint detection and model order selection.
-#' @param monitoring A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether print out middle results for each iterations of GA.
-#' @param parallel A logical value \code{TRUE} or \code{FALSE}. Default value is FALSE. It indicates whether use multiple threads to parallel compute the individual fittness function values..
-#' @param nCore An integer. Default value is \code{NULL}. It represents the number of cores used in parallel computing. It must be specified if setting \code{parallel=TRUE}.
-#' @param tol An numerical value. Default is \code{1e-05}. The tolerance level for deciding GA to stop.
-#' @param seed An integer. Default value \code{NULL}. An single integer allows function produce reproducible results.
-#' @param popInitialize A function. It should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome. See \code{\link{random_population}} for details.
-#' @param suggestions A list object. Default value is \code{NULL}. Each element only needs to include the better or more reasonable results of the multiple changepoint locations. Having better \code{suggestions} can help GA converges faster.
-#' @param selection A function. This GA operator can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.
-#' @param crossover A function. This GA operator can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.
-#' @param mutation A function. This GA operator can apply mutation to the produced child with the specified probability \code{pmutation}. See \code{\link{mutation}} for details in the default mutation operator. The function returned object is a vector contain \code{child} chromosome representation.
+#' @param option A character string controls the optimization task. \code{"cp"} 
+#' indicates the task is changepoint detection only. \code{"both"} indicates the 
+#' task will include both changepoint detection and model order selection.
+#' @param monitoring A logical value with either \code{TRUE} or \code{FALSE}, 
+#' indicating whether to print out summarized results (current best fitness 
+#' function value and its corresponding $C$) for each generation from the GA.
+#' @param parallel A logical value with \code{TRUE} or \code{FALSE}, indicating 
+#' whether to use multiple cores for parallel computation of the fitness function 
+#' values for individuals after population initialization.
+#' @param nCore An integer with the default value of \code{NULL}. It  
+#' represents the number of cores used in parallel computing. The value of 
+#' \code{nCore} must be less than the number of physical cores available.
+#' @param tol An numerical value with the default value of \code{1e-05}. The 
+#' tolerance level that helps evaluate whether the two iterations have the same 
+#' fitness value, which aids in determining GA termination.
+#' @param seed An integer with the default value of \code{NULL}. An single integer allows function produce reproducible results.
+#' @param popInitialize A function or sourced function name character string. It should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome. See \code{\link{random_population}} for details.
+#' @param suggestions A list object. Default value is \code{NULL}. Each element 
+#' includes better or more reasonable guessed changepoints locations, which will 
+#' resulting in one chromosome. If the number of provided suggestions equals to 
+#' \code{popSize}, all the suggestions will be used as population. If the number 
+#' of provided suggestions is less than \code{popSize}, the function from 
+#' \code{popInitialize} will generate the remaining individual chromosomes. 
+#' The number of provided suggestions cannot be greater than \code{popSize}. 
+#' Having better \code{suggestions} can help GA converges faster.
+#' @param selection A function or sourced function name character string. This GA operator can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.
+#' @param crossover A function or sourced function name character string. This GA operator can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.
+#' @param mutation A function or sourced function name character string. This GA operator can apply mutation to the produced \code{child} with the specified probability \code{pmutation}. See \code{\link{mutation}} for details in the default mutation operator. The function returned object is a vector contain \code{child} chromosome representation.
 #' @param ... additional arguments that will be passed to the fitness function.
 #' @return Return an object class \code{cptga-class}. See \code{\link{cptga-class}} for a more detailed description.
 #' @import stats
