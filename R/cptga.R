@@ -66,18 +66,20 @@
 #' For a time series of length 1000 and we only want to detect the changepoint 
 #' (\code{option="cp"}), the default value is 501. The suggested value should be 
 #' based on the length of the time series. For instance, if a time series has 
-#' length \eqn{N}, the recommended \code{lmax} should be \eqn{2+N/2-1}. It is suggested to 
-#' add the number of model hyperparameters if both changepoint detection and 
+#' length \eqn{N}, the recommended \code{lmax} should be \eqn{2+N/2-1}. It is 
+#' suggested to add the number of model hyperparameters if both changepoint detection and 
 #' model order selection tasks are of-interested simultaneously (\code{option="both"}).
-#' @param maxgen The maximum number of generations the GA can run before the search is forcibly terminated.
-#' @param maxconv If the overall best fitted value doesn't change after \code{maxconv} consecutive migrations, the GA algorithm stops.
+#' @param maxgen The maximum number of generations the GA can run before the 
+#' search is forcibly terminated.
+#' @param maxconv If the overall best fitted value doesn't change after 
+#' \code{maxconv} consecutive migrations, the GA algorithm stops.
 #' @param option A character string controls the optimization task. \code{"cp"} 
 #' indicates the task is changepoint detection only. \code{"both"} indicates the 
 #' task will include both changepoint detection and model order selection.
 #' @param monitoring A logical value with either \code{TRUE} or \code{FALSE}, 
 #' indicating whether to print out summarized results (current best fitness 
 #' function value and its corresponding $C$) for each generation from the GA.
-#' @param parallel A logical value with \code{TRUE} or \code{FALSE}, indicating 
+#' @param parallel A logical value with either \code{TRUE} or \code{FALSE}, indicating 
 #' whether to use multiple cores for parallel computation of the fitness function 
 #' values for individuals after population initialization.
 #' @param nCore An integer with the default value of \code{NULL}. It  
@@ -86,8 +88,16 @@
 #' @param tol An numerical value with the default value of \code{1e-05}. The 
 #' tolerance level that helps evaluate whether the two iterations have the same 
 #' fitness value, which aids in determining GA termination.
-#' @param seed An integer with the default value of \code{NULL}. An single integer allows function produce reproducible results.
-#' @param popInitialize A function or sourced function name character string. It should be designed for initializing a population. The default population initialization is random initialization with some imposed constraints. See \code{\link{random_population}} for example. The function returned object is a matrix, \code{pop}. The users can specified their own \code{population} function. It could also be a matrix object, which contain the user specified chromosome. By default, each column represents one individual chromosome. See \code{\link{random_population}} for details.
+#' @param seed An integer with the default value of \code{NULL}. An single 
+#' integer allows function produce reproducible results.
+#' @param popInitialize A function or sourced function name character string. 
+#' It should be designed for initializing a population. The default population 
+#' initialization is random initialization with some imposed constraints. See 
+#' \code{\link{random_population}} for example. The function returned object is 
+#' a matrix, \code{pop}. The users can specified their own \code{population} 
+#' function. It could also be a matrix object, which contain the user specified 
+#' chromosome. By default, each column represents one individual chromosome. 
+#' See \code{\link{random_population}} for details.
 #' @param suggestions A list object. Default value is \code{NULL}. Each element 
 #' includes better or more reasonable guessed changepoints locations, which will 
 #' resulting in one chromosome. If the number of provided suggestions equals to 
@@ -96,11 +106,27 @@
 #' \code{popInitialize} will generate the remaining individual chromosomes. 
 #' The number of provided suggestions cannot be greater than \code{popSize}. 
 #' Having better \code{suggestions} can help GA converges faster.
-#' @param selection A function or sourced function name character string. This GA operator can help select \code{mom} and \code{dad} from current generation population, where \code{dad} is set to have better fit (smaller fitness function values). The default for selection uses the linear rank selection method. See \code{\link{selection_linearrank}} for example. The function returned object is a list contain the chromosomes for \code{mom} and \code{dad}.
-#' @param crossover A function or sourced function name character string. This GA operator can apply crossover to the chosen parents to produce child for next generation with specified probability. The default for crossover uses the uniform crossover method. See \code{\link{uniformcrossover}} for details in the default crossover operator. The function returned object is a vector contain the chromosomes for \code{child}.
-#' @param mutation A function or sourced function name character string. This GA operator can apply mutation to the produced \code{child} with the specified probability \code{pmutation}. See \code{\link{mutation}} for details in the default mutation operator. The function returned object is a vector contain \code{child} chromosome representation.
+#' @param selection A function or sourced function name character string. This 
+#' GA operator can help select \code{mom} and \code{dad} from current generation 
+#' population, where \code{dad} is set to have better fit (smaller fitness 
+#' function values). The default for selection uses the linear rank selection 
+#' method. See \code{\link{selection_linearrank}} for example. The function 
+#' returned object is a list contain the chromosomes for \code{mom} and 
+#' \code{dad}.
+#' @param crossover A function or sourced function name character string. This 
+#' GA operator can apply crossover to the chosen parents to produce child for 
+#' next generation with specified probability. The default for crossover uses 
+#' the uniform crossover method. See \code{\link{uniformcrossover}} for details 
+#' in the default crossover operator. The function returned object is a vector 
+#' contain the chromosomes for \code{child}.
+#' @param mutation A function or sourced function name character string. This 
+#' GA operator can apply mutation to the produced \code{child} with the 
+#' specified probability \code{pmutation}. See \code{\link{mutation}} for 
+#' details in the default mutation operator. The function returned object 
+#' is a vector contain \code{child} chromosome representation.
 #' @param ... additional arguments that will be passed to the fitness function.
-#' @return Return an object class \code{cptga-class}. See \code{\link{cptga-class}} for a more detailed description.
+#' @return Return an object class \code{cptga-class}. See 
+#' \code{\link{cptga-class}} for a more detailed description.
 #' @import stats
 #' @import Rcpp
 #' @import foreach
