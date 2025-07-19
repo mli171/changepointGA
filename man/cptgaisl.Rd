@@ -11,7 +11,7 @@ cptgaisl(
   popSize = 200,
   numIslands = 5,
   pcrossover = 0.95,
-  pmutation = 0.15,
+  pmutation = 0.3,
   pchangepoint = 0.01,
   minDist = 1,
   mmax = NULL,
@@ -64,7 +64,7 @@ value is close to 1, with the default setting in this package being 0.95.}
 \item{pmutation}{The probability that the mutation operator applies on one 
 individual chromosome. Similar to the natural mutation process, new genetic 
 information is introduced to the offspring chromosome with a relatively small 
-probability (close to 0), with a default value of 0.15.}
+probability (close to 0), with a default value of 0.3.}
 
 \item{pchangepoint}{The probability that a changepoint has occurred. User 
 could change this probability based on domain knowledge and the time series 

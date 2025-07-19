@@ -106,9 +106,11 @@ setMethod("print", "cptgaisl", function(x, ...) str(x))
 #'
 #' @return Invisibly returns \code{NULL}. Called for its side effect of printing to the console.
 #'
-#' @seealso \code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{cptgaisl-class}}, \code{\link{plot.cptgaisl}}
-#'
-#' @exportS3Method
+#' @seealso \code{\link{cptgaisl}}, \code{\link[=summary.cptgaisl]{summary}}, \code{\link{plot.cptgaisl}}
+#' 
+#' @method print summary.cptgaisl
+#' @export
+#' @aliases print.summary.cptgaisl
 print.summary.cptgaisl = function(x, digits=getOption("digits"), max_display=5, ...)
 {
   cat("###############################################\n")
@@ -188,7 +190,7 @@ print.summary.cptgaisl = function(x, digits=getOption("digits"), max_display=5, 
 #' @param object An object of class \code{cptgaisl}.
 #' @param ... Additional arguments (ignored).
 #' @rdname cptgaisl-class
-#' @aliases summary.cptgaisl, cptgaisl-method
+#' @aliases summary.cptgaisl
 #' @export
 setMethod("summary", "cptgaisl", function(object, ...) {
   print.summary.cptgaisl(object, ...)
@@ -198,91 +200,96 @@ setMethod("summary", "cptgaisl", function(object, ...) {
 #' Plot Time Series with Detected Changepoints from a `cptgaisl` Object
 #'
 #' This function visualizes a univariate time series along with the changepoints
-#' identified by a Island model Genetic Algorithm, as represented by a `cptgaisl` object. Vertical
-#' dashed lines mark changepoint locations, and segment means are shown as horizontal
-#' dashed lines. A legend summarizes the optimal fitness value and changepoint locations.
+#' identified by a island model genetic algorithm, as represented by a `cptgaisl` object. 
+#' Vertical dashed lines mark changepoint locations, and segment means are shown as horizontal
+#' dashed lines. The optimal fitness value and changepoint locations are 
+#' displayed as margin text.
 #'
-#' @param x An object of class \code{cptgaisl}, typically returned by a Island GA based
+#' @param x An object of class \code{cptgaisl}, typically returned by an island model genetic algorithm based
 #' changepoint detection procedure.
 #' @param data A numeric vector representing the observed univariate time series.
-#' @param ... Additional optional graphical arguments, including:
-#' \itemize{
-#'   \item \code{XTickLab}: Optional numeric or date vector for custom x-axis labels. Must be the same length as \code{data}.
-#'   \item \code{XTickPos}: Optional vector of positions on the x-axis where tick marks should appear.
-#'   \item \code{XAxisLab}, \code{YAxisLab}: Optional character strings for x-axis and y-axis labels.
-#' }
 #' @param main Optional main title for the plot.
-#' @param LegendPos Character string indicating the position of the legend.
-#'        Accepts standard legend positions such as \code{"topright"}, \code{"bottom"},
-#'        \code{"topleft"}, etc. Default is \code{"topright"}.
+#' @param XTickLab Optional vector (e.g., numeric or date) for custom x-axis labels.
+#'        Must be the same length as \code{data}.
+#' @param XTickPos Optional vector specifying which elements of \code{XTickLab} to show as ticks.
+#' @param XAxisLab Optional label for the x-axis. Default is \code{"Time"}.
+#' @param YAxisLab Optional label for the y-axis. Default is \code{"Data"}.
+#' @param cex.lab Text size for axis labels and margin text. Default is \code{1.3}.
+#' @param cex.axis Text size for axis tick labels. Default is \code{1.3}.
+#' @param cex.main Text size for the main title. Default is \code{1.3}.
+#' @param lwd Line width for vertical and horizontal dashed lines. Default is \code{2}.
+#' @param ... Additional graphical parameters passed to \code{plot()}.
 #'
 #' @details
-#' If \code{XTickLab} is supplied and matches the length of \code{data}, it is used for the x-axis;
-#' otherwise, the default \code{1:length(data)} is used.
+#' If \code{XTickLab} is supplied and matches the length of \code{data}, it is used for
+#' the x-axis; otherwise, the default sequence \code{1:length(data)} is used.
 #'
-#' If the GA was run with \code{option = "both"}, the function adjusts the changepoint indices
-#' to skip over model hyperparameters in the chromosome.
+#' If the genetic algorithm was run with \code{option = "both"}, the function skips hyperparameters
+#' in the chromosome when extracting changepoint positions.
 #'
-#' The plot legend reports the optimal fitness value and changepoint locations (transformed
-#' by \code{XTickLab} if applicable). The y-axis is extended slightly to make room for the legend.
+#' The plot displays vertical dashed lines at changepoint locations and horizontal dashed
+#' lines for the mean of each segment. Fitness and changepoint summaries are shown above the plot.
 #'
-#' @return A time series plot is displayed. The function returns \code{NULL} invisibly.
+#' @return This function is called for its side effects and returns \code{NULL} invisibly.
 #'
 #' @seealso \code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{print.summary.cptgaisl}}
 #'
 #' @exportS3Method
-plot.cptgaisl = function(x, data, ..., main = NULL, LegendPos = "topright") {
-  dots = list(...)
-  
-  XTickLab = dots$XTickLab
-  XTickPos = dots$XTickPos
-  XAxisLab = dots$XAxisLab %||% "Time"
-  YAxisLab = dots$YAxisLab %||% "Y"
+plot.cptgaisl <- function(x, 
+                          data, 
+                          main = NULL,
+                          XTickLab=NULL,
+                          XTickPos=NULL,
+                          XAxisLab="Time",
+                          YAxisLab="Data",
+                          cex.lab = 1.3, 
+                          cex.axis = 1.3, 
+                          cex.main = 1.3, 
+                          lwd = 2, ...) {
   
   Ts = length(data)
   use_custom_X = !is.null(XTickLab) && length(XTickLab) == Ts
+  plot_x = if (use_custom_X) XTickLab else 1:Ts
   
   chrom = x@overbestchrom
-  if (x@option == "cp") {
-    m = chrom[1]
-    tau = if (m > 0) chrom[2:(1 + m)] else NULL
-  } else if (x@option == "both") {
-    m = chrom[1]
-    n.hyparam = length(x@p.range)
-    tau = if (m > 0) chrom[(2 + n.hyparam):(1 + n.hyparam + m)] else NULL
+  m = chrom[1]
+  if (m > 0) {
+    tau = if (x@option == "both") {
+      n.hyparam = length(x@p.range)
+      chrom[(2 + n.hyparam):(1 + n.hyparam + m)]
+    } else {
+      chrom[2:(1 + m)]
+    }
+  } else {
+    tau <- NULL
   }
-  fit = format(x@overbestfit, digits = 4)
   
+  fit = sprintf("%.3f", x@overbestfit)
   tau_vals = if (!is.null(tau)) if (use_custom_X) XTickLab[tau] else tau else NULL
   changepoint_str = if (!is.null(tau_vals)) {
     paste0("Changepoints: ", paste(tau_vals, collapse = ", "))
   } else {
-    "Changepoints Locations: None"
+    "Changepoint Locations: None"
   }
   
-  legend_text = c(
-    paste("Fitness:", fit),
-    changepoint_str
-  )
-  
-  plot_x = if (use_custom_X) XTickLab else 1:Ts
-  
-  y_range = range(data, na.rm = TRUE)
-  y_buffer = 0.15 * diff(y_range)
-  y_min = y_range[1]
-  y_max = y_range[2] + y_buffer
-  
-  op = par(no.readonly = TRUE)
+  op <- par(no.readonly = TRUE)
   on.exit(par(op))
+  
+  par(mar = c(5, 5, 6, 2), 
+      cex.lab = cex.lab, 
+      cex.axis = cex.axis, 
+      cex.main = cex.main)
   
   plot(plot_x, data,
        type = "l",
        xlab = XAxisLab,
        ylab = YAxisLab,
        xaxt = "n",
-       main = main,
-       ylim = c(y_min, y_max)
+       ...
   )
+  if (!is.null(main)) {
+    title(main = main, line = 3.5)  # push title down a bit
+  }
   
   if (!is.null(XTickPos) && use_custom_X) {
     axis(1, at = match(XTickPos, XTickLab), labels = XTickPos)
@@ -291,28 +298,25 @@ plot.cptgaisl = function(x, data, ..., main = NULL, LegendPos = "topright") {
   }
   
   if (!is.null(tau)) {
-    abline(v = if (use_custom_X) XTickLab[tau] else tau, col = "blue", lty = "dashed", lwd = 2)
-  }
-  
-  if (!is.null(tau)) {
-    tau_full = c(1, tau, Ts + 1)
-    seg_len = diff(tau_full)
-    ff = rep(0:m, times = seg_len)
-    mu.seg = tapply(data, ff, mean)
+    cp_x <- if (use_custom_X) XTickLab[tau] else tau
+    abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
+    
+    tau_full <- c(1, tau, Ts + 1)
+    seg_len <- diff(tau_full)
+    ff <- rep(0:m, times = seg_len)
+    mu.seg <- tapply(data, ff, mean)
+    
     for (i in seq_along(mu.seg)) {
-      x0 = tau_full[i]
-      x1 = tau_full[i + 1]
       segments(
-        x0 = if (use_custom_X) XTickLab[x0] else x0,
+        x0 = if (use_custom_X) XTickLab[tau_full[i]] else tau_full[i],
         y0 = mu.seg[i],
-        x1 = if (use_custom_X) XTickLab[x1] else x1,
+        x1 = if (use_custom_X) XTickLab[tau_full[i + 1]] else tau_full[i + 1],
         y1 = mu.seg[i],
-        col = "red", lty = "dashed", lwd = 2
+        col = "red", lty = "dashed", lwd = lwd
       )
     }
   }
   
-  legend(LegendPos,
-         legend = legend_text,
-         bty = "o", box.lwd = 1, box.col = "black")
+  mtext(paste("Fitness:", fit), side = 3, line = 1.5, adj = 0, cex = cex.lab)
+  mtext(changepoint_str, side = 3, line = 0.5, adj = 0, cex = cex.lab)
 }

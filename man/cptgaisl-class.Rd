@@ -4,8 +4,7 @@
 \name{cptgaisl-class}
 \alias{cptgaisl-class}
 \alias{summary,cptgaisl-method}
-\alias{summary.cptgaisl,}
-\alias{cptgaisl-method}
+\alias{summary.cptgaisl}
 \title{S4 Class Definition for `cptgaisl`}
 \usage{
 \S4method{summary}{cptgaisl}(object, ...)

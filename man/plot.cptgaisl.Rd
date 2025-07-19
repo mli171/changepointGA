@@ -4,45 +4,67 @@
 \alias{plot.cptgaisl}
 \title{Plot Time Series with Detected Changepoints from a `cptgaisl` Object}
 \usage{
-\method{plot}{cptgaisl}(x, data, ..., main = NULL, LegendPos = "topright")
+\method{plot}{cptgaisl}(
+  x,
+  data,
+  main = NULL,
+  XTickLab = NULL,
+  XTickPos = NULL,
+  XAxisLab = "Time",
+  YAxisLab = "Data",
+  cex.lab = 1.3,
+  cex.axis = 1.3,
+  cex.main = 1.3,
+  lwd = 2,
+  ...
+)
 }
 \arguments{
-\item{x}{An object of class \code{cptgaisl}, typically returned by a Island GA based
+\item{x}{An object of class \code{cptgaisl}, typically returned by an island model genetic algorithm based
 changepoint detection procedure.}
 
 \item{data}{A numeric vector representing the observed univariate time series.}
 
-\item{...}{Additional optional graphical arguments, including:
-\itemize{
-  \item \code{XTickLab}: Optional numeric or date vector for custom x-axis labels. Must be the same length as \code{data}.
-  \item \code{XTickPos}: Optional vector of positions on the x-axis where tick marks should appear.
-  \item \code{XAxisLab}, \code{YAxisLab}: Optional character strings for x-axis and y-axis labels.
-}}
-
 \item{main}{Optional main title for the plot.}
 
-\item{LegendPos}{Character string indicating the position of the legend.
-Accepts standard legend positions such as \code{"topright"}, \code{"bottom"},
-\code{"topleft"}, etc. Default is \code{"topright"}.}
+\item{XTickLab}{Optional vector (e.g., numeric or date) for custom x-axis labels.
+Must be the same length as \code{data}.}
+
+\item{XTickPos}{Optional vector specifying which elements of \code{XTickLab} to show as ticks.}
+
+\item{XAxisLab}{Optional label for the x-axis. Default is \code{"Time"}.}
+
+\item{YAxisLab}{Optional label for the y-axis. Default is \code{"Data"}.}
+
+\item{cex.lab}{Text size for axis labels and margin text. Default is \code{1.3}.}
+
+\item{cex.axis}{Text size for axis tick labels. Default is \code{1.3}.}
+
+\item{cex.main}{Text size for the main title. Default is \code{1.3}.}
+
+\item{lwd}{Line width for vertical and horizontal dashed lines. Default is \code{2}.}
+
+\item{...}{Additional graphical parameters passed to \code{plot()}.}
 }
 \value{
-A time series plot is displayed. The function returns \code{NULL} invisibly.
+This function is called for its side effects and returns \code{NULL} invisibly.
 }
 \description{
 This function visualizes a univariate time series along with the changepoints
-identified by a Island model Genetic Algorithm, as represented by a `cptgaisl` object. Vertical
-dashed lines mark changepoint locations, and segment means are shown as horizontal
-dashed lines. A legend summarizes the optimal fitness value and changepoint locations.
+identified by a island model genetic algorithm, as represented by a `cptgaisl` object. 
+Vertical dashed lines mark changepoint locations, and segment means are shown as horizontal
+dashed lines. The optimal fitness value and changepoint locations are 
+displayed as margin text.
 }
 \details{
-If \code{XTickLab} is supplied and matches the length of \code{data}, it is used for the x-axis;
-otherwise, the default \code{1:length(data)} is used.
+If \code{XTickLab} is supplied and matches the length of \code{data}, it is used for
+the x-axis; otherwise, the default sequence \code{1:length(data)} is used.
 
-If the GA was run with \code{option = "both"}, the function adjusts the changepoint indices
-to skip over model hyperparameters in the chromosome.
+If the genetic algorithm was run with \code{option = "both"}, the function skips hyperparameters
+in the chromosome when extracting changepoint positions.
 
-The plot legend reports the optimal fitness value and changepoint locations (transformed
-by \code{XTickLab} if applicable). The y-axis is extended slightly to make room for the legend.
+The plot displays vertical dashed lines at changepoint locations and horizontal dashed
+lines for the mean of each segment. Fitness and changepoint summaries are shown above the plot.
 }
 \seealso{
 \code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{print.summary.cptgaisl}}

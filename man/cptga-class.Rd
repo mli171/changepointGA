@@ -4,8 +4,7 @@
 \name{cptga-class}
 \alias{cptga-class}
 \alias{summary,cptga-method}
-\alias{summary.cptga,}
-\alias{cptga-method}
+\alias{summary.cptga}
 \title{S4 Class Definition for `cptga`}
 \usage{
 \S4method{summary}{cptga}(object, ...)

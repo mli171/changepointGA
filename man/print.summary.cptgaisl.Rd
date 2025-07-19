@@ -33,5 +33,5 @@ The function uses plain text output to print a formatted summary to the console.
 \code{x@suggestions} is provided, only up to \code{max_display} suggestions will be shown.
 }
 \seealso{
-\code{\link[=summary,cptgaisl-method]{summary}}, \code{\link{cptgaisl-class}}, \code{\link{plot.cptgaisl}}
+\code{\link{cptgaisl}}, \code{\link[=summary.cptgaisl]{summary}}, \code{\link{plot.cptgaisl}}
 }

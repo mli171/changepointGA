@@ -33,5 +33,5 @@ The function uses plain text output to print a formatted summary to the console.
 \code{x@suggestions} is provided, only up to \code{max_display} suggestions will be shown.
 }
 \seealso{
-\code{\link[=summary,cptga-method]{summary}}, \code{\link{cptga-class}}, \code{\link{plot.cptga}}
+\code{\link{cptga}}, \code{\link[=summary.cptga]{summary}}, \code{\link{plot.cptga}}
 }
