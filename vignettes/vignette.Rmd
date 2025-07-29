@@ -21,23 +21,23 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The **changepointGA** package applies Genetic Algorithms (GAs) to detect both single and multiple changepoints in time series data. By encoding each candidate changepoint as an integer, **changepointGA** dynamically adjusts the model parameter vector to accommodate varying numbers of changepoints and optimizes the model fitness function accordingly. Additionally, it also provides the functionalities of estimating the model hyperparameters, parameters, and changepoint configurations simultaneously.
+The **changepointGA** package applies Genetic Algorithms (GA) to detect both single and multiple changepoints in time series data. Each candidate solution encodes changepoint locations as integer-valued time indices, allowing for flexible representation of changepoint configurations. Because each changepoint introduces at least one associated model parameter, the total number of parameters is not fixed in the multiple changepoint setting. Consequently, the model parameter vector must adapt dynamically as the number and location of changepoints vary. Unlike fixed-length encodings, **changepointGA** supports variable-length chromosome representations. By encoding each changepoint as an integer, the algorithm dynamically adjusts the dimensionality of the model parameter vector and jointly optimizes the model fitness function. Additionally, in many classical time series models—such as autoregressive (AR), moving average (MA), autoregressive moving average (ARMA), and periodic autoregression (PAR)—model selection traditionally involves determining the appropriate order (e.g., the AR or MA lag length) before detecting changepoints. This separate step can introduce additional complexity and potential error. In contrast, our **changepointGA** can simultaneously estimates integer-valued model hyperparameters (e.g., model orders), model parameters, and changepoint configurations. This integrated approach eliminates the need for a separate model selection phase and supports a more unified and efficient framework for changepoint detection.
 
 ```{r}
 library(changepointGA)
 ```
 
-## Generate a time series data with changepoints
+## Simulate a time series data with changepoints
 
 This package includes the time series simulation function `ts.sim()` with the ability to introduce changepoint effects. The time series \eqn{Z_{t}, t=1,\ldots,T_{s}} could be simulated from a class of time series models,
 
 $$Z_{t}=\mu_{t}+e_{t}.$$
 
-The model could be specified by the arguments of `phi` and `theta`, representing the autoregressive (AR) coefficients of and the moving-average (MA) coefficients for the autoregressive moving-average (ARMA) model. The default values of `phi` and `theta` are `NULL`, generating time series with $e_{t}$ that are independent and identically $N(0,\sigma^{2})$ distributed. If we assign values to `phi` and/or `theta`, the $e_{t}$ will be generated from an ARMA($p$,$q$) process, where $p$ equals the number of values in `phi` and $q$ equals the number of values in `theta`. For the above model, $\mu_{t}$ denotes time-varying mean function and the mean changepoint effects could be introduced through indicator functions to $\mu_{t}$. Note that the **changepointGA** could also work with other time series model as long as the fitness function is appropriately specified. To illustrate the package usage, we will generate the $e_{t}$ following an ARMA($p=1$,$q=1$) process. The AR coefficient is $\phi=0.5$ and the MA coefficient is $\theta=0.8$. The time varying mean values are generated through the following equation,
+The model could be specified by the arguments of `phi` and `theta`, representing the AR coefficients of and the MA coefficients for the ARMA model. The default values of `phi` and `theta` are `NULL`, generating time series with $e_{t}$ that are independent and identically $N(0,\sigma^{2})$ distributed. If we assign values to `phi` and/or `theta`, the $e_{t}$ will be generated from an ARMA($p$,$q$) process, where $p$ equals the number of values in `phi` and $q$ equals the number of values in `theta`. For the above model, $\mu_{t}$ denotes time-varying mean function and the mean changepoint effects could be introduced through indicator functions to $\mu_{t}$. Note that the **changepointGA** could also work with other time series model as long as the fitness function is appropriately specified. To illustrate the package usage, we will generate the $e_{t}$ following an ARMA($p=1$,$q=1$) process. The AR coefficient is $\phi=0.5$ and the MA coefficient is $\theta=0.8$. The time varying mean values are generated through the following equation,
 
 $$\mu_{t}=\beta_{0}+\Delta_{1}I_{[t>\tau_{1}]} + \Delta_{2}I_{[t>\tau_{2}]},$$
 
-including the intercept term with $\beta_{0}=0.5$ and two changepoints at $\tau_{1}=125$ and $\tau_{2}=375$ with $\Delta_{1}=2$ and $\Delta_{2}=-2$. The users can also include additional covariates into matrix `XMatT` for other possible model dynamics, such as tread and seasonalities.
+including the intercept term with $\beta_{0}=0.5$ and two changepoints at $\tau_{1}=125$ and $\tau_{2}=375$ with the mean changing effects of $\Delta_{1}=2$ and $\Delta_{2}=-2$. The users can also include additional covariates into matrix (`XMatT` below) for other possible model dynamics, such as tread and seasonalities.
 
 ```{r}
 Ts = 200
@@ -57,41 +57,81 @@ str(myts)
 The simulated time series could be plotted in the figure below. The vertical dashed blue lines indicate the true changepoint location and the horizontal red dashed segments represent the time series segment sample mean. We can clearly observe the mean changing effects from the introduced changepoints $\tau_{1}=250$ and $\tau_{2}=500$. The **changepointGA** package will be used to detected these two changepoints.
 
 ```{r, fig.align = "center", fig.height=4, fig.width=6}
-TsPlotCheck(Y=myts, tau=CpLocT)
+plot(x = 1:Ts, y = myts, type = "l", xlab = "Time", ylab="Y")
+abline(v = CpLocT, lty = "dashed", col = "blue", lwd = 2)
+
+## Segmentation sample mean calculation and plotting
+m = length(CpLocT)
+tauclc = c(1, CpLocT, Ts + 1)
+seg.len = diff(tauclc)
+ff = rep(0:m, times = seg.len)
+Xseg = split(myts, ff)
+mu.seg = unlist(lapply(Xseg, mean), use.names = F)
+for (i in 1:(m + 1)) {
+  segments(x0=tauclc[i], y0=mu.seg[i], 
+           x1=tauclc[i+1], y1=mu.seg[i], 
+           col = "red", lty = "dashed", lwd = 2)
+}
 ```
 
 ## The objective function for optimization
 
 Considering the model used in the data simulation, we could use the R function, `ARIMA.BIC.Order()`, included in the **changepointGA** package. This function inputs include the 
 
-- `chromosome`, consists of the number of changepoints, the order of AR part, the order of MA part, the changepoint locations, and a value of time series sample size plus 1 ($N+1$) indicating the end of the chromosome;
-- `plen` represent the number of model order hyperparameters. We have `plen=2` for this example representing one hyperparameter for AR order and one hyperparameter for MA order;
+- `chromosome`, consists of the number of changepoints, the order of AR component (refers to the number of lagged terms used to model the current value of a time series), the order of MA component (refers to the number of lagged error terms used to model the current value of a time series), the changepoint locations, and a value of time series sample size plus 1 ($N+1$) indicating the end of the chromosome;
+- `plen` represents the number of model order hyperparameters. We have `plen=2` for this example representing one hyperparameter for AR order and one hyperparameter for MA order;
 - `XMat` requires the design matrix, including the of-interested covariates;
 - `Xt` requires the simulated time series data objects.
 
-Give the specific chromosome, including the ARMA model AR and MA orders and the changepoint configuration information, the function `ARIMA.BIC.Order()` returns the model BIC value, which represents the configuration's fitness.
+Given a specific chromosome that encodes the ARMA model structure—namely, the AR and moving average (MA) orders—as well as the changepoint configuration, the function ARIMA.BIC.Order() evaluates the BIC for the corresponding segmented model. The returned BIC value serves as the fitness score of that configuration. The example below presents the BIC value computed at the true changepoint locations with the true ARMA model orders, providing a benchmark for comparison.
 
 ```{r}
 ARIMA.BIC.Order(chromosome=c(2, 1, 1, 50, 150, Ts+1), plen=2, XMat=XMatT, Xt=myts)
 ```
 
-## Genetic Algorithm
+## Basic GA
 
-The genetic algorithm requires users set up a list object, including all the GA hyperparameters. As shown below, we will have 40 individual chromosomes in the population for each generation. `p.range` is a list object containing integer values ranges for parameters `phi` and `theta`. For example, in the code snippet below, `p.range` specifies that the AR and MA orders can vary from the set $\{0, 1, 2\}$. Details for each hyperparameter definition can be found via the package help documentation. 
+The GA requires users to set up an objective function (`ObjFunc`), sample size of the time series (`N`). All other algorithm hyperparameters, such as `popSize`, `pcrossover`, `pmutation` and etc, can be specified through the function arguments. Please use `?cptga` to see help detailed documentation. 
+
+A special note is warranted regarding the setup of the `p.range` argument:
+
+- For tasks requiring changepoint detection only, the default value is `NULL`.
+- If joint estimation of model order and changepoints is required, `p.range` must be specified as a list, where each element defines the permissible range for one model order parameter. The length of this list must match the number of model order parameters to be estimated in the objective function.
+
+As shown below, we will have 40 individual chromosomes in the population for each generation. `p.range` is a list object containing integer values ranges for parameters `phi` and `theta`. For example, in the code snippet below, `p.range` specifies that the AR and MA orders can vary from the set $\{0, 1, 2\}$. 
 
 ```{r}
 N = Ts
 p.range = list(ar=c(0,2), ma=c(0,2))
 ```
 
-
 ### Population chromosome initialization
 
-The default argument `GA_operators` for the `GA()` function requires four operators, `population`, `selection`, `crossover`, and `mutation`. The `population` operator will provide a matrix like R object that store the randomly generated chromosome representations as the initial population. As with any optimization problem, better initial values can lead to improved and faster-converging results. For convenience, users can specify their preferred solutions in a matrix R object to serve as the initialized population and replace the default operator in `operators`, but the matrix dimensions should be `lmax` rows and `popsize` columns. Each column from this matrix represents an individual chromosome.
+The population initialization step generates the initial set of chromosomes for the GA. This is controlled by the population operator by the argument `popInitialize`, which is one of the four required components in the GA or island model GA for the `cptga()` function—namely: population, selection, crossover, and mutation.
+
+By default, the population operator randomly generates a matrix-like R object, where each column represents a chromosome (i.e., a candidate solution). The matrix should have `lmax` rows and `popSize` columns, where `lmax` is the maximum chromosome length and `popSize` is the number of individuals in the population.
+
+To improve performance or guide the search, users may replace the default population operator by supplying a custom initialization matrix with the same dimensions. Providing informed or domain-specific initial solutions can lead to faster convergence and improved optimization outcomes.
+
+- `suggestions` is a list object where each element specifies a vector of changepoint locations for one chromosome.
+- The default value is `NULL`, meaning the population is entirely randomly initialized.
+- If `length(suggestions) == popSize`, all chromosomes in the population will be taken from suggestions.
+- If `length(suggestions) < popSize`, the remaining chromosomes will be filled in using the default popInitialize method.
+- The number of provided suggestions cannot exceed popSize.
+
+Providing better or more informed suggestions can help the Genetic Algorithm converge faster by giving it a more promising starting point.
 
 ```{r}
 suggestions = list(NULL, c(50), c(50, 150), c(50, 100, 150))
 ```
+
+Each element of the list corresponds to a candidate changepoint configuration. In this example, 4 suggestions are provided:
+
+- `NULL` indicates no changepoint;
+- `c(50)` suggests a single changepoint at time 50;
+- `c(50, 150)` specifies changepoints at time 50 and 150, and etc,
+
+and 6 chromosomes will be generated randomly using the default function if `popSize=10`. These suggested chromosomes can be incorporated into the population by replacing the default population operator or modifying the population matrix directly.
 
 Since we are trying to estimate the changepoint configurations, it is necessary to set the `XMat` to include all other covariates except the changepoint indicators, as if we are under a changepoint free model.
 
@@ -114,9 +154,17 @@ summary(res.changepointGA)
 ```
 
 
-## Island version of Genetic Algorithm
+## Island model GA
 
-The island GA model can be implemented by calling R function `cptgaisl()` with similar arguments as in `cptga()` function. The argument of `cptgaisl()` would be slightly different. Related, the initialized population is a list object, the length of such list should equal to the number of request islands. Here, we use the default operator to initialize the population, but users can also insert in their "reasonable" and "better" initial solutions to the list object `suggestions` as in previous section for improved and faster-converging results. The associated model orders will be randomly picked based on `p.range`. The computational time is also showing below.
+The island model GA can be implemented using the `cptgaisl()` function, which supports similar core arguments as the basic GA function `cptga()`, but introduces additional flexibility and parallelism via multiple isolated sub-populations (islands).
+
+Key differences include:
+
+- The initial population in `cptgaisl()` is expected to be a list object, where each element is a matrix and corresponds to the population for one island.
+- The length of this list must equal the number of islands (e.g., `numIslands`).
+- By default, each island's population is initialized using the internal operator, but users may insert their own informed or "reasonable" initial solutions into the `suggestions` list as above. These will serve as seed chromosomes for each island's initial population.
+
+If model order selection is enabled (e.g., for AR, MA, or ARIMA models), the associated model orders will be randomly sampled based on the user-supplied `p.range` argument.
 
 ```{r}
 tim1 = Sys.time()
@@ -140,7 +188,11 @@ plot(res.Island.changepointGA, data=myts)
 
 ## Parallel computing
 
-The default setting for both `GA()` and `IslandGA()` implementations is to evaluate each changepoint configuration sequentially and the initialized population fitness evaluation is computational expensive. In some case, we could use the parallel computing techniques to speed up the fitness evaluation, which requires the R packages **foreach** and **doParallel**. The parallel computing will be more efficient when the island size ad the number of islands is larger (a larger starting population). We then could implement the parallel computing easily by setting `parallel=TRUE` and apply `nCore=2` threads on a single computer as below (set `nCore` equals to the number of island is recommended).
+The default behavior of both `cptga()` and `cptgaisl()` is to evaluate each candidate changepoint configuration sequentially, which can be computationally expensive, especially during the initial population fitness evaluation. To address this, users may enable parallel computing to significantly speed up the evaluation process.
+
+Parallel execution requires the R packages `foreach` and `doParallel`. This approach is particularly beneficial when the population size and the number of islands are large, as more evaluations can be distributed across available CPU cores.
+
+To enable parallel computing, simply set the argument `parallel = TRUE` and specify the number of cores via `nCore`. It is generally recommended to set `nCore` equal to the number of islands (when using `cptgaisl()`), or to the number of physical cores available for `cptga()`. The following example will distribute the fitness evaluations across two parallel threads, potentially reducing the runtime substantially for large or complex problems.
 
 ```{r}
 tim3 = Sys.time()

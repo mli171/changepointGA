@@ -7,9 +7,12 @@
 ARIMA.BIC.Order(chromosome, plen = 2, XMat, Xt)
 }
 \arguments{
-\item{chromosome}{The chromosome consists of the number of changepoints, the
-order of AR part, the order of MA part, the changepoint locations, and a
-value of time series length plus 1 (N+1) indicating the end of the chromosome.}
+\item{chromosome}{A vector consists of the number of changepoints, the order 
+of AR component (refers to the number of lagged terms used to model the 
+current value of a time series), the order of MA component (refers to the 
+number of lagged error terms used to model the current value of a time 
+series), the changepoint locations, and a value of time series sample size 
+plus 1 ($N+1$) indicating the end of the chromosome.}
 
 \item{plen}{The number of model order parameters that need to be selected.
 If model order selection needs to be performed simultaneously with the

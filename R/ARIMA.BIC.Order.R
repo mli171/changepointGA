@@ -4,9 +4,12 @@
 #' moving average with model order selection via Bayesian Information Criterion
 #' (BIC).
 #'
-#' @param chromosome The chromosome consists of the number of changepoints, the
-#' order of AR part, the order of MA part, the changepoint locations, and a
-#' value of time series length plus 1 (N+1) indicating the end of the chromosome.
+#' @param chromosome A vector consists of the number of changepoints, the order 
+#' of AR component (refers to the number of lagged terms used to model the 
+#' current value of a time series), the order of MA component (refers to the 
+#' number of lagged error terms used to model the current value of a time 
+#' series), the changepoint locations, and a value of time series sample size 
+#' plus 1 ($N+1$) indicating the end of the chromosome.
 #' @param plen The number of model order parameters that need to be selected.
 #' If model order selection needs to be performed simultaneously with the
 #' changepoint detection task, \code{plen} should be nonzero.
