@@ -27,14 +27,13 @@
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCpopulation = function(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax){
+AMOCpopulation <- function(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax) {
+  tauclc <- floor(0.05 * N):ceiling(0.95 * N)
 
-  tauclc = floor(0.05*N):ceiling(0.95*N)
-
-  pop = matrix(0, nrow=lmax, ncol=popsize)
-  pop[1,] = rep(1, popsize)
-  pop[2,] = sample(tauclc, size=popsize)
-  pop[3,] = N+1
+  pop <- matrix(0, nrow = lmax, ncol = popsize)
+  pop[1, ] <- rep(1, popsize)
+  pop[2, ] <- sample(tauclc, size = popsize)
+  pop[3, ] <- N + 1
 
   return(pop)
 }
@@ -59,7 +58,7 @@ AMOCpopulation = function(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCselection = function(pop, popFit){
+AMOCselection <- function(pop, popFit) {
   return(selection_linearrank(pop, popFit))
 }
 
@@ -86,12 +85,11 @@ AMOCselection = function(pop, popFit){
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCcrossover = function(mom, dad, p.range=NULL, minDist, lmax, N){
-
-  child = matrix(0, nrow=lmax, 1)
-  child[1] = 1
-  child[2] = round((dad[2]+mom[2])/2)
-  child[3] = N + 1
+AMOCcrossover <- function(mom, dad, p.range = NULL, minDist, lmax, N) {
+  child <- matrix(0, nrow = lmax, 1)
+  child[1] <- 1
+  child[2] <- round((dad[2] + mom[2]) / 2)
+  child[3] <- N + 1
 
   return(child)
 }
@@ -127,15 +125,14 @@ AMOCcrossover = function(mom, dad, p.range=NULL, minDist, lmax, N){
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCmutation = function(child, p.range=NULL, minDist, Pchangepoint=NULL, lmax=NULL, mmax=NULL, N=NULL){
+AMOCmutation <- function(child, p.range = NULL, minDist, Pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
+  tmptau <- 1
 
-  tmptau = 1
-
-  while(tmptau < floor(0.05*N) | tmptau > ceiling(0.95*N)){
-    tmpsign = sample(x=c(-1,1), size = 1)
-    tmptau = child[2] + tmpsign*minDist
+  while (tmptau < floor(0.05 * N) | tmptau > ceiling(0.95 * N)) {
+    tmpsign <- sample(x = c(-1, 1), size = 1)
+    tmptau <- child[2] + tmpsign * minDist
   }
-  child[2] = tmptau
+  child[2] <- tmptau
 
   return(child)
 }

@@ -51,112 +51,127 @@
 #' @export
 #' @examples
 #' ##### M1: Time series observations are IID
-#' Ts = 1000
-#' betaT = c(0.5) # intercept
-#' XMatT = matrix(1, nrow=Ts, ncol=1)
-#' colnames(XMatT) = "intercept"
-#' sigmaT = 1
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' Ts <- 1000
+#' betaT <- c(0.5) # intercept
+#' XMatT <- matrix(1, nrow = Ts, ncol = 1)
+#' colnames(XMatT) <- "intercept"
+#' sigmaT <- 1
+#' DeltaT <- c(2, -2)
+#' Cp.prop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-#'               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts <- ts.sim(
+#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+#' )
 #'
 #' ##### M2: ARMA(2,1) model with constant mean
-#' Ts = 1000
-#' betaT = c(0.5) # intercept
-#' XMatT = matrix(1, nrow=Ts, ncol=1)
-#' colnames(XMatT) = "intercept"
-#' sigmaT = 1
-#' phiT = c(0.5, -0.5)
-#' thetaT = c(0.8)
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' Ts <- 1000
+#' betaT <- c(0.5) # intercept
+#' XMatT <- matrix(1, nrow = Ts, ncol = 1)
+#' colnames(XMatT) <- "intercept"
+#' sigmaT <- 1
+#' phiT <- c(0.5, -0.5)
+#' thetaT <- c(0.8)
+#' DeltaT <- c(2, -2)
+#' Cp.prop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts <- ts.sim(
+#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+#' )
 #'
 #' ##### M3: ARMA(2,1) model with seasonality
-#' Ts = 1000
-#' betaT = c(0.5, -0.5, 0.3) # intercept, B, D
-#' period = 30
-#' XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
-#' colnames(XMatT) = c("intercept", "Bvalue", "DValue")
-#' sigmaT = 1
-#' phiT = c(0.5, -0.5)
-#' thetaT = c(0.8)
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' Ts <- 1000
+#' betaT <- c(0.5, -0.5, 0.3) # intercept, B, D
+#' period <- 30
+#' XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period))
+#' colnames(XMatT) <- c("intercept", "Bvalue", "DValue")
+#' sigmaT <- 1
+#' phiT <- c(0.5, -0.5)
+#' thetaT <- c(0.8)
+#' DeltaT <- c(2, -2)
+#' Cp.prop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+#' myts <- ts.sim(
+#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+#' )
 #'
 #'
 #' ##### M4: ARMA(2,1) model with seasonality and trend
 #' # scaled trend if large number of sample size
-#' Ts = 1000
-#' betaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
-#' period = 30
-#' XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period), 1:Ts)
-#' colnames(XMatT) = c("intercept", "Bvalue", "DValue", "trend")
-#' sigmaT = 1
-#' phiT = c(0.5, -0.5)
-#' thetaT = c(0.8)
-#' DeltaT = c(2, -2)
-#' Cp.prop = c(1/4, 3/4)
-#' CpLocT = floor(Ts*Cp.prop)
+#' Ts <- 1000
+#' betaT <- c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
+#' period <- 30
+#' XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period), 1:Ts)
+#' colnames(XMatT) <- c("intercept", "Bvalue", "DValue", "trend")
+#' sigmaT <- 1
+#' phiT <- c(0.5, -0.5)
+#' thetaT <- c(0.8)
+#' DeltaT <- c(2, -2)
+#' Cp.prop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cp.prop)
 #'
-#' myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-#'               phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-ts.sim = function(beta, XMat, sigma, phi=NULL, theta=NULL, Delta=NULL, CpLoc=NULL, seed=NULL){
-  
-  if(!is.null(seed)){set.seed(seed)}
-  
-  Ts = NROW(XMat)
-  
-  if(is.null(Delta)){
-    if(is.null(CpLoc)){
+#' myts <- ts.sim(
+#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+#' )
+ts.sim <- function(beta, XMat, sigma, phi = NULL, theta = NULL, Delta = NULL, CpLoc = NULL, seed = NULL) {
+  if (!is.null(seed)) {
+    set.seed(seed)
+  }
+
+  Ts <- NROW(XMat)
+
+  if (is.null(Delta)) {
+    if (is.null(CpLoc)) {
       warnings("\n No changepoint effects!\n")
-      DesignX = XMat
-      mu = DesignX%*%beta
-    }else{
+      DesignX <- XMat
+      mu <- DesignX %*% beta
+    } else {
       stop("Changepoint effects invalid!")
     }
-  }else{
-    if(is.null(CpLoc)){
+  } else {
+    if (is.null(CpLoc)) {
       stop("Changepoint effects invalid!")
-    }else{
-      if(any(CpLoc>Ts) | any(CpLoc<0)){stop("Changepoint effects invalid!")}
-      if(length(Delta) != length(CpLoc)){stop("Changepoint effects invalid!")}
+    } else {
+      if (any(CpLoc > Ts) | any(CpLoc < 0)) {
+        stop("Changepoint effects invalid!")
+      }
+      if (length(Delta) != length(CpLoc)) {
+        stop("Changepoint effects invalid!")
+      }
       # changepoints
-      tmptau = unique(c(CpLoc, Ts+1))
-      CpMat = matrix(0, nrow=Ts, ncol=length(tmptau)-1)
-      for(i in 1:NCOL(CpMat)){CpMat[tmptau[i]:(tmptau[i+1]-1),i] = 1}
-      DesignX = cbind(XMat, CpMat)
-      beta = c(beta, Delta)
-      mu = DesignX%*%beta
+      tmptau <- unique(c(CpLoc, Ts + 1))
+      CpMat <- matrix(0, nrow = Ts, ncol = length(tmptau) - 1)
+      for (i in 1:NCOL(CpMat)) {
+        CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
+      }
+      DesignX <- cbind(XMat, CpMat)
+      beta <- c(beta, Delta)
+      mu <- DesignX %*% beta
     }
   }
-  
-  if(is.null(phi) & is.null(theta)){
-    et = rnorm(n=Ts, mean=0, sd=sigma) # independent
-  }else{
-    et = arima.sim(n=Ts, list(ar=phi, ma=theta), sd=sigma) # sd argument is for WN
+
+  if (is.null(phi) & is.null(theta)) {
+    et <- rnorm(n = Ts, mean = 0, sd = sigma) # independent
+  } else {
+    et <- arima.sim(n = Ts, list(ar = phi, ma = theta), sd = sigma) # sd argument is for WN
   }
-  
-  Z = et + mu
-  
-  attr(Z, 'DesignX') = DesignX
-  attr(Z, 'mu') = mu
-  attr(Z, 'theta') = beta
-  attr(Z, 'CpEff') = Delta
-  attr(Z, 'CpLoc') = CpLoc
-  attr(Z, 'arEff') = phi
-  attr(Z, 'maEff') = theta
-  attr(Z, 'seed')  = seed
-  
+
+  Z <- et + mu
+
+  attr(Z, "DesignX") <- DesignX
+  attr(Z, "mu") <- mu
+  attr(Z, "theta") <- beta
+  attr(Z, "CpEff") <- Delta
+  attr(Z, "CpLoc") <- CpLoc
+  attr(Z, "arEff") <- phi
+  attr(Z, "maEff") <- theta
+  attr(Z, "seed") <- seed
+
   return(Z)
 }

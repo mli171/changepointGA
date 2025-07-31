@@ -35,47 +35,51 @@
 #' @useDynLib changepointGA
 #' @export
 #' @examples
-#' N = 100
+#' N <- 100
 #'
 #' # both tau1 and tau2 has detected changepoints
-#' tau2 = c(25, 50, 75)
-#' tau1 = c(20, 35, 70, 80, 90)
-#' cptDist(tau1=tau1, tau2=tau2, N=N)
+#' tau2 <- c(25, 50, 75)
+#' tau1 <- c(20, 35, 70, 80, 90)
+#' cptDist(tau1 = tau1, tau2 = tau2, N = N)
 #'
 #' # either tau1 or tau2 has zero detected changepoints
-#' cptDist(tau1=tau1, tau2=NULL, N=N)
-#' cptDist(tau1=NULL, tau2=tau2, N=N)
+#' cptDist(tau1 = tau1, tau2 = NULL, N = N)
+#' cptDist(tau1 = NULL, tau2 = tau2, N = N)
 #'
 #' # both tau1 and tau2 has zero detected changepoints
-#' cptDist(tau1=NULL, tau2=NULL, N=N)
-cptDist = function(tau1, tau2, N){
+#' cptDist(tau1 = NULL, tau2 = NULL, N = N)
+cptDist <- function(tau1, tau2, N) {
+  m <- length(tau1)
+  k <- length(tau2)
 
-  m = length(tau1)
-  k = length(tau2)
-
-  if(is.null(tau1) & is.null(tau2)){
-    dist.res = NA
+  if (is.null(tau1) & is.null(tau2)) {
+    dist.res <- NA
     warning("Both configurations are NULL.")
-  }else{
-    if(is.null(tau1) | is.null(tau2)){
-      ACC = 0
-    }else{
-      if(any(tau1 < 0 | tau1 > N)){stop("First changepoint configuration invalid.")}
-      if(any(tau2 < 0 | tau2 > N)){stop("Second changepoint configuration invalid.")}
+  } else {
+    if (is.null(tau1) | is.null(tau2)) {
+      ACC <- 0
+    } else {
+      if (any(tau1 < 0 | tau1 > N)) {
+        stop("First changepoint configuration invalid.")
+      }
+      if (any(tau2 < 0 | tau2 > N)) {
+        stop("Second changepoint configuration invalid.")
+      }
 
-      costs = matrix(0, nrow=m, ncol=k)
-      for(i in 1:m){
-        for(j in 1:k){
-          costs[i,j] = abs(tau1[i] - tau2[j])/N
+      costs <- matrix(0, nrow = m, ncol = k)
+      for (i in 1:m) {
+        for (j in 1:k) {
+          costs[i, j] <- abs(tau1[i] - tau2[j]) / N
         }
       }
-      if(m > k){costs=t(costs)}
-      y = clue::solve_LSAP(costs, maximum = FALSE)
-      ACC = sum(costs[cbind(seq_along(y), y)])
+      if (m > k) {
+        costs <- t(costs)
+      }
+      y <- clue::solve_LSAP(costs, maximum = FALSE)
+      ACC <- sum(costs[cbind(seq_along(y), y)])
     }
-    dist.res = abs(m-k) + ACC
+    dist.res <- abs(m - k) + ACC
   }
 
   return(dist.res)
 }
-

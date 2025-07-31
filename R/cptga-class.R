@@ -49,36 +49,37 @@ setClassUnion("listOrNULL", members = c("list", "NULL"))
 
 #' @rdname cptga-class
 #' @export
-setClass(Class = "cptga", 
-         representation(
-           call = "language",
-           N = "numeric",
-           p.range = "listOrNULL",
-           popSize = "numeric",
-           pcrossover = "numeric",
-           pmutation = "numeric",
-           pchangepoint = "numeric",
-           minDist = "numeric",
-           mmax = "numericOrNULL",
-           lmax = "numericOrNULL",
-           maxgen = "numeric",
-           maxconv = "numeric",
-           option = "character",
-           monitoring = "logical",
-           parallel = "logical",
-           nCore = "numericOrNULL",
-           tol = "numeric",
-           seed = "numericOrNULL",
-           suggestions = "listOrNULL",
-           population = "matrix",
-           fitness = "vector",
-           overbestchrom = "vector",
-           overbestfit = "numeric",
-           bestfit = "vector",
-           count = "numeric",
-           convg = "numeric"
-         ),
-         package = "changepointGA"
+setClass(
+  Class = "cptga",
+  representation(
+    call = "language",
+    N = "numeric",
+    p.range = "listOrNULL",
+    popSize = "numeric",
+    pcrossover = "numeric",
+    pmutation = "numeric",
+    pchangepoint = "numeric",
+    minDist = "numeric",
+    mmax = "numericOrNULL",
+    lmax = "numericOrNULL",
+    maxgen = "numeric",
+    maxconv = "numeric",
+    option = "character",
+    monitoring = "logical",
+    parallel = "logical",
+    nCore = "numericOrNULL",
+    tol = "numeric",
+    seed = "numericOrNULL",
+    suggestions = "listOrNULL",
+    population = "matrix",
+    fitness = "vector",
+    overbestchrom = "vector",
+    overbestfit = "numeric",
+    bestfit = "vector",
+    count = "numeric",
+    convg = "numeric"
+  ),
+  package = "changepointGA"
 )
 
 setMethod("print", "cptga", function(x, ...) str(x))
@@ -107,16 +108,15 @@ setMethod("print", "cptga", function(x, ...) str(x))
 #' @return Invisibly returns \code{NULL}. Called for its side effect of printing to the console.
 #'
 #' @seealso \code{\link{cptga}}, \code{\link[=summary.cptga]{summary}}, \code{\link{plot.cptga}}
-#' 
+#'
 #' @method print summary.cptga
 #' @export
 #' @aliases print.summary.cptga
-print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...)
-{
+print.summary.cptga <- function(x, digits = getOption("digits"), max_display = 5, ...) {
   cat("###############################################\n")
   cat("#         Changepoint Detection via GA        #\n")
   cat("###############################################\n")
-  
+
   cat("   Settings: \n")
   cat(paste("   Population size         = ", x@popSize, "\n"))
   cat(paste("   Number of generations   = ", x@count, "\n"))
@@ -125,10 +125,10 @@ print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...
   cat(paste("   Changepoint probability = ", format(x@pchangepoint, digits = digits), "\n"))
   cat(paste("   Task mode               = ", x@option, "\n"))
   cat(paste("   Parallel Usage          = ", x@parallel, "\n"))
-  if(x@parallel){
+  if (x@parallel) {
     cat(paste("   Number of thread      = ", x@nCore, "\n"))
   }
-  if(!is.null(x@suggestions)){ 
+  if (!is.null(x@suggestions)) {
     cat("   Suggestions: \n")
     for (i in seq_along(x@suggestions)) {
       cat("    ", sprintf("[%d]:", i))
@@ -142,42 +142,42 @@ print.summary.cptga = function(x, digits=getOption("digits"), max_display=5, ...
   }
   cat("\n##### GA results ##### \n")
   cat(paste("   Optimal Fitness value =", format(x@overbestfit, digits = digits), "\n"))
-  cat(paste("   Optimal Solution: \n")) 
-  m.sol = x@overbestchrom[1]
-  cat(paste("        Number of Changepoints = ", m.sol, "\n")) 
-  if(x@option == "cp"){
-    if(m.sol > 0){
-      tau.sol = x@overbestchrom[2:(1+m.sol)]
+  cat(paste("   Optimal Solution: \n"))
+  m.sol <- x@overbestchrom[1]
+  cat(paste("        Number of Changepoints = ", m.sol, "\n"))
+  if (x@option == "cp") {
+    if (m.sol > 0) {
+      tau.sol <- x@overbestchrom[2:(1 + m.sol)]
       cat(paste("        Changepoints Locations = ", paste(tau.sol, collapse = " ")), "\n")
-    }else{
+    } else {
       cat("        Changepoints Locations = No changepoint reached optimum \n")
     }
-  }else if (x@option == "both"){
-    n.hyperparam = length(x@p.range)
-    name.hyperparam = names(x@p.range)
-    if(is.null(name.hyperparam)){
-      name.hyperparam = paste0("Hyper.param.", 1:n.hyperparam)
+  } else if (x@option == "both") {
+    n.hyperparam <- length(x@p.range)
+    name.hyperparam <- names(x@p.range)
+    if (is.null(name.hyperparam)) {
+      name.hyperparam <- paste0("Hyper.param.", 1:n.hyperparam)
     }
-    if(m.sol > 0){
-      hyperparam.sol = x@overbestchrom[2:(1+n.hyperparam)]
-      hyperparam.sol = paste0(name.hyperparam, " = ", hyperparam.sol)
+    if (m.sol > 0) {
+      hyperparam.sol <- x@overbestchrom[2:(1 + n.hyperparam)]
+      hyperparam.sol <- paste0(name.hyperparam, " = ", hyperparam.sol)
       cat("        Model hyperparameters:\n")
-      for(i in seq_along(name.hyperparam)){
+      for (i in seq_along(name.hyperparam)) {
         cat(paste("            ", hyperparam.sol[i]), "\n")
       }
-      tau.sol = x@overbestchrom[(2+n.hyperparam):(1+n.hyperparam+m.sol)]
+      tau.sol <- x@overbestchrom[(2 + n.hyperparam):(1 + n.hyperparam + m.sol)]
       cat(paste("        Changepoints Locations = ", paste(tau.sol, collapse = " ")), "\n")
-    }else{
-      hyperparam.sol = x@overbestchrom[2:(1+n.hyperparam)]
-      hyperparam.sol = paste0(name.hyperparam, " = ", hyperparam.sol)
+    } else {
+      hyperparam.sol <- x@overbestchrom[2:(1 + n.hyperparam)]
+      hyperparam.sol <- paste0(name.hyperparam, " = ", hyperparam.sol)
       cat("        Model hyperparameters:\n")
-      for(i in seq_along(name.hyperparam)){
+      for (i in seq_along(name.hyperparam)) {
         cat(paste("            ", hyperparam.sol[i]), "\n")
       }
       cat("        Changepoints Locations = No changepoint reached optimum \n")
     }
   }
-  
+
   #
   invisible()
 }
@@ -197,9 +197,9 @@ setMethod("summary", "cptga", function(object, ...) {
 #' Plot Time Series with Detected Changepoints from a `cptga` Object
 #'
 #' This function visualizes a univariate time series along with the changepoints
-#' identified by a basic genetic algorithm, as represented by a `cptga` object. 
+#' identified by a basic genetic algorithm, as represented by a `cptga` object.
 #' Vertical dashed lines mark changepoint locations, and segment means are shown as horizontal
-#' dashed lines. The optimal fitness value and changepoint locations are 
+#' dashed lines. The optimal fitness value and changepoint locations are
 #' displayed as margin text.
 #'
 #' @param x An object of class \code{cptgaisl}, typically returned by a basic genetic algorithm based
@@ -232,27 +232,26 @@ setMethod("summary", "cptga", function(object, ...) {
 #' @seealso \code{\link{cptga}}, \code{\link[=summary.cptga]{summary}}, \code{\link{plot.cptga}}
 #'
 #' @exportS3Method
-plot.cptga = function(x, 
-                      data, 
-                      main = NULL,
-                      XTickLab=NULL,
-                      XTickPos=NULL,
-                      XAxisLab="Time",
-                      YAxisLab="Data",
-                      cex.lab = 1.3, 
-                      cex.axis = 1.3, 
-                      cex.main = 1.3, 
-                      lwd = 2, ...) {
-  
-  Ts = length(data)
-  use_custom_X = !is.null(XTickLab) && length(XTickLab) == Ts
-  plot_x = if (use_custom_X) XTickLab else 1:Ts
-  
-  chrom = x@overbestchrom
-  m = chrom[1]
+plot.cptga <- function(x,
+                       data,
+                       main = NULL,
+                       XTickLab = NULL,
+                       XTickPos = NULL,
+                       XAxisLab = "Time",
+                       YAxisLab = "Data",
+                       cex.lab = 1.3,
+                       cex.axis = 1.3,
+                       cex.main = 1.3,
+                       lwd = 2, ...) {
+  Ts <- length(data)
+  use_custom_X <- !is.null(XTickLab) && length(XTickLab) == Ts
+  plot_x <- if (use_custom_X) XTickLab else 1:Ts
+
+  chrom <- x@overbestchrom
+  m <- chrom[1]
   if (m > 0) {
-    tau = if (x@option == "both") {
-      n.hyparam = length(x@p.range)
+    tau <- if (x@option == "both") {
+      n.hyparam <- length(x@p.range)
       chrom[(2 + n.hyparam):(1 + n.hyparam + m)]
     } else {
       chrom[2:(1 + m)]
@@ -260,49 +259,51 @@ plot.cptga = function(x,
   } else {
     tau <- NULL
   }
-  
-  fit = sprintf("%.3f", x@overbestfit)
-  tau_vals = if (!is.null(tau)) if (use_custom_X) XTickLab[tau] else tau else NULL
-  changepoint_str = if (!is.null(tau_vals)) {
+
+  fit <- sprintf("%.3f", x@overbestfit)
+  tau_vals <- if (!is.null(tau)) if (use_custom_X) XTickLab[tau] else tau else NULL
+  changepoint_str <- if (!is.null(tau_vals)) {
     paste0("Changepoints: ", paste(tau_vals, collapse = ", "))
   } else {
     "Changepoint Locations: None"
   }
-  
+
   op <- par(no.readonly = TRUE)
   on.exit(par(op))
-  
-  par(mar = c(5, 5, 6, 2), 
-      cex.lab = cex.lab, 
-      cex.axis = cex.axis, 
-      cex.main = cex.main)
-  
+
+  par(
+    mar = c(5, 5, 6, 2),
+    cex.lab = cex.lab,
+    cex.axis = cex.axis,
+    cex.main = cex.main
+  )
+
   plot(plot_x, data,
-       type = "l",
-       xlab = XAxisLab,
-       ylab = YAxisLab,
-       xaxt = "n",
-       ...
+    type = "l",
+    xlab = XAxisLab,
+    ylab = YAxisLab,
+    xaxt = "n",
+    ...
   )
   if (!is.null(main)) {
-    title(main = main, line = 3.5)  # push title down a bit
+    title(main = main, line = 3.5) # push title down a bit
   }
-  
+
   if (!is.null(XTickPos) && use_custom_X) {
     axis(1, at = match(XTickPos, XTickLab), labels = XTickPos)
   } else {
     axis(1, at = pretty(plot_x), labels = pretty(plot_x))
   }
-  
+
   if (!is.null(tau)) {
     cp_x <- if (use_custom_X) XTickLab[tau] else tau
     abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
-    
+
     tau_full <- c(1, tau, Ts + 1)
     seg_len <- diff(tau_full)
     ff <- rep(0:m, times = seg_len)
     mu.seg <- tapply(data, ff, mean)
-    
+
     for (i in seq_along(mu.seg)) {
       segments(
         x0 = if (use_custom_X) XTickLab[tau_full[i]] else tau_full[i],
@@ -313,7 +314,7 @@ plot.cptga = function(x,
       )
     }
   }
-  
+
   mtext(paste("Fitness:", fit), side = 3, line = 1.5, adj = 0, cex = cex.lab)
   mtext(changepoint_str, side = 3, line = 0.5, adj = 0, cex = cex.lab)
 }

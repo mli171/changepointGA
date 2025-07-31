@@ -1,4 +1,4 @@
-.default.GA_param = list(
+.default.GA_param <- list(
   popsize      = 200,
   Pcrossover   = 0.95,
   Pmutation    = 0.15,
@@ -17,7 +17,7 @@
 )
 
 
-.default.IslandGA_param = list(
+.default.IslandGA_param <- list(
   subpopsize   = 40,
   Islandsize   = 5,
   Pcrossover   = 0.95,
@@ -37,7 +37,9 @@
   seed         = NULL
 )
 
-.default.operators = list(population = "random_population",
-                          selection  = "selection_linearrank",
-                          crossover  = "uniformcrossover",
-                          mutation   = "mutation")
+.default.operators <- list(
+  population = "random_population",
+  selection = "selection_linearrank",
+  crossover = "uniformcrossover",
+  mutation = "mutation"
+)
