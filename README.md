@@ -167,3 +167,13 @@ plot(tmp3, data=Xt)
 tim4 - tim3
 tim6 - tim5
 ```
+
+# Code style
+
+Before pushing changes, please run 
+
+```r
+styler::style_pkg()
+```
+
+to ensure your code follows the tidyverse style guide.
