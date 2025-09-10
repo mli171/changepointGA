@@ -113,7 +113,7 @@ setMethod("print", "cptgaisl", function(x, ...) str(x))
 #' @aliases print.summary.cptgaisl
 print.summary.cptgaisl <- function(x, digits = getOption("digits"), max_display = 5, ...) {
   cat("###############################################\n")
-  cat("#    Changepoint Detection via IMGA           #\n")
+  cat("#  Changepoint Detection via Island Model GA  #\n")
   cat("###############################################\n")
 
   cat("   Settings: \n")
