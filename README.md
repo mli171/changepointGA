@@ -22,8 +22,8 @@ install.packages("changepointGA")
 or the development version from Github:
 
 ```{r}
-# install.packages("devtools")
-devtools::install_github("mli171/changepointGA")
+# install.packages("remotes")
+remotes::install_github("mli171/changepointGA", build_vignettes = FALSE, force = TRUE)
 ```
 
 ## Changepoint Detection Only
