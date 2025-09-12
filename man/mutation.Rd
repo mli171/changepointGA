@@ -4,7 +4,7 @@
 \alias{mutation}
 \title{The default mutation operator in genetic algorithm}
 \usage{
-mutation(child, prange = NULL, minDist, Pb, lmax, mmax, N)
+mutation(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
 }
 \arguments{
 \item{child}{The child chromosome resulting from the \code{crossover} genetic
@@ -17,7 +17,7 @@ order parameters must be equal to the length of \code{prange}.}
 
 \item{minDist}{The required minimum distance between two adjacent changepoints.}
 
-\item{Pb}{The probability of changepoints for every time series.}
+\item{pchangepoint}{The probability of changepoints for every time series.}
 
 \item{lmax}{The user specified maximum number of changepoints, by default,
 as \code{N/2 - 1}.}

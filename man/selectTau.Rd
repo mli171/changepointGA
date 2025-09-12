@@ -4,7 +4,7 @@
 \alias{selectTau}
 \title{Randomly select the chromosome}
 \usage{
-selectTau(N, prange, minDist, Pb, mmax, lmax)
+selectTau(N, prange, minDist, pchangepoint, mmax, lmax)
 }
 \arguments{
 \item{N}{The length of time series.}
@@ -14,7 +14,7 @@ pre-defined model parameters, i.e. AR/MA order of ARMA models.}
 
 \item{minDist}{The minimum length between two adjacent changepoints.}
 
-\item{Pb}{Same as \code{Pchangepoint}, the probability that a changepoint has occurred.}
+\item{pchangepoint}{Same as \code{Pchangepoint}, the probability that a changepoint has occurred.}
 
 \item{mmax}{The maximum possible number of changepoints in the data set.}
 

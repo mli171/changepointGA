@@ -4,7 +4,7 @@
 \alias{random_population}
 \title{Random population initialization}
 \usage{
-random_population(popSize, prange, N, minDist, Pb, mmax, lmax)
+random_population(popSize, prange, N, minDist, pchangepoint, mmax, lmax)
 }
 \arguments{
 \item{popSize}{An integer represents the number of individual in each
@@ -19,7 +19,7 @@ order parameters must be equal to the length of \code{prange}.}
 
 \item{minDist}{The minimum length between two adjacent changepoints.}
 
-\item{Pb}{Same as \code{pchangepoint} from \code{\link{cptga}} or 
+\item{pchangepoint}{Same as \code{pchangepoint} from \code{\link{cptga}} or 
 \code{\link{cptgaisl}}, the probability that a changepoint has occurred.}
 
 \item{mmax}{The maximum possible number of changepoints in the data set.}
