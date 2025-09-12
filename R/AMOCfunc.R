@@ -4,7 +4,7 @@
 #' to construct the first generation population for the at most one changepoint
 #' (AMOC) problem.
 #'
-#' @param popsize An integer represents the number of individual in each
+#' @param popSize An integer represents the number of individual in each
 #' population for GA (or subpopulation for IslandGA).
 #' @param prange Default is \code{NULL} for only changepoint detection. If
 #' \code{prange} is specified as a list object, which contains the range of
@@ -27,12 +27,12 @@
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCpopulation <- function(popsize, prange, N, minDist, Pchangepoint, mmax, lmax) {
+AMOCpopulation <- function(popSize, prange, N, minDist, Pchangepoint, mmax, lmax) {
   tauclc <- floor(0.05 * N):ceiling(0.95 * N)
 
-  pop <- matrix(0, nrow = lmax, ncol = popsize)
-  pop[1, ] <- rep(1, popsize)
-  pop[2, ] <- sample(tauclc, size = popsize)
+  pop <- matrix(0, nrow = lmax, ncol = popSize)
+  pop[1, ] <- rep(1, popSize)
+  pop[2, ] <- sample(tauclc, size = popSize)
   pop[3, ] <- N + 1
 
   return(pop)
@@ -49,7 +49,7 @@ AMOCpopulation <- function(popsize, prange, N, minDist, Pchangepoint, mmax, lmax
 #' value/larger rank than \code{mom}.
 #' @param pop A matrix contains the chromosomes for all individuals. The number of
 #' rows is equal to \code{lmax} and the number of columns is equal to the
-#' \code{popsize}.
+#' \code{popSize}.
 #' @param popFit A vector contains the objective function value (population fit)
 #' being associated to each individual chromosome from above.
 #' @return A list contains the chromosomes for \code{dad} and \code{mom}.
