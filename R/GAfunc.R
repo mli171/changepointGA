@@ -119,7 +119,7 @@ mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
   return(childMut)
 }
 
-NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, pchangepoint, maxgen, N, prange, ...) {
+NewpopulationIsland <- function(ObjFunc, prange, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, pcrossover, pmutation, pchangepoint, maxgen, N, ...) {
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -127,8 +127,8 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
   #   minDist= minimum distances between two adjacent changepoints
   #   lmax= max length of chromosome
   #   mmax= max number of changepoints
-  #   Pc= prob of crossover
-  #   Pm= prob of mutation
+  #   pcrossover= prob of crossover
+  #   pmutation= prob of mutation
   #   pchangepoint= prob of changepoints for every time series
   #   maxgen= for each subpopulation, after maxgen then apply migration
   #   N= sample size
@@ -156,7 +156,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
 
     ##### step 3: crossover
     a1 <- runif(1)
-    if (a1 <= Pc) {
+    if (a1 <= pcrossover) {
       child <- crossover(mom, dad, prange, minDist, lmax, N)
     } else {
       child <- dad
@@ -165,7 +165,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
 
     ## step 4-2: mutation
     a2 <- runif(1)
-    if (a2 <= Pm) {
+    if (a2 <= pmutation) {
       child <- mutation(child, prange, minDist, pchangepoint, lmax, mmax, N)
     } else {
       flag[2] <- 1

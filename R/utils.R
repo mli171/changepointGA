@@ -18,6 +18,6 @@
   if (length(dots) == 0L || is.null(names(dots))) return(list())
   
   fmls <- names(formals(fn))
-  fmls <- setdiff(fmls, "...")   # don't forward everything via "..."
+  fmls <- setdiff(fmls, "...")
   dots[intersect(names(dots), fmls)]
 }
