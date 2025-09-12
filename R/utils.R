@@ -11,21 +11,7 @@
 #' @keywords internal
 #' @noRd
 .filter_args <- function(dots, fn) {
-  if (is.character(fn)) fn <- get(fn, mode = "function")
-  stopifnot(is.function(fn))
-  
-  if (length(dots) == 0L || is.null(names(dots))) return(list())
-  
-  fmls     <- names(formals(fn))
-  has_dots <- any(fmls == "...")
-  fmls0    <- setdiff(fmls, "...")
-  
-  # If fn has "...", allow all named args to pass through (so they land in ...).
-  # Otherwise, strict filtering to the declared formals only.
-  if (has_dots) {
-    # keep all named entries from dots (no positional args in do.call here)
-    dots
-  } else {
-    dots[ intersect(names(dots), fmls0) ]
-  }
+  fmls <- names(formals(fn))
+  fmls <- setdiff(fmls, "...")  # don't forward everything via "..."
+  dots[intersect(names(dots), fmls)]
 }
