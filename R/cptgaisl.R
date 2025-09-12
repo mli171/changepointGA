@@ -356,8 +356,7 @@ cptgaisl <- function(ObjFunc,
       init_args <- c(dots,
                      list(popSize = RemainpopSize, prange = prange, N = N,
                           minDist = minDist, pchangepoint = pchangepoint,
-                          mmax = mmax, lmax = lmax)
-      )
+                          mmax = mmax, lmax = lmax))
       init_args <- .filter_args(init_args, popInitialize)
       pop <- do.call(popInitialize, init_args)
       pop <- cbind(pop, suggestions.mat)
@@ -373,8 +372,7 @@ cptgaisl <- function(ObjFunc,
     init_args <- c(dots,
                    list(popSize = popSize, prange = prange, N = N,
                         minDist = minDist, pchangepoint = pchangepoint,
-                        mmax = mmax, lmax = lmax)
-    )
+                        mmax = mmax, lmax = lmax))
     init_args <- .filter_args(init_args, popInitialize)
     pop <- do.call(popInitialize, init_args)
   }
@@ -402,10 +400,10 @@ cptgaisl <- function(ObjFunc,
   
   object@Islandsize <- Islandsize
   
-  obj_shared   <- .filter_args(dots, ObjFunc)
-  obj_formals  <- setdiff(names(formals(ObjFunc)), "...")
-  first_param  <- obj_formals[1]
-  has_plen     <- "plen" %in% obj_formals
+  obj_shared <- .filter_args(dots, ObjFunc)
+  obj_formals <- setdiff(names(formals(ObjFunc)), "...")
+  first_param <- obj_formals[1]
+  has_plen <- "plen" %in% obj_formals
   
   ## evaluate the fitness (Parallel or NOT)
   if (parallel) {
