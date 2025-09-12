@@ -20,13 +20,13 @@ rank_asR <- function(x, decreasing = FALSE) {
 #' @param prange A list object containing the possible range for other
 #' pre-defined model parameters, i.e. AR/MA order of ARMA models.
 #' @param minDist The minimum length between two adjacent changepoints.
-#' @param Pb Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
+#' @param pchangepoint Same as \code{Pchangepoint}, the probability that a changepoint has occurred.
 #' @param mmax The maximum possible number of changepoints in the data set.
 #' @param lmax The maximum possible length of the chromosome representation.
 #' @return A single changepoint configuration format as above.
 #' @export
-selectTau <- function(N, prange, minDist, Pb, mmax, lmax) {
-    .Call('_changepointGA_selectTau', PACKAGE = 'changepointGA', N, prange, minDist, Pb, mmax, lmax)
+selectTau <- function(N, prange, minDist, pchangepoint, mmax, lmax) {
+    .Call('_changepointGA_selectTau', PACKAGE = 'changepointGA', N, prange, minDist, pchangepoint, mmax, lmax)
 }
 
 #' Random population initialization
@@ -42,7 +42,7 @@ selectTau <- function(N, prange, minDist, Pb, mmax, lmax) {
 #' order parameters must be equal to the length of \code{prange}.
 #' @param N The length of time series.
 #' @param minDist The minimum length between two adjacent changepoints.
-#' @param Pb Same as \code{pchangepoint} from \code{\link{cptga}} or 
+#' @param pchangepoint Same as \code{pchangepoint} from \code{\link{cptga}} or 
 #' \code{\link{cptgaisl}}, the probability that a changepoint has occurred.
 #' @param mmax The maximum possible number of changepoints in the data set.
 #' @param lmax The maximum possible length of the chromosome representation.
@@ -72,8 +72,8 @@ selectTau <- function(N, prange, minDist, Pb, mmax, lmax) {
 #' population.
 #' @return A matrix that contains each individual's chromosome.
 #' @export
-random_population <- function(popSize, prange, N, minDist, Pb, mmax, lmax) {
-    .Call('_changepointGA_random_population', PACKAGE = 'changepointGA', popSize, prange, N, minDist, Pb, mmax, lmax)
+random_population <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax) {
+    .Call('_changepointGA_random_population', PACKAGE = 'changepointGA', popSize, prange, N, minDist, pchangepoint, mmax, lmax)
 }
 
 #' Uniform crossover to produce offsprings
