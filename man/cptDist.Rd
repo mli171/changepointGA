@@ -42,19 +42,19 @@ configuration, \eqn{C_{est}=\{\eta_{1}, \ldots, \eta_{k}\}}, and \eqn{C_{true}}
 can be used to evaluate the performance of the detection algorithm.
 }
 \examples{
-N = 100
+N <- 100
 
 # both tau1 and tau2 has detected changepoints
-tau2 = c(25, 50, 75)
-tau1 = c(20, 35, 70, 80, 90)
-cptDist(tau1=tau1, tau2=tau2, N=N)
+tau2 <- c(25, 50, 75)
+tau1 <- c(20, 35, 70, 80, 90)
+cptDist(tau1 = tau1, tau2 = tau2, N = N)
 
 # either tau1 or tau2 has zero detected changepoints
-cptDist(tau1=tau1, tau2=NULL, N=N)
-cptDist(tau1=NULL, tau2=tau2, N=N)
+cptDist(tau1 = tau1, tau2 = NULL, N = N)
+cptDist(tau1 = NULL, tau2 = tau2, N = N)
 
 # both tau1 and tau2 has zero detected changepoints
-cptDist(tau1=NULL, tau2=NULL, N=N)
+cptDist(tau1 = NULL, tau2 = NULL, N = N)
 }
 \references{
 {

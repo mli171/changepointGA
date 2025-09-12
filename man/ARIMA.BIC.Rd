@@ -29,21 +29,23 @@ moving average with model order selection via Bayesian Information Criterion
 (BIC).
 }
 \examples{
-Ts = 1000
-betaT = c(0.5) # intercept
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
-sigmaT = 1
-phiT = c(0.5)
-thetaT = NULL
-DeltaT = c(2, -2)
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+Ts <- 1000
+betaT <- c(0.5) # intercept
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
+colnames(XMatT) <- "intercept"
+sigmaT <- 1
+phiT <- c(0.5)
+thetaT <- NULL
+DeltaT <- c(2, -2)
+Cp.prop <- c(1 / 4, 3 / 4)
+CpLocT <- floor(Ts * Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts <- ts.sim(
+  beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT,
+  Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+)
 
 # candidate changepoint configuration
-chromosome = c(2, 250, 750, 1001)
-ARIMA.BIC(chromosome, XMat=XMatT, Xt=myts)
+chromosome <- c(2, 250, 750, 1001)
+ARIMA.BIC(chromosome, XMat = XMatT, Xt = myts)
 }

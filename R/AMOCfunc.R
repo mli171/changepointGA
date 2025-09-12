@@ -6,10 +6,10 @@
 #'
 #' @param popsize An integer represents the number of individual in each
 #' population for GA (or subpopulation for IslandGA).
-#' @param p.range Default is \code{NULL} for only changepoint detection. If
-#' \code{p.range} is specified as a list object, which contains the range of
+#' @param prange Default is \code{NULL} for only changepoint detection. If
+#' \code{prange} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
-#' order parameters must be equal to the length of \code{p.range}.
+#' order parameters must be equal to the length of \code{prange}.
 #' @param N The length of time series.
 #' @param minDist The minimum length between two adjacent changepoints.
 #' @param Pchangepoint The probability that a changepoint can occur.
@@ -27,7 +27,7 @@
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCpopulation <- function(popsize, p.range, N, minDist, Pchangepoint, mmax, lmax) {
+AMOCpopulation <- function(popsize, prange, N, minDist, Pchangepoint, mmax, lmax) {
   tauclc <- floor(0.05 * N):ceiling(0.95 * N)
 
   pop <- matrix(0, nrow = lmax, ncol = popsize)
@@ -72,7 +72,7 @@ AMOCselection <- function(pop, popFit) {
 #' chromosome representation with lower fitness function value.
 #' @param dad Among two selected individuals, \code{dad} represents the selected
 #' chromosome representation with larger fitness function value.
-#' @param p.range The default value is \code{NULL}. If there is no requirement
+#' @param prange The default value is \code{NULL}. If there is no requirement
 #' on model order selection, such an auxiliary argument is needed for \code{GA}
 #' and \code{IslandGA} functions.
 #' @param minDist The minimum length between two adjacent changepoints.
@@ -85,7 +85,7 @@ AMOCselection <- function(pop, popFit) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCcrossover <- function(mom, dad, p.range = NULL, minDist, lmax, N) {
+AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
   child <- matrix(0, nrow = lmax, 1)
   child[1] <- 1
   child[2] <- round((dad[2] + mom[2]) / 2)
@@ -105,7 +105,7 @@ AMOCcrossover <- function(mom, dad, p.range = NULL, minDist, lmax, N) {
 #'
 #' @param child The child chromosome resulting from the \code{crossover} genetic
 #' operator.
-#' @param p.range The default value is \code{NULL}. If there is no requirement
+#' @param prange The default value is \code{NULL}. If there is no requirement
 #' on model order selection, such an auxiliary argument is needed for \code{GA}
 #' and \code{IslandGA} functions.
 #' @param minDist The minimum length between two adjacent changepoints in
@@ -125,7 +125,7 @@ AMOCcrossover <- function(mom, dad, p.range = NULL, minDist, lmax, N) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCmutation <- function(child, p.range = NULL, minDist, Pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
+AMOCmutation <- function(child, prange = NULL, minDist, Pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
   tmptau <- 1
 
   while (tmptau < floor(0.05 * N) | tmptau > ceiling(0.95 * N)) {

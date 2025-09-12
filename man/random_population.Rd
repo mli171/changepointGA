@@ -4,10 +4,10 @@
 \alias{random_population}
 \title{Random population initialization}
 \usage{
-random_population(popsize, prange, N, minDist, Pb, mmax, lmax)
+random_population(popSize, prange, N, minDist, Pb, mmax, lmax)
 }
 \arguments{
-\item{popsize}{An integer represents the number of individual in each
+\item{popSize}{An integer represents the number of individual in each
 population for GA (or subpopulation for IslandGA).}
 
 \item{prange}{Default is \code{NULL} for only changepoint detection. If

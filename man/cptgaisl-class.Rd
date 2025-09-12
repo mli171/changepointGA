@@ -31,7 +31,7 @@ used in multiple changepoint detection and optional model order selection.
 
 \item{\code{N}}{The sample size of the time series.}
 
-\item{\code{p.range}}{A list or NULL. Ranges for each model order parameter when \code{option = "both"}.}
+\item{\code{prange}}{A list or NULL. Ranges for each model order parameter when \code{option = "both"}.}
 
 \item{\code{popSize}}{Integer. It represents the total number of individuals in each generation, which equal to the number of islands multiplied by the size of each island (i.e., \code{popSize = numIslands × Islandsize}).}
 

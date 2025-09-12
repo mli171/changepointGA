@@ -10,7 +10,7 @@
 #'
 #' @slot call The matched call that created the object.
 #' @slot N The sample size of the time series.
-#' @slot p.range A list object. Default is \code{NULL}. If specified, it contains the
+#' @slot prange A list object. Default is \code{NULL}. If specified, it contains the
 #' ranges for each model order parameter (integers). Required when \code{option = "both"}
 #' is used for joint changepoint and model selection.
 #' @slot popSize An integer representing the number of individuals in each GA population.
@@ -54,7 +54,7 @@ setClass(
   representation(
     call = "language",
     N = "numeric",
-    p.range = "listOrNULL",
+    prange = "listOrNULL",
     popSize = "numeric",
     pcrossover = "numeric",
     pmutation = "numeric",
@@ -153,8 +153,8 @@ print.summary.cptga <- function(x, digits = getOption("digits"), max_display = 5
       cat("        Changepoints Locations = No changepoint reached optimum \n")
     }
   } else if (x@option == "both") {
-    n.hyperparam <- length(x@p.range)
-    name.hyperparam <- names(x@p.range)
+    n.hyperparam <- length(x@prange)
+    name.hyperparam <- names(x@prange)
     if (is.null(name.hyperparam)) {
       name.hyperparam <- paste0("Hyper.param.", 1:n.hyperparam)
     }
@@ -251,7 +251,7 @@ plot.cptga <- function(x,
   m <- chrom[1]
   if (m > 0) {
     tau <- if (x@option == "both") {
-      n.hyparam <- length(x@p.range)
+      n.hyparam <- length(x@prange)
       chrom[(2 + n.hyparam):(1 + n.hyparam + m)]
     } else {
       chrom[2:(1 + m)]

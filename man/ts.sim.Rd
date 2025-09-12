@@ -74,64 +74,72 @@ where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}} are the changepoint location
 }
 \examples{
 ##### M1: Time series observations are IID
-Ts = 1000
-betaT = c(0.5) # intercept
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
-sigmaT = 1
-DeltaT = c(2, -2)
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+Ts <- 1000
+betaT <- c(0.5) # intercept
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
+colnames(XMatT) <- "intercept"
+sigmaT <- 1
+DeltaT <- c(2, -2)
+Cp.prop <- c(1 / 4, 3 / 4)
+CpLocT <- floor(Ts * Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts <- ts.sim(
+  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+)
 
 ##### M2: ARMA(2,1) model with constant mean
-Ts = 1000
-betaT = c(0.5) # intercept
-XMatT = matrix(1, nrow=Ts, ncol=1)
-colnames(XMatT) = "intercept"
-sigmaT = 1
-phiT = c(0.5, -0.5)
-thetaT = c(0.8)
-DeltaT = c(2, -2)
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+Ts <- 1000
+betaT <- c(0.5) # intercept
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
+colnames(XMatT) <- "intercept"
+sigmaT <- 1
+phiT <- c(0.5, -0.5)
+thetaT <- c(0.8)
+DeltaT <- c(2, -2)
+Cp.prop <- c(1 / 4, 3 / 4)
+CpLocT <- floor(Ts * Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts <- ts.sim(
+  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+)
 
 ##### M3: ARMA(2,1) model with seasonality
-Ts = 1000
-betaT = c(0.5, -0.5, 0.3) # intercept, B, D
-period = 30
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period))
-colnames(XMatT) = c("intercept", "Bvalue", "DValue")
-sigmaT = 1
-phiT = c(0.5, -0.5)
-thetaT = c(0.8)
-DeltaT = c(2, -2)
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+Ts <- 1000
+betaT <- c(0.5, -0.5, 0.3) # intercept, B, D
+period <- 30
+XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period))
+colnames(XMatT) <- c("intercept", "Bvalue", "DValue")
+sigmaT <- 1
+phiT <- c(0.5, -0.5)
+thetaT <- c(0.8)
+DeltaT <- c(2, -2)
+Cp.prop <- c(1 / 4, 3 / 4)
+CpLocT <- floor(Ts * Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts <- ts.sim(
+  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+)
 
 
 ##### M4: ARMA(2,1) model with seasonality and trend
 # scaled trend if large number of sample size
-Ts = 1000
-betaT = c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
-period = 30
-XMatT = cbind(rep(1, Ts), cos(2*pi*(1:Ts)/period), sin(2*pi*(1:Ts)/period), 1:Ts)
-colnames(XMatT) = c("intercept", "Bvalue", "DValue", "trend")
-sigmaT = 1
-phiT = c(0.5, -0.5)
-thetaT = c(0.8)
-DeltaT = c(2, -2)
-Cp.prop = c(1/4, 3/4)
-CpLocT = floor(Ts*Cp.prop)
+Ts <- 1000
+betaT <- c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
+period <- 30
+XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period), 1:Ts)
+colnames(XMatT) <- c("intercept", "Bvalue", "DValue", "trend")
+sigmaT <- 1
+phiT <- c(0.5, -0.5)
+thetaT <- c(0.8)
+DeltaT <- c(2, -2)
+Cp.prop <- c(1 / 4, 3 / 4)
+CpLocT <- floor(Ts * Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT,
-              phi=phiT, theta=thetaT, Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+myts <- ts.sim(
+  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+)
 }

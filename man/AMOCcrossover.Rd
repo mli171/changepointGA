@@ -4,7 +4,7 @@
 \alias{AMOCcrossover}
 \title{Average crossover operator to produce offspring for AMOC problem}
 \usage{
-AMOCcrossover(mom, dad, p.range = NULL, minDist, lmax, N)
+AMOCcrossover(mom, dad, prange = NULL, minDist, lmax, N)
 }
 \arguments{
 \item{mom}{Among two selected individuals, \code{mom} represents the selected
@@ -13,7 +13,7 @@ chromosome representation with lower fitness function value.}
 \item{dad}{Among two selected individuals, \code{dad} represents the selected
 chromosome representation with larger fitness function value.}
 
-\item{p.range}{The default value is \code{NULL}. If there is no requirement
+\item{prange}{The default value is \code{NULL}. If there is no requirement
 on model order selection, such an auxiliary argument is needed for \code{GA}
 and \code{IslandGA} functions.}
 

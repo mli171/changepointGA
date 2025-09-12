@@ -95,16 +95,16 @@ ARIMA.BIC.Order(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT
 
 The GA requires users to set up an objective function (`ObjFunc`), sample size of the time series (`N`). All other algorithm hyperparameters, such as `popSize`, `pcrossover`, `pmutation` and etc, can be specified through the function arguments. Please use `?cptga` to see help detailed documentation. 
 
-A special note is warranted regarding the setup of the `p.range` argument:
+A special note is warranted regarding the setup of the `prange` argument:
 
 - For tasks requiring changepoint detection only, the default value is `NULL`.
-- If joint estimation of model order and changepoints is required, `p.range` must be specified as a list, where each element defines the permissible range for one model order parameter. The length of this list must match the number of model order parameters to be estimated in the objective function.
+- If joint estimation of model order and changepoints is required, `prange` must be specified as a list, where each element defines the permissible range for one model order parameter. The length of this list must match the number of model order parameters to be estimated in the objective function.
 
-As shown below, we will have 40 individual chromosomes in the population for each generation. `p.range` is a list object containing integer values ranges for parameters `phi` and `theta`. For example, in the code snippet below, `p.range` specifies that the AR and MA orders can vary from the set $\{0, 1, 2\}$. 
+As shown below, we will have 40 individual chromosomes in the population for each generation. `prange` is a list object containing integer values ranges for parameters `phi` and `theta`. For example, in the code snippet below, `prange` specifies that the AR and MA orders can vary from the set $\{0, 1, 2\}$. 
 
 ```{r}
 N <- Ts
-p.range <- list(ar = c(0, 2), ma = c(0, 2))
+prange <- list(ar = c(0, 2), ma = c(0, 2))
 ```
 
 ### Population chromosome initialization
@@ -147,7 +147,7 @@ Then we call function `cptga()` for changepoint searching and simultaneously est
 res.changepointGA <- suppressWarnings(cptga(
   ObjFunc = ARIMA.BIC.Order,
   N = N,
-  p.range = p.range,
+  prange = prange,
   suggestions = suggestions,
   option = "both",
   XMat = XMatEst,
@@ -168,14 +168,14 @@ Key differences include:
 - The length of this list must equal the number of islands (e.g., `numIslands`).
 - By default, each island's population is initialized using the internal operator, but users may insert their own informed or "reasonable" initial solutions into the `suggestions` list as above. These will serve as seed chromosomes for each island's initial population.
 
-If model order selection is enabled (e.g., for AR, MA, or ARIMA models), the associated model orders will be randomly sampled based on the user-supplied `p.range` argument.
+If model order selection is enabled (e.g., for AR, MA, or ARIMA models), the associated model orders will be randomly sampled based on the user-supplied `prange` argument.
 
 ```{r}
 tim1 <- Sys.time()
 res.Island.changepointGA <- suppressWarnings(cptgaisl(
   ObjFunc = ARIMA.BIC.Order,
   N = N,
-  p.range = p.range,
+  prange = prange,
   popSize = 160,
   numIslands = 2,
   maxMig = 1000,
@@ -205,7 +205,7 @@ tim3 <- Sys.time()
 res.Island.changepointGA <- suppressWarnings(cptgaisl(
   ObjFunc = ARIMA.BIC.Order,
   N = N,
-  p.range = p.range,
+  prange = prange,
   popSize = 160,
   numIslands = 2,
   maxMig = 1000,

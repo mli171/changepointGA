@@ -33,10 +33,10 @@ checkConv <- function(a, maxconv, tol) {
 #'
 #' @param child The child chromosome resulting from the \code{crossover} genetic
 #' operator.
-#' @param p.range Default is \code{NULL} for only changepoint detection. If
-#' \code{p.range} is specified as a list object, which contains the range of
+#' @param prange Default is \code{NULL} for only changepoint detection. If
+#' \code{prange} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
-#' order parameters must be equal to the length of \code{p.range}.
+#' order parameters must be equal to the length of \code{prange}.
 #' @param minDist The required minimum distance between two adjacent changepoints.
 #' @param Pb The probability of changepoints for every time series.
 #' @param lmax The user specified maximum number of changepoints, by default,
@@ -69,8 +69,8 @@ checkConv <- function(a, maxconv, tol) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-mutation <- function(child, p.range = NULL, minDist, Pb, lmax, mmax, N) {
-  plen <- length(p.range)
+mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
+  plen <- length(prange)
 
   if (plen > 0) {
     childMut <- matrix(0, nrow = lmax, 1)
@@ -87,12 +87,12 @@ mutation <- function(child, p.range = NULL, minDist, Pb, lmax, mmax, N) {
       childMut[(plen + 2):(plen + tmpchildMut[1] + 2), ] <- tmpchildMut[2:(tmpchildMut[1] + 2)]
     } else {
       # 2. order from new
-      new.p.range <- rep(NA, plen)
+      new.prange <- rep(NA, plen)
       for (ii in 1:plen) {
-        tmp.p.range <- setdiff(p.range[[ii]][1]:p.range[[ii]][2], child[2 + ii - 1])
-        new.p.range[ii] <- sample(tmp.p.range, 1)
+        tmp.prange <- setdiff(prange[[ii]][1]:prange[[ii]][2], child[2 + ii - 1])
+        new.prange[ii] <- sample(tmp.prange, 1)
       }
-      childMut[2:(plen + 1), ] <- new.p.range
+      childMut[2:(plen + 1), ] <- new.prange
       a2 <- runif(1)
       if (a2 > 0.5) {
         # 2.1 cpt from new
@@ -119,7 +119,7 @@ mutation <- function(child, p.range = NULL, minDist, Pb, lmax, mmax, N) {
   return(childMut)
 }
 
-NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, p.range, ...) {
+NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, prange, ...) {
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -141,7 +141,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
   #   bestfit  = currnt minimum of fitness values
   #   bestchrom = chromosome representation of the individual associated with bestfit
 
-  plen <- length(p.range)
+  plen <- length(prange)
 
   count <- 1
   repeat{
@@ -157,7 +157,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
     ##### step 3: crossover
     a1 <- runif(1)
     if (a1 <= Pc) {
-      child <- crossover(mom, dad, p.range, minDist, lmax, N)
+      child <- crossover(mom, dad, prange, minDist, lmax, N)
     } else {
       child <- dad
       flag[1] <- 1
@@ -166,7 +166,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
     ## step 4-2: mutation
     a2 <- runif(1)
     if (a2 <= Pm) {
-      child <- mutation(child, p.range, minDist, Pb, lmax, mmax, N)
+      child <- mutation(child, prange, minDist, Pb, lmax, mmax, N)
     } else {
       flag[2] <- 1
     }

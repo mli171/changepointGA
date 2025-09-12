@@ -7,11 +7,11 @@
 ARIMA.BIC.Order(chromosome, plen = 2, XMat, Xt)
 }
 \arguments{
-\item{chromosome}{A vector consists of the number of changepoints, the order 
-of AR component (refers to the number of lagged terms used to model the 
-current value of a time series), the order of MA component (refers to the 
-number of lagged error terms used to model the current value of a time 
-series), the changepoint locations, and a value of time series sample size 
+\item{chromosome}{A vector consists of the number of changepoints, the order
+of AR component (refers to the number of lagged terms used to model the
+current value of a time series), the order of MA component (refers to the
+number of lagged error terms used to model the current value of a time
+series), the changepoint locations, and a value of time series sample size
 plus 1 ($N+1$) indicating the end of the chromosome.}
 
 \item{plen}{The number of model order parameters that need to be selected.
@@ -32,12 +32,14 @@ moving average with model order selection via Bayesian Information Criterion
 (BIC).
 }
 \examples{
-N = 1000
-XMatT = matrix(1, nrow=N, ncol=1)
-Xt = ts.sim(beta=0.5, XMat=XMatT, sigma=1, phi=0.5, theta=0.8,
-            Delta=c(2, -2), CpLoc=c(250, 750), seed=1234)
+N <- 1000
+XMatT <- matrix(1, nrow = N, ncol = 1)
+Xt <- ts.sim(
+  beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = 0.8,
+  Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
+)
 
 # one chromosome representation
-chromosome = c(2, 1, 1, 250, 750, 1001)
-ARIMA.BIC.Order(chromosome, plen=2, XMat=XMatT, Xt=Xt)
+chromosome <- c(2, 1, 1, 250, 750, 1001)
+ARIMA.BIC.Order(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
 }

@@ -33,7 +33,7 @@ intermediate population structures, and the optimal solution found.
 
 \item{\code{N}}{The sample size of the time series.}
 
-\item{\code{p.range}}{A list object. Default is \code{NULL}. If specified, it contains the
+\item{\code{prange}}{A list object. Default is \code{NULL}. If specified, it contains the
 ranges for each model order parameter (integers). Required when \code{option = "both"}
 is used for joint changepoint and model selection.}
 

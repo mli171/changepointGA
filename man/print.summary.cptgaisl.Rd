@@ -20,7 +20,7 @@ Invisibly returns \code{NULL}. Called for its side effect of printing to the con
 }
 \description{
 Displays key information about the settings and results from a changepoint detection
-procedure using the Island model Genetic Algorithm (GA) stored in a `cptgaisl` object. This includes
+procedure using the Island model Genetic Algorithm (IMGA) stored in a `cptgaisl` object. This includes
 the algorithm configuration, population settings, optimization mode, and final
 solution such as the number and location of changepoints and model parameters (if applicable).
 }

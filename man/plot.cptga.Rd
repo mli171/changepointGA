@@ -51,9 +51,9 @@ This function is called for its side effects and returns \code{NULL} invisibly.
 }
 \description{
 This function visualizes a univariate time series along with the changepoints
-identified by a basic genetic algorithm, as represented by a `cptga` object. 
+identified by a basic genetic algorithm, as represented by a `cptga` object.
 Vertical dashed lines mark changepoint locations, and segment means are shown as horizontal
-dashed lines. The optimal fitness value and changepoint locations are 
+dashed lines. The optimal fitness value and changepoint locations are
 displayed as margin text.
 }
 \details{

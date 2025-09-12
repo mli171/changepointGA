@@ -8,7 +8,7 @@
 #'
 #' @slot call The matched call that created the object.
 #' @slot N The sample size of the time series.
-#' @slot p.range A list or NULL. Ranges for each model order parameter when \code{option = "both"}.
+#' @slot prange A list or NULL. Ranges for each model order parameter when \code{option = "both"}.
 #' @slot popSize Integer. It represents the total number of individuals in each generation, which equal to the number of islands multiplied by the size of each island (i.e., \code{popSize = numIslands × Islandsize}).
 #' @slot numIslands Integer. The number of islands (sub-populations).
 #' @slot Islandsize Numerical value. The number of individuals in each island.
@@ -49,7 +49,7 @@ setClass("cptgaisl",
   representation(
     call = "language",
     N = "numeric",
-    p.range = "listOrNULL",
+    prange = "listOrNULL",
     popSize = "numeric",
     numIslands = "numeric",
     Islandsize = "numeric",
@@ -155,8 +155,8 @@ print.summary.cptgaisl <- function(x, digits = getOption("digits"), max_display 
       cat("        Changepoints Locations = No changepoint reached optimum \n")
     }
   } else if (x@option == "both") {
-    n.hyperparam <- length(x@p.range)
-    name.hyperparam <- names(x@p.range)
+    n.hyperparam <- length(x@prange)
+    name.hyperparam <- names(x@prange)
     if (is.null(name.hyperparam)) {
       name.hyperparam <- paste0("Hyper.param.", 1:n.hyperparam)
     }
@@ -253,7 +253,7 @@ plot.cptgaisl <- function(x,
   m <- chrom[1]
   if (m > 0) {
     tau <- if (x@option == "both") {
-      n.hyparam <- length(x@p.range)
+      n.hyparam <- length(x@prange)
       chrom[(2 + n.hyparam):(1 + n.hyparam + m)]
     } else {
       chrom[2:(1 + m)]
