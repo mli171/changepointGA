@@ -435,12 +435,12 @@ cptgaisl <- function(ObjFunc,
         #                     pcrossover, pmutation, pchangepoint,
         #                     maxgen, N, prange, XMat, Xt)
         NewpopulationIsland(
-          ObjFunc = ObjFunc, selection = selection,
+          ObjFunc = ObjFunc, prange=prange, selection = selection,
           crossover = crossover, mutation = mutation,
           pop = Island[, , k], fit = IslandFit[, k],
           minDist, lmax, mmax,
           pcrossover, pmutation, pchangepoint,
-          maxgen, N, prange, ...
+          maxgen, N, ...
         )
       )
       for (k in 1:numIslands) {
@@ -460,12 +460,12 @@ cptgaisl <- function(ObjFunc,
         #                                 Pc=pcrossover, Pm=pmutation, Pb=pchangepoint,
         #                                 maxgen, N, prange, XMat, Xt)
         resNewpop <- NewpopulationIsland(
-          ObjFunc = ObjFunc, selection = selection,
+          ObjFunc = ObjFunc, prange=prange, selection = selection,
           crossover = crossover, mutation = mutation,
           pop = Island[, , k], fit = IslandFit[, k],
           minDist, lmax, mmax,
           pcrossover, pmutation, pchangepoint,
-          maxgen, N, prange, ...
+          maxgen, N, ...
         )
         tmpfit <- resNewpop[1, ]
         tmppop <- resNewpop[-1, ]
