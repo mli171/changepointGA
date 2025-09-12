@@ -12,7 +12,7 @@
 #' order parameters must be equal to the length of \code{prange}.
 #' @param N The length of time series.
 #' @param minDist The minimum length between two adjacent changepoints.
-#' @param Pchangepoint The probability that a changepoint can occur.
+#' @param pchangepoint The probability that a changepoint can occur.
 #' @param mmax The maximum possible number of changepoints in the data set.
 #' @param lmax The maximum possible length of the chromosome representation.
 #' @details
@@ -27,7 +27,7 @@
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCpopulation <- function(popSize, prange, N, minDist, Pchangepoint, mmax, lmax) {
+AMOCpopulation <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax) {
   tauclc <- floor(0.05 * N):ceiling(0.95 * N)
 
   pop <- matrix(0, nrow = lmax, ncol = popSize)
@@ -111,7 +111,7 @@ AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
 #' @param minDist The minimum length between two adjacent changepoints in
 #' \code{\link{AMOCselection}} operator, which is also the jump magnitude in the
 #' \code{AMOCmutation} operator.
-#' @param Pchangepoint An auxiliary argument is needed for \code{GA}
+#' @param pchangepoint An auxiliary argument is needed for \code{GA}
 #' and \code{IslandGA} functions.
 #' @param lmax An auxiliary argument is needed for \code{GA} and \code{IslandGA}
 #' functions.
@@ -125,7 +125,7 @@ AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCmutation <- function(child, prange = NULL, minDist, Pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
+AMOCmutation <- function(child, prange = NULL, minDist, pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
   tmptau <- 1
 
   while (tmptau < floor(0.05 * N) | tmptau > ceiling(0.95 * N)) {
