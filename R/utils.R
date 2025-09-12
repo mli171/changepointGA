@@ -10,14 +10,33 @@
 #' @return A named list containing only the args that `fn` declares.
 #' @keywords internal
 #' @noRd
+# .filter_args <- function(dots, fn) {
+#   if (is.character(fn)) fn <- get(fn, mode = "function")
+#   stopifnot(is.function(fn))
+#   
+#   # guard: if dots unnamed or empty
+#   if (length(dots) == 0L || is.null(names(dots))) return(list())
+#   
+#   fmls <- names(formals(fn))
+#   fmls <- setdiff(fmls, "...")
+#   dots[intersect(names(dots), fmls)]
+# }
 .filter_args <- function(dots, fn) {
   if (is.character(fn)) fn <- get(fn, mode = "function")
   stopifnot(is.function(fn))
   
-  # guard: if dots unnamed or empty
   if (length(dots) == 0L || is.null(names(dots))) return(list())
   
-  fmls <- names(formals(fn))
-  fmls <- setdiff(fmls, "...")
-  dots[intersect(names(dots), fmls)]
+  fmls     <- names(formals(fn))
+  has_dots <- any(fmls == "...")
+  fmls0    <- setdiff(fmls, "...")
+  
+  # If fn has "...", allow all named args to pass through (so they land in ...).
+  # Otherwise, strict filtering to the declared formals only.
+  if (has_dots) {
+    # keep all named entries from dots (no positional args in do.call here)
+    dots
+  } else {
+    dots[ intersect(names(dots), fmls0) ]
+  }
 }
