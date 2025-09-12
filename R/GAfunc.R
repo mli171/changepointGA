@@ -38,7 +38,7 @@ checkConv <- function(a, maxconv, tol) {
 #' each model order parameters for order selection (integers). The number of
 #' order parameters must be equal to the length of \code{prange}.
 #' @param minDist The required minimum distance between two adjacent changepoints.
-#' @param Pb The probability of changepoints for every time series.
+#' @param pchangepoint The probability of changepoints for every time series.
 #' @param lmax The user specified maximum number of changepoints, by default,
 #' as \code{N/2 - 1}.
 #' @param mmax The user specified maximum length of individual chromosome,
@@ -69,7 +69,7 @@ checkConv <- function(a, maxconv, tol) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
+mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N) {
   plen <- length(prange)
 
   if (plen > 0) {
@@ -80,7 +80,7 @@ mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
       childMut[2:(plen + 1), ] <- child[2:(plen + 1)]
       # 1.1 cpt from new
       tmpchildMut <- selectTau(
-        N = N, prange = NULL, minDist = minDist, Pb = Pb,
+        N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
         mmax = mmax, lmax = lmax
       )
       childMut[1, ] <- tmpchildMut[1]
@@ -97,7 +97,7 @@ mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
       if (a2 > 0.5) {
         # 2.1 cpt from new
         tmpchildMut <- selectTau(
-          N = N, prange = NULL, minDist = minDist, Pb = Pb,
+          N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
           mmax = mmax, lmax = lmax
         )
         childMut[1, ] <- tmpchildMut[1]
@@ -110,7 +110,7 @@ mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
     }
   } else {
     tmpchildMut <- selectTau(
-      N = N, prange = NULL, minDist = minDist, Pb = Pb,
+      N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
       mmax = mmax, lmax = lmax
     )
     childMut <- tmpchildMut
@@ -119,7 +119,7 @@ mutation <- function(child, prange = NULL, minDist, Pb, lmax, mmax, N) {
   return(childMut)
 }
 
-NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, Pb, maxgen, N, prange, ...) {
+NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, Pc, Pm, pchangepoint, maxgen, N, prange, ...) {
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population
@@ -129,7 +129,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
   #   mmax= max number of changepoints
   #   Pc= prob of crossover
   #   Pm= prob of mutation
-  #   Pb= prob of changepoints for every time series
+  #   pchangepoint= prob of changepoints for every time series
   #   maxgen= for each subpopulation, after maxgen then apply migration
   #   N= sample size
   #   X_hour= categorical time series
@@ -166,7 +166,7 @@ NewpopulationIsland <- function(ObjFunc, selection, crossover, mutation, pop, fi
     ## step 4-2: mutation
     a2 <- runif(1)
     if (a2 <= Pm) {
-      child <- mutation(child, prange, minDist, Pb, lmax, mmax, N)
+      child <- mutation(child, prange, minDist, pchangepoint, lmax, mmax, N)
     } else {
       flag[2] <- 1
     }
