@@ -6,7 +6,7 @@ using namespace Rcpp;
 using namespace arma;
 
 int m, i, j, k, id, jp;
-int popsize, islandSize;
+int popSize, islandSize;
 int lmax;
 
 // [[Rcpp::export]]
@@ -70,7 +70,7 @@ arma::vec selectTau(int N, List prange, int minDist, double Pb, int mmax, int lm
 //' Randomly generate the individuals' chromosomes (changepoint confirgurations)
 //' to construct the first generation population.
 //'
-//' @param popsize An integer represents the number of individual in each
+//' @param popSize An integer represents the number of individual in each
 //' population for GA (or subpopulation for IslandGA).
 //' @param prange Default is \code{NULL} for only changepoint detection. If
 //' \code{prange} is specified as a list object, which contains the range of
@@ -109,11 +109,11 @@ arma::vec selectTau(int N, List prange, int minDist, double Pb, int mmax, int lm
 //' @return A matrix that contains each individual's chromosome.
 //' @export
 // [[Rcpp::export]]
-arma::mat random_population(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax){
+arma::mat random_population(int popSize, List prange, int N, int minDist, double Pb, int mmax, int lmax){
 
-  arma::mat pop(lmax, popsize, fill::zeros);
+  arma::mat pop(lmax, popSize, fill::zeros);
 
-  for(j=0;j<popsize;j++){
+  for(j=0;j<popSize;j++){
     pop.col(j) = selectTau(N, prange, minDist, Pb, mmax, lmax);
   }
 
@@ -234,7 +234,7 @@ arma::vec uniformcrossover(arma::vec& mom, arma::vec& dad, List prange, int minD
 //' value/larger rank than \code{mom}.
 //' @param pop A matrix contains the chromosomes for all individuals. The number of
 //' rows is equal to \code{lmax} and the number of columns is equal to the
-//' \code{popsize}.
+//' \code{popSize}.
 //' @param popFit A vector contains the objective function value (population fit)
 //' being associated to each individual chromosome from above.
 //' @return A list contains the chromosomes for \code{dad} and \code{mom}.
@@ -242,12 +242,12 @@ arma::vec uniformcrossover(arma::vec& mom, arma::vec& dad, List prange, int minD
 // [[Rcpp::export]]
 List selection_linearrank(arma::mat& pop, arma::vec& popFit){
 
-  popsize = popFit.size();
+  popSize = popFit.size();
   arma::vec myorder = arma::conv_to<arma::vec>::from(arma::sort_index(arma::sort_index(popFit))+1);
-  arma::vec selectrank = popsize - myorder;
-  arma::vec probs0 = 2.0*selectrank/(popsize*(popsize-1));
+  arma::vec selectrank = popSize - myorder;
+  arma::vec probs0 = 2.0*selectrank/(popSize*(popSize-1));
 
-  arma::vec popID = linspace(0, popsize-1, popsize);
+  arma::vec popID = linspace(0, popSize-1, popSize);
   arma::vec parentI = Rcpp::RcppArmadillo::sample(popID, 2, FALSE, probs0);
 
   arma::vec dad = pop.col(parentI(0));

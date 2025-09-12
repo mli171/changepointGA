@@ -34,7 +34,7 @@ selectTau <- function(N, prange, minDist, Pb, mmax, lmax) {
 #' Randomly generate the individuals' chromosomes (changepoint confirgurations)
 #' to construct the first generation population.
 #'
-#' @param popsize An integer represents the number of individual in each
+#' @param popSize An integer represents the number of individual in each
 #' population for GA (or subpopulation for IslandGA).
 #' @param prange Default is \code{NULL} for only changepoint detection. If
 #' \code{prange} is specified as a list object, which contains the range of
@@ -72,8 +72,8 @@ selectTau <- function(N, prange, minDist, Pb, mmax, lmax) {
 #' population.
 #' @return A matrix that contains each individual's chromosome.
 #' @export
-random_population <- function(popsize, prange, N, minDist, Pb, mmax, lmax) {
-    .Call('_changepointGA_random_population', PACKAGE = 'changepointGA', popsize, prange, N, minDist, Pb, mmax, lmax)
+random_population <- function(popSize, prange, N, minDist, Pb, mmax, lmax) {
+    .Call('_changepointGA_random_population', PACKAGE = 'changepointGA', popSize, prange, N, minDist, Pb, mmax, lmax)
 }
 
 #' Uniform crossover to produce offsprings
@@ -116,7 +116,7 @@ uniformcrossover <- function(mom, dad, prange, minDist, lmax, N) {
 #' value/larger rank than \code{mom}.
 #' @param pop A matrix contains the chromosomes for all individuals. The number of
 #' rows is equal to \code{lmax} and the number of columns is equal to the
-#' \code{popsize}.
+#' \code{popSize}.
 #' @param popFit A vector contains the objective function value (population fit)
 #' being associated to each individual chromosome from above.
 #' @return A list contains the chromosomes for \code{dad} and \code{mom}.

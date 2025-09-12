@@ -53,19 +53,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // random_population
-arma::mat random_population(int popsize, List prange, int N, int minDist, double Pb, int mmax, int lmax);
-RcppExport SEXP _changepointGA_random_population(SEXP popsizeSEXP, SEXP prangeSEXP, SEXP NSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
+arma::mat random_population(int popSize, List prange, int N, int minDist, double Pb, int mmax, int lmax);
+RcppExport SEXP _changepointGA_random_population(SEXP popSizeSEXP, SEXP prangeSEXP, SEXP NSEXP, SEXP minDistSEXP, SEXP PbSEXP, SEXP mmaxSEXP, SEXP lmaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type popsize(popsizeSEXP);
+    Rcpp::traits::input_parameter< int >::type popSize(popSizeSEXP);
     Rcpp::traits::input_parameter< List >::type prange(prangeSEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
     Rcpp::traits::input_parameter< int >::type minDist(minDistSEXP);
     Rcpp::traits::input_parameter< double >::type Pb(PbSEXP);
     Rcpp::traits::input_parameter< int >::type mmax(mmaxSEXP);
     Rcpp::traits::input_parameter< int >::type lmax(lmaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(random_population(popsize, prange, N, minDist, Pb, mmax, lmax));
+    rcpp_result_gen = Rcpp::wrap(random_population(popSize, prange, N, minDist, Pb, mmax, lmax));
     return rcpp_result_gen;
 END_RCPP
 }
