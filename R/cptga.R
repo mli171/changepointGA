@@ -493,9 +493,10 @@ cptga <- function(ObjFunc,
         break
       }
     }
-
-    object@overbestfit <- bestfit[count]
+    
+    overbestfit <- bestfit[count]
     overbestchrom <- bestchrom[, count]
+    object@overbestfit <- bestfit[count]
     object@overbestchrom <- overbestchrom[1:(overbestchrom[1] + plen + 2)]
     if (monitoring) {
       cat("\n==== No.", count, "Generation ====")
