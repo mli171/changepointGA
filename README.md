@@ -130,7 +130,7 @@ plot(tmp1, data=Xt)
 tim2 - tim1
 ```
 
-### An example of using the island-based GA 
+### An example of using the island model GA 
 ```{r}
 N = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
