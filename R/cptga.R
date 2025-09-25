@@ -47,7 +47,7 @@
 #' individual chromosome. Similar to the natural mutation process, new genetic
 #' information is introduced to the offspring chromosome with a relatively small
 #' probability (close to 0), with a default value of 0.3.
-#' @param pchangepoint The probability that a changepoint has occurred. User
+#' @param pchangepoint The probability that a changepoint has occurred with a default value of 0.01. User
 #' could change this probability based on domain knowledge and the time series
 #' length. This probability is used during population initialization and in the
 #' creation of new chromosomes by the mutation operator. By default, the mutation

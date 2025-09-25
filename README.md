@@ -1,16 +1,22 @@
 # changepointGA
-Genetic algorithms (GA) are stochastic search techniques designed to address 
-combinatorial optimization problems by mimicking the principles of natural 
-selection and evolution. GAs have proven effective in both single and multiple 
-changepoint analyses within time series data, where each chromosome encodes 
-the hyperparameters, number, and locations of changepoints, along with the 
-associated model parameters. Starting with a population of potential changepoint 
-configurations, GAs use genetic operators, selection, crossover, and mutation, 
-to evolve toward solutions with enhanced fitness. This github page presents the 
-R package changepointGA, which encodes changepoint chromosomes in an integer format. 
-Furthermore, changepointGA also can be applied in the dynamic and simultaneous estimation 
-of changepoint models hyperparameters, changepoint configurations, and model 
-parameters, leading to more robust and accurate analyses.
+Detecting changepoints in a time series of length $N$ entails evaluating up to 
+$2^{N-1}$ possible changepoint models, making exhaustive enumeration 
+computationally infeasible. Genetic algorithms (GAs) provide a stochastic 
+way to identify the structural changes: a population of candidate models 
+evolves via selection, crossover, and mutation operators until it converges 
+on one changepoint model that balances the goodness-of-fit with parsimony. 
+The R package changepointGA encodes each candidate model as an integer 
+chromosome vector and supports both the basic single-population model GA 
+and the island model GA. Parallel computing is implemented on multi-core 
+hardware to further accelerate computation. Users may supply custom fitness 
+functions or genetic operators, while a user-friendly wrapper streamlines 
+routine analyses. Extensive simulations demonstrate that our package runs 
+significantly faster than binary-encoded GA alternatives. Additionally, 
+this package can simultaneously locate changepoints and estimate their 
+effects, as well as other model parameters and any integer-valued 
+hyperparameters. Applications to array-based comparative genomic 
+hybridization data and a century-long temperature series further 
+highlight the package’s value in biological and climate research.
 
 ## Installation
 You can install the version of changepointGA from CRAN:
@@ -46,9 +52,6 @@ CpLocT = floor(N*Cp.prop)
 Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
-# TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
-
-
 tim1 = Sys.time()
 tmp1 = cptga(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
 tim2 = Sys.time()
@@ -75,7 +78,6 @@ CpLocT = floor(N*Cp.prop)
 
 Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-# TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 
 ## No parallel computing
@@ -115,7 +117,6 @@ CpLocT = floor(N*Cp.prop)
 
 Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-# TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
 
@@ -145,7 +146,6 @@ CpLocT = floor(N*Cp.prop)
 
 myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
-# TsPlotCheck(X=1:N, Xat=seq(from=1, to=N, length=10), Y=Xt, tau=CpLocT)
 
 p.range = list(ar=c(0,2), ma=c(0,2))
 
