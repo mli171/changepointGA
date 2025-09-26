@@ -1,0 +1,7 @@
+name	user	system	elapsed
+ARIMA.BIC.Order	0.009	0.001	0.010	
+ARIMA.BIC	0.000	0.000	0.001	
+cptDist	0.005	0.001	0.006	
+cptga	609.639	 24.208	635.301	
+cptgaisl	1174.001	  42.358	1219.233	
+ts.sim	0.001	0.000	0.001	

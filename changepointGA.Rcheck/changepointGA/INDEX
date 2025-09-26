@@ -1,0 +1,33 @@
+AMOCcrossover           Average crossover operator to produce offspring
+                        for AMOC problem
+AMOCmutation            Jump mutation operator to produce offspring for
+                        AMOC problem
+AMOCpopulation          Random population initialization for AMOC
+                        problem
+AMOCselection           The parents selection genetic algorithm
+                        operator for AMOC problem
+ARIMA.BIC               Example function: Calculating BIC for AR(1)
+                        model
+ARIMA.BIC.Order         Calculating BIC for Multiple changepoint
+                        detection with model order selection
+cptDist                 Comparing multiple changepoint configurations
+                        by pairwise distance
+cptga                   Genetic algorithm
+cptga-class             S4 Class Definition for 'cptga'
+cptgaisl                Island model based genetic algorithm
+cptgaisl-class          S4 Class Definition for 'cptgaisl'
+mutation                The default mutation operator in genetic
+                        algorithm
+plot.cptga              Plot Time Series with Detected Changepoints
+                        from a 'cptga' Object
+plot.cptgaisl           Plot Time Series with Detected Changepoints
+                        from a 'cptgaisl' Object
+print.summary.cptga     Print Summary for a 'cptga' Object
+print.summary.cptgaisl
+                        Print Summary for a 'cptgaisl' Object
+random_population       Random population initialization
+selectTau               Randomly select the chromosome
+selection_linearrank    The default parents selection genetic algorithm
+                        operator
+ts.sim                  Time series simulation with changepoint effects
+uniformcrossover        Uniform crossover to produce offsprings
