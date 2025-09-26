@@ -13,10 +13,12 @@
 .filter_args <- function(dots, fn) {
   if (is.character(fn)) fn <- get(fn, mode = "function")
   stopifnot(is.function(fn))
-  
+
   # guard: if dots unnamed or empty
-  if (length(dots) == 0L || is.null(names(dots))) return(list())
-  
+  if (length(dots) == 0L || is.null(names(dots))) {
+    return(list())
+  }
+
   fmls <- names(formals(fn))
   fmls <- setdiff(fmls, "...")
   dots[intersect(names(dots), fmls)]

@@ -8,7 +8,7 @@ AMOCmutation(
   child,
   prange = NULL,
   minDist,
-  Pchangepoint = NULL,
+  pchangepoint = NULL,
   lmax = NULL,
   mmax = NULL,
   N = NULL
@@ -26,7 +26,7 @@ and \code{IslandGA} functions.}
 \code{\link{AMOCselection}} operator, which is also the jump magnitude in the
 \code{AMOCmutation} operator.}
 
-\item{Pchangepoint}{An auxiliary argument is needed for \code{GA}
+\item{pchangepoint}{An auxiliary argument is needed for \code{GA}
 and \code{IslandGA} functions.}
 
 \item{lmax}{An auxiliary argument is needed for \code{GA} and \code{IslandGA}

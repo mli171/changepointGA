@@ -9,7 +9,7 @@ AMOCselection(pop, popFit)
 \arguments{
 \item{pop}{A matrix contains the chromosomes for all individuals. The number of
 rows is equal to \code{lmax} and the number of columns is equal to the
-\code{popsize}.}
+\code{popSize}.}
 
 \item{popFit}{A vector contains the objective function value (population fit)
 being associated to each individual chromosome from above.}

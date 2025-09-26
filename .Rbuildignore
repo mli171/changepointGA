@@ -4,3 +4,4 @@
 ^00LOCK.*
 ^.*\.Rproj$
 
+^CRAN-SUBMISSION$
