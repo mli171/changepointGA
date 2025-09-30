@@ -1,4 +1,10 @@
 # changepointGA
+---
+Authors: Mo Li (mo.li@louisiana.edu), QiQi Lu (qlu2@vcu.edu)
+---
+
+## Overview
+
 Detecting changepoints in a time series of length $N$ entails evaluating up to 
 $2^{N-1}$ possible changepoint models, making exhaustive enumeration 
 computationally infeasible. Genetic algorithms (GAs) provide a stochastic 
