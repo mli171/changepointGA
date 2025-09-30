@@ -1,5 +1,5 @@
 # changepointGA
----
+
 Authors: Mo Li (mo.li@louisiana.edu), QiQi Lu (qlu2@vcu.edu)
 ---
 
