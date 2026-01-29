@@ -53,7 +53,7 @@ cptDist <- function(tau1, tau2, N) {
   k <- length(tau2)
 
   if (is.null(tau1) & is.null(tau2)) {
-    dist.res <- NA
+    dist.res <- 0
     warning("Both configurations are NULL.")
   } else {
     if (is.null(tau1) | is.null(tau2)) {
