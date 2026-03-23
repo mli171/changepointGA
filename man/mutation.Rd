@@ -34,19 +34,19 @@ The resulting child chromosome representation.
 In a certain probability, the \code{mutation} genetic operator can be applied
 to generate a new \code{child}. By default, the new child selection can be
 down by the similar individual selection method in population initialization,
-\code{\link{selectTau}}.
+\code{\link{select_tau}}.
 }
 \details{
 A function can apply mutation to the produced child with the specified
 probability \code{pmutation} in \code{cptga} and
 \code{cptgaisl}. If order selection is not requested
 (\code{option = "cp"} in \code{cptga} and \code{cptgaisl}), the default
-\code{\link{mutation}} operator function uses \code{selectTau} to select
+\code{\link{mutation}} operator function uses \code{select_tau} to select
 a completely new individual with a new chromosome as the mutated child.
-For details, see \code{\link{selectTau}}. If order selection is needed
+For details, see \code{\link{select_tau}}. If order selection is needed
 (\code{option = "both"} in \code{cptga} and \code{cptgaisl}), we first
 decide whether to keep the produced child's model order with a probability
-of 0.5. If the child's model order is retained, the \code{selectTau}
+of 0.5. If the child's model order is retained, the \code{select_tau}
 function is used to select a completely new individual with a new chromosome
 as the mutated child. If a new model order is selected from the candidate
 model order set, there is a 0.5 probability to either select a completely new

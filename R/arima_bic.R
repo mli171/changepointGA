@@ -30,14 +30,14 @@
 #' Cp.prop <- c(1 / 4, 3 / 4)
 #' CpLocT <- floor(Ts * Cp.prop)
 #'
-#' myts <- ts.sim(
+#' myts <- ts_sim(
 #'   beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT,
 #'   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
 #'
 #' # candidate changepoint configuration
 #' chromosome <- c(2, 250, 750, 1001)
-#' ARIMA.BIC(chromosome, XMat = XMatT, Xt = myts)
-ARIMA.BIC <- function(chromosome, plen = 0, XMat, Xt) {
-  ARIMA_BIC_changepointGA_rcpp(chromosome, XMat, Xt)
+#' arima_bic(chromosome, XMat = XMatT, Xt = myts)
+arima_bic <- function(chromosome, plen = 0, XMat, Xt) {
+  arima_bic_changepointGA_rcpp(chromosome, XMat, Xt)
 }

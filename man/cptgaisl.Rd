@@ -27,8 +27,8 @@ cptgaisl(
   seed = NULL,
   popInitialize = "random_population",
   suggestions = NULL,
-  selection = "selection_linearrank",
-  crossover = "uniformcrossover",
+  selection = "selection_linear_rank",
+  crossover = "uniform_crossover",
   mutation = "mutation",
   ...
 )
@@ -153,14 +153,14 @@ Having better \code{suggestions} can help GA converges faster.}
 GA operator can help select \code{mom} and \code{dad} from current generation
 population, where \code{dad} is set to have better fit (smaller fitness
 function values). The default for selection uses the linear rank selection
-method. See \code{\link{selection_linearrank}} for example. The function
+method. See \code{\link{selection_linear_rank}} for example. The function
 returned object is a list contain the chromosomes for \code{mom} and
 \code{dad}.}
 
 \item{crossover}{A function or sourced function name character string. This
 GA operator can apply crossover to the chosen parents to produce child for
 next generation with specified probability. The default for crossover uses
-the uniform crossover method. See \code{\link{uniformcrossover}} for details
+the uniform crossover method. See \code{\link{uniform_crossover}} for details
 in the default crossover operator. The function returned object is a vector
 contain the chromosomes for \code{child}.}
 
@@ -208,7 +208,7 @@ marking the boundary of the chromosome.
 
 N <- 1000
 XMatT <- matrix(1, nrow = N, ncol = 1)
-Xt <- ts.sim(
+Xt <- ts_sim(
   beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = NULL,
   Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
 )
@@ -216,15 +216,15 @@ Xt <- ts.sim(
 ## Multiple changepoint detection without model order selection
 
 # without suggestions
-GAISL.res <- cptgaisl(ObjFunc = ARIMA.BIC, N = N, XMat = XMatT, Xt = Xt)
-summary(GAISL.res)
-plot(GAISL.res, data = Xt)
+GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, XMat = XMatT, Xt = Xt)
+summary(GAISLres)
+plot(GAISLres, data = Xt)
 
 # with suggestions
 suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-GAISL.res <- cptgaisl(ObjFunc = ARIMA.BIC, N = N, suggestions = suggestions, XMat = XMatT, Xt = Xt)
-summary(GAISL.res)
-plot(GAISL.res, data = Xt)
+GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, suggestions = suggestions, XMat = XMatT, Xt = Xt)
+summary(GAISLres)
+plot(GAISLres, data = Xt)
 
 
 ## Multiple changepoint detection with model order selection
@@ -232,20 +232,20 @@ plot(GAISL.res, data = Xt)
 prange <- list(ar = c(0, 3), ma = c(0, 3))
 
 # without suggestions
-GAISL.res <- cptgaisl(
-  ObjFunc = ARIMA.BIC.Order, N = N, prange = prange,
+GAISLres <- cptgaisl(
+  ObjFunc = arima_bic_order, N = N, prange = prange,
   option = "both", XMat = XMatT, Xt = Xt
 )
-summary(GAISL.res)
-plot(GAISL.res, data = Xt)
+summary(GAISLres)
+plot(GAISLres, data = Xt)
 
 # with suggestions
 suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-GAISL.res <- cptgaisl(
-  ObjFunc = ARIMA.BIC.Order, N = N, prange = prange,
+GAISLres <- cptgaisl(
+  ObjFunc = arima_bic_order, N = N, prange = prange,
   suggestions = suggestions, option = "both", XMat = XMatT, Xt = Xt
 )
-summary(GAISL.res)
-plot(GAISL.res, data = Xt)
+summary(GAISLres)
+plot(GAISLres, data = Xt)
 }
 }

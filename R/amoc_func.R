@@ -27,7 +27,7 @@
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCpopulation <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax) {
+amoc_population <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax) {
   tauclc <- floor(0.05 * N):ceiling(0.95 * N)
 
   pop <- matrix(0, nrow = lmax, ncol = popSize)
@@ -43,7 +43,7 @@ AMOCpopulation <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax
 #' The genetic algorithm require to select a pair of chromosomes, representing
 #' \code{dad} and \code{mom}, for the \code{crossover} operator to
 #' produce offspring (individual for next generation). Here, the same linear
-#' ranking method in \code{\link{selection_linearrank}} is used to select a pair
+#' ranking method in \code{\link{selection_linear_rank}} is used to select a pair
 #' of chromosomes for \code{dad} and \code{mom} in the at most one changepoint
 #' (AMOC) problem. By default, the dad has better fit/smaller fitness function
 #' value/larger rank than \code{mom}.
@@ -58,8 +58,8 @@ AMOCpopulation <- function(popSize, prange, N, minDist, pchangepoint, mmax, lmax
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCselection <- function(pop, popFit) {
-  return(selection_linearrank(pop, popFit))
+amoc_selection <- function(pop, popFit) {
+  return(selection_linear_rank(pop, popFit))
 }
 
 #' Average crossover operator to produce offspring for AMOC problem
@@ -85,7 +85,7 @@ AMOCselection <- function(pop, popFit) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
+amoc_crossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
   child <- matrix(0, nrow = lmax, 1)
   child[1] <- 1
   child[2] <- round((dad[2] + mom[2]) / 2)
@@ -109,8 +109,8 @@ AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
 #' on model order selection, such an auxiliary argument is needed for \code{GA}
 #' and \code{IslandGA} functions.
 #' @param minDist The minimum length between two adjacent changepoints in
-#' \code{\link{AMOCselection}} operator, which is also the jump magnitude in the
-#' \code{AMOCmutation} operator.
+#' \code{\link{amoc_selection}} operator, which is also the jump magnitude in the
+#' \code{amoc_mutation} operator.
 #' @param pchangepoint An auxiliary argument is needed for \code{GA}
 #' and \code{IslandGA} functions.
 #' @param lmax An auxiliary argument is needed for \code{GA} and \code{IslandGA}
@@ -125,7 +125,7 @@ AMOCcrossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
 #' @import graphics
 #' @useDynLib changepointGA
 #' @export
-AMOCmutation <- function(child, prange = NULL, minDist, pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
+amoc_mutation <- function(child, prange = NULL, minDist, pchangepoint = NULL, lmax = NULL, mmax = NULL, N = NULL) {
   tmptau <- 1
 
   while (tmptau < floor(0.05 * N) | tmptau > ceiling(0.95 * N)) {

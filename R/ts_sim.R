@@ -57,10 +57,10 @@
 #' colnames(XMatT) <- "intercept"
 #' sigmaT <- 1
 #' DeltaT <- c(2, -2)
-#' Cp.prop <- c(1 / 4, 3 / 4)
-#' CpLocT <- floor(Ts * Cp.prop)
+#' Cpprop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cpprop)
 #'
-#' myts <- ts.sim(
+#' myts <- ts_sim(
 #'   beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
@@ -74,10 +74,10 @@
 #' phiT <- c(0.5, -0.5)
 #' thetaT <- c(0.8)
 #' DeltaT <- c(2, -2)
-#' Cp.prop <- c(1 / 4, 3 / 4)
-#' CpLocT <- floor(Ts * Cp.prop)
+#' Cpprop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cpprop)
 #'
-#' myts <- ts.sim(
+#' myts <- ts_sim(
 #'   beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
@@ -92,10 +92,10 @@
 #' phiT <- c(0.5, -0.5)
 #' thetaT <- c(0.8)
 #' DeltaT <- c(2, -2)
-#' Cp.prop <- c(1 / 4, 3 / 4)
-#' CpLocT <- floor(Ts * Cp.prop)
+#' Cpprop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cpprop)
 #'
-#' myts <- ts.sim(
+#' myts <- ts_sim(
 #'   beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
@@ -112,14 +112,14 @@
 #' phiT <- c(0.5, -0.5)
 #' thetaT <- c(0.8)
 #' DeltaT <- c(2, -2)
-#' Cp.prop <- c(1 / 4, 3 / 4)
-#' CpLocT <- floor(Ts * Cp.prop)
+#' Cpprop <- c(1 / 4, 3 / 4)
+#' CpLocT <- floor(Ts * Cpprop)
 #'
-#' myts <- ts.sim(
+#' myts <- ts_sim(
 #'   beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
-ts.sim <- function(beta, XMat, sigma, phi = NULL, theta = NULL, Delta = NULL, CpLoc = NULL, seed = NULL) {
+ts_sim <- function(beta, XMat, sigma, phi = NULL, theta = NULL, Delta = NULL, CpLoc = NULL, seed = NULL) {
   if (!is.null(seed)) {
     set.seed(seed)
   }

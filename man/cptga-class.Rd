@@ -86,5 +86,5 @@ to guide initial population design and potentially accelerate convergence.}
 }}
 
 \seealso{
-\code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
+\code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linear_rank}}, \code{\link{uniform_crossover}}, \code{\link{mutation}}.
 }

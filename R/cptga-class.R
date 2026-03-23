@@ -39,7 +39,7 @@
 #' @slot convg A numeric vector representing convergence information. A value of \code{0} indicates the algorithm successful completion. A value of \code{1} indicates the the total number of generations exceeds the pre-specified \code{maxgen} limit.
 #'
 #' @return An object of class \code{cptga}.
-#' @seealso \code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
+#' @seealso \code{\link{cptga}}, \code{\link{cptga-class}}, \code{\link{random_population}}, \code{\link{selection_linear_rank}}, \code{\link{uniform_crossover}}, \code{\link{mutation}}.
 
 
 

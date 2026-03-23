@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 
-double ARIMA_BIC_changepointGA_rcpp(NumericVector chromosome_, NumericMatrix XMat_, NumericVector Xt_){
+double arima_bic_changepointGA_rcpp(NumericVector chromosome_, NumericMatrix XMat_, NumericVector Xt_){
   
   arma::vec chromosome = as<arma::vec>(chromosome_);
   arma::mat XMat = as<arma::mat>(XMat_);

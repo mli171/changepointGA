@@ -122,13 +122,13 @@
 #' GA operator can help select \code{mom} and \code{dad} from current generation
 #' population, where \code{dad} is set to have better fit (smaller fitness
 #' function values). The default for selection uses the linear rank selection
-#' method. See \code{\link{selection_linearrank}} for example. The function
+#' method. See \code{\link{selection_linear_rank}} for example. The function
 #' returned object is a list contain the chromosomes for \code{mom} and
 #' \code{dad}.
 #' @param crossover A function or sourced function name character string. This
 #' GA operator can apply crossover to the chosen parents to produce child for
 #' next generation with specified probability. The default for crossover uses
-#' the uniform crossover method. See \code{\link{uniformcrossover}} for details
+#' the uniform crossover method. See \code{\link{uniform_crossover}} for details
 #' in the default crossover operator. The function returned object is a vector
 #' contain the chromosomes for \code{child}.
 #' @param mutation A function or sourced function name character string. This
@@ -153,7 +153,7 @@
 #'
 #' N <- 1000
 #' XMatT <- matrix(1, nrow = N, ncol = 1)
-#' Xt <- ts.sim(
+#' Xt <- ts_sim(
 #'   beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = NULL,
 #'   Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
 #' )
@@ -161,15 +161,15 @@
 #' ## Multiple changepoint detection without model order selection
 #'
 #' # without suggestions
-#' GAISL.res <- cptgaisl(ObjFunc = ARIMA.BIC, N = N, XMat = XMatT, Xt = Xt)
-#' summary(GAISL.res)
-#' plot(GAISL.res, data = Xt)
+#' GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, XMat = XMatT, Xt = Xt)
+#' summary(GAISLres)
+#' plot(GAISLres, data = Xt)
 #'
 #' # with suggestions
 #' suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-#' GAISL.res <- cptgaisl(ObjFunc = ARIMA.BIC, N = N, suggestions = suggestions, XMat = XMatT, Xt = Xt)
-#' summary(GAISL.res)
-#' plot(GAISL.res, data = Xt)
+#' GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, suggestions = suggestions, XMat = XMatT, Xt = Xt)
+#' summary(GAISLres)
+#' plot(GAISLres, data = Xt)
 #'
 #'
 #' ## Multiple changepoint detection with model order selection
@@ -177,21 +177,21 @@
 #' prange <- list(ar = c(0, 3), ma = c(0, 3))
 #'
 #' # without suggestions
-#' GAISL.res <- cptgaisl(
-#'   ObjFunc = ARIMA.BIC.Order, N = N, prange = prange,
+#' GAISLres <- cptgaisl(
+#'   ObjFunc = arima_bic_order, N = N, prange = prange,
 #'   option = "both", XMat = XMatT, Xt = Xt
 #' )
-#' summary(GAISL.res)
-#' plot(GAISL.res, data = Xt)
+#' summary(GAISLres)
+#' plot(GAISLres, data = Xt)
 #'
 #' # with suggestions
 #' suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-#' GAISL.res <- cptgaisl(
-#'   ObjFunc = ARIMA.BIC.Order, N = N, prange = prange,
+#' GAISLres <- cptgaisl(
+#'   ObjFunc = arima_bic_order, N = N, prange = prange,
 #'   suggestions = suggestions, option = "both", XMat = XMatT, Xt = Xt
 #' )
-#' summary(GAISL.res)
-#' plot(GAISL.res, data = Xt)
+#' summary(GAISLres)
+#' plot(GAISLres, data = Xt)
 #' }
 cptgaisl <- function(ObjFunc,
                      N,
@@ -215,8 +215,8 @@ cptgaisl <- function(ObjFunc,
                      seed = NULL,
                      popInitialize = "random_population",
                      suggestions = NULL,
-                     selection = "selection_linearrank",
-                     crossover = "uniformcrossover",
+                     selection = "selection_linear_rank",
+                     crossover = "uniform_crossover",
                      mutation = "mutation",
                      ...) {
   call <- match.call()
@@ -225,43 +225,38 @@ cptgaisl <- function(ObjFunc,
   if (missing(N)) {
     stop("The sample size must be provided")
   }
-
+  if (missing(ObjFunc) || !is.function(ObjFunc)) {
+    stop("`ObjFunc` must be a function.")
+  }
+  
   if (is.null(mmax)) {
     mmax <- floor(N / 2 - 1)
   }
   if (is.null(lmax)) {
     lmax <- floor(2 + N / 2 - 1)
   }
-
-  if (missing(ObjFunc)) {
-    stop("A fitness function must be provided")
-  }
-  if (!is.function(ObjFunc)) {
-    stop("A fitness function must be provided")
-  }
-
-  i <- NULL # add for global variables declare
+  
   plen <- length(prange)
 
-  if (pcrossover < 0 | pcrossover > 1) {
+  if (pcrossover < 0 || pcrossover > 1) {
     stop("Probability of crossover must be between 0 and 1.")
   }
-  if (pmutation < 0 | pmutation > 1) {
+  if (pmutation < 0 || pmutation > 1) {
     stop("Probability of mutation must be between 0 and 1.")
   }
-  if (pchangepoint < 0 | pchangepoint > 1) {
+  if (pchangepoint < 0 || pchangepoint > 1) {
     stop("Probability of changepoint must be between 0 and 1.")
   }
-  if (minDist >= N | minDist < 1) {
+  if (minDist >= N || minDist < 1) {
     stop("Minimum number of locations between two changepoints invalid.")
   }
   if (lmax < mmax + 2) {
     stop("Maximum length of chromosome needs to be larger than (maximum number of changepoints+2).")
   }
-  if (option == "both" & plen == 0) {
+  if (option == "both" && plen == 0) {
     stop("Opt for changepoint and order search, prange must be provided.")
   }
-  if (option == "cp" & plen != 0) {
+  if (option == "cp" && plen != 0) {
     stop("Opt for changepoint search, prange must be NULL.")
   }
 
@@ -319,65 +314,79 @@ cptgaisl <- function(ObjFunc,
   ###### step 1: generate initial population for each island
   if (!is.null(suggestions)) {
     if (!is.list(suggestions)) {
-      stop("Suggested changepoints must be a List.")
+      stop("`suggestions` must be a list.")
     }
-    # 1. with suggestions
-    if (any(sapply(suggestions, function(x) any(is.na(x))))) {
-      stop("NA provided in suggestions list")
+    if (any(vapply(suggestions, function(x) any(is.na(x)), logical(1)))) {
+      stop("NA values are not allowed in `suggestions`.")
     }
-    n.suggs <- length(suggestions)
-    suggestions.mat <- matrix(0L, nrow = lmax, ncol = n.suggs)
+    
+    n_suggs <- length(suggestions)
+    suggestions_mat <- matrix(0L, nrow = lmax, ncol = n_suggs)
+    
     for (i in seq_along(suggestions)) {
       idx <- suggestions[[i]]
-      if (any(idx <= 1 | idx > N)) {
-        stop(paste0("\n No. ", i, "th suggestion is invalid."))
+      
+      if (!is.null(idx) && any(idx <= 1 | idx > N)) {
+        stop("Suggestion ", i, " is invalid.")
       }
-      if (object@option == "cp") {
+      
+      if (option == "cp") {
         if (is.null(idx)) {
-          suggestions.mat[1:2, i] <- c(0, N + 1)
+          suggestions_mat[1:2, i] <- c(0L, N + 1L)
         } else {
-          idx <- idx[idx > 1 & idx <= N] # filter valid indices
-          suggestions.mat[1:(length(idx) + 2), i] <- c(length(idx), idx, N + 1)
+          idx <- idx[idx > 1 & idx <= N]
+          suggestions_mat[1:(length(idx) + 2L), i] <- c(length(idx), idx, N + 1L)
         }
-      } else if (object@option == "both") {
-        hyper.param <- sapply(prange, function(x) if (length(x) > 0) sample(min(x):max(x), 1) else NA)
+      } else {
+        hyper_param <- vapply(
+          prange,
+          function(x) sample(min(x):max(x), 1),
+          integer(1)
+        )
+        
         if (is.null(idx)) {
-          suggestions.mat[1:(2 + plen), i] <- c(0, hyper.param, N + 1)
+          suggestions_mat[1:(plen + 2L), i] <- c(0L, hyper_param, N + 1L)
         } else {
-          idx <- idx[idx > 1 & idx <= N] # filter valid indices
-          suggestions.mat[1:(length(idx) + plen + 2), i] <- c(length(idx), hyper.param, idx, N + 1)
+          idx <- idx[idx > 1 & idx <= N]
+          suggestions_mat[1:(length(idx) + plen + 2L), i] <- c(length(idx), hyper_param, idx, N + 1L)
         }
       }
     }
-    RemainpopSize <- popSize - n.suggs
-    if (RemainpopSize > 0) {
-      # 1.1 partial from suggestions
+    
+    remain_pop_size <- popSize - n_suggs
+    
+    if (remain_pop_size > 0) {
       init_args <- c(
         dots,
         list(
-          popSize = RemainpopSize, prange = prange, N = N,
-          minDist = minDist, pchangepoint = pchangepoint,
-          mmax = mmax, lmax = lmax
+          popSize = remain_pop_size,
+          prange = prange,
+          N = N,
+          minDist = minDist,
+          pchangepoint = pchangepoint,
+          mmax = mmax,
+          lmax = lmax
         )
       )
       init_args <- .filter_args(init_args, popInitialize)
       pop <- do.call(popInitialize, init_args)
-      pop <- cbind(pop, suggestions.mat)
-    } else if (RemainpopSize == 0) {
-      # 1.2 completely from suggestions
-      pop <- suggestions.mat
+      pop <- cbind(pop, suggestions_mat)
+    } else if (remain_pop_size == 0) {
+      pop <- suggestions_mat
     } else {
-      # 1.3 some errors
-      stop("Number of suggested chromosome must be less than specified population size.")
+      stop("The number of suggested chromosomes must not exceed `popSize`.")
     }
   } else {
-    # 2. completely generated by popInitialize
     init_args <- c(
       dots,
       list(
-        popSize = popSize, prange = prange, N = N,
-        minDist = minDist, pchangepoint = pchangepoint,
-        mmax = mmax, lmax = lmax
+        popSize = popSize,
+        prange = prange,
+        N = N,
+        minDist = minDist,
+        pchangepoint = pchangepoint,
+        mmax = mmax,
+        lmax = lmax
       )
     )
     init_args <- .filter_args(init_args, popInitialize)
@@ -387,82 +396,88 @@ cptgaisl <- function(ObjFunc,
   Islandsize <- floor(popSize / numIslands)
   remainder <- popSize %% numIslands
   # Shuffle individual indices
-  shuffled_idx <- sample(1:popSize)
-  Island <- array(0, dim = c(lmax, Islandsize, numIslands))
-  for (k in 1:numIslands) {
-    idx_start <- (k - 1) * Islandsize + 1
+  shuffled_idx <- sample.int(popSize)
+  
+  Island <- array(0L, dim = c(lmax, Islandsize, numIslands))
+  for (k in seq_len(numIslands)) {
+    idx_start <- (k - 1L) * Islandsize + 1L
     idx_end <- k * Islandsize
     idx <- shuffled_idx[idx_start:idx_end]
-    Island[, , k] <- pop[, idx]
+    Island[, , k] <- pop[, idx, drop = FALSE]
   }
-  if (remainder > 0) {
-    leftover_idx <- shuffled_idx[(numIslands * Islandsize + 1):popSize]
-    message("Warning: ", remainder, " unassigned. Consider adjusting number of islands.")
-    # update population size
+  
+  if (remainder > 0L) {
+    warning(remainder, " individuals were unassigned. Consider adjusting `numIslands`.")
     popSize <- numIslands * Islandsize
     object@popSize <- popSize
-    object@numIslands <- numIslands
-    object@Islandsize <- Islandsize
   }
 
+  object@numIslands <- numIslands
   object@Islandsize <- Islandsize
-
+  
   obj_shared <- .filter_args(dots, ObjFunc)
   obj_formals <- setdiff(names(formals(ObjFunc)), "...")
   first_param <- obj_formals[1]
   has_plen <- "plen" %in% obj_formals
 
+  eval_fitness <- function(chromosome) {
+    chrom <- trim_chromosome(chromosome, plen)
+    call_list <- c(
+      setNames(list(chrom), first_param),
+      if (has_plen) list(plen = plen) else list(),
+      obj_shared
+    )
+    out <- do.call(ObjFunc, call_list)
+    if (!is.finite(out)) Inf else out
+  }
+  
+  get_island_best <- function(pop_mat, fit_vec) {
+    best_idx <- which.min(fit_vec)
+    list(
+      fit = fit_vec[best_idx],
+      chrom = pop_mat[, best_idx]
+    )
+  }
+  
   ## evaluate the fitness (Parallel or NOT)
   if (parallel) {
-    nAvaCore <- detectCores()
+    n_ava_core <- parallel::detectCores()
     if (is.null(nCore)) {
-      stop(paste0("Missing number of computing cores (", nAvaCore, " cores available)."))
+      nCore <- numIslands
     }
-    registerDoParallel(cores = nCore)
-    IslandFit <- foreach::foreach(k = 1:numIslands, .combine = "cbind") %dopar% {
-      apply(Island[, , k], 2, function(x) {
-        chrom <- x[1:(x[1] + plen + 2)]
-        call_list <- c(
-          setNames(list(chrom), first_param),
-          if (has_plen) list(plen = plen) else list(),
-          obj_shared
-        )
-        do.call(ObjFunc, call_list)
-      })
+    if (nCore < 1 || nCore > n_ava_core) {
+      stop("`nCore` must be between 1 and ", n_ava_core, ".")
+    }
+    
+    doParallel::registerDoParallel(cores = nCore)
+    on.exit(foreach::registerDoSEQ(), add = TRUE)
+    
+    IslandFit <- foreach::foreach(k = seq_len(numIslands), .combine = "cbind") %dopar% {
+      vapply(seq_len(Islandsize), function(j) eval_fitness(Island[, j, k]), numeric(1))
     }
   } else {
     IslandFit <- matrix(0, nrow = Islandsize, ncol = numIslands)
-    for (k in 1:numIslands) {
-      IslandFit[, k] <- apply(Island[, , k], 2, function(x) {
-        chrom <- x[1:(x[1] + plen + 2)]
-        call_list <- c(
-          setNames(list(chrom), first_param),
-          if (has_plen) list(plen = plen) else list(),
-          obj_shared
-        )
-        do.call(ObjFunc, call_list)
-      })
+    for (k in seq_len(numIslands)) {
+      IslandFit[, k] <- vapply(seq_len(Islandsize), function(j) eval_fitness(Island[, j, k]), numeric(1))
     }
   }
 
   object@Island <- Island
   object@IslandFit <- IslandFit
 
-  countMig <- 0
+  countMig <- 0L
+  countMig <- 0L
+  Bfit <- rep(Inf, numIslands)
+  Bchrom <- matrix(0L, nrow = lmax, ncol = numIslands)
+  bestfit <- rep(NA_real_, maxMig)
+  bestchrom <- matrix(0L, nrow = lmax, ncol = maxMig)
 
-  Bfit <- rep(0, numIslands)
-  Bchrom <- matrix(0, nrow = lmax, ncol = numIslands)
-
-  bestfit <- rep(0, maxMig)
-  bestchrom <- matrix(0, nrow = lmax, ncol = maxMig)
-
-  object@bestfit <- bestfit
-
-  repeat{
+  while (countMig < maxMig) {
+    
     # step 2,3,4,5: select parents, crossover, mutation, new pop
     if (parallel) {
-      resNewpop <- foreach::foreach(k = 1:numIslands) %dopar% {
-        do.call(NewpopulationIsland, c(
+      resNewpop <- foreach::foreach(k = seq_len(numIslands)) %dopar% {
+        do.call(new_population_Island, c(
           dots,
           list(
             ObjFunc = ObjFunc,
@@ -483,17 +498,22 @@ cptgaisl <- function(ObjFunc,
           )
         ))
       }
-      for (k in 1:numIslands) {
+      
+      for (k in seq_len(numIslands)) {
         tmpfit <- resNewpop[[k]][1, ]
-        tmppop <- resNewpop[[k]][-1, ]
-        Bfit[k] <- min(tmpfit)
-        Bchrom[, k] <- tmppop[, which.min(tmpfit)]
+        tmppop <- resNewpop[[k]][-1, , drop = FALSE]
+        tmpfit[!is.finite(tmpfit)] <- Inf
+        
         Island[, , k] <- tmppop
         IslandFit[, k] <- tmpfit
+        
+        island_best <- get_island_best(tmppop, tmpfit)
+        Bfit[k] <- island_best$fit
+        Bchrom[, k] <- island_best$chrom
       }
     } else {
-      for (k in 1:numIslands) {
-        resNewpop <- do.call(NewpopulationIsland, c(
+      for (k in seq_len(numIslands)) {
+        resNewpop <- do.call(new_population_Island, c(
           dots,
           list(
             ObjFunc = ObjFunc,
@@ -514,88 +534,79 @@ cptgaisl <- function(ObjFunc,
           )
         ))
         tmpfit <- resNewpop[1, ]
-        tmppop <- resNewpop[-1, ]
-        # update bestfit in each island
-        Bfit[k] <- min(tmpfit)
-        Bchrom[, k] <- tmppop[, which.min(tmpfit)]
-        # update island chromosomes
+        tmppop <- resNewpop[-1, , drop = FALSE]
+        tmpfit[!is.finite(tmpfit)] <- Inf
+        
         Island[, , k] <- tmppop
         IslandFit[, k] <- tmpfit
+        
+        island_best <- get_island_best(tmppop, tmpfit)
+        Bfit[k] <- island_best$fit
+        Bchrom[, k] <- island_best$chrom
       }
     }
-
+    
     # step 6: migration
-    for (k in 1:numIslands) {
-      pleast <- which.max(IslandFit[, k])
-      leastfit <- IslandFit[pleast, k]
-      # replace the worst in kth island with the best from another randomly selected island
-      pisland <- sample(1:numIslands, 1)
-      if (pisland != k) {
-        Island[, pleast, k] <- Bchrom[, pisland]
-        IslandFit[pleast, k] <- Bfit[pisland]
-      }
+    for (k in seq_len(numIslands)) {
+      worst_idx <- which.max(IslandFit[, k])
+      donor_pool <- setdiff(seq_len(numIslands), k)
+      if (length(donor_pool) == 0L) {next}
+      donor_island <- sample(donor_pool, 1)
+      Island[, worst_idx, k] <- Bchrom[, donor_island]
+      IslandFit[worst_idx, k] <- Bfit[donor_island]
     }
-    # update the overall bestfit
-    for (k in 1:numIslands) {
-      pbest <- which.min(IslandFit[, k])
-      Bchrom[, k] <- Island[, pbest, k]
-      Bfit[k] <- IslandFit[pbest, k]
+    ## recompute island bests after migration
+    for (k in seq_len(numIslands)) {
+      island_best <- get_island_best(Island[, , k], IslandFit[, k])
+      Bfit[k] <- island_best$fit
+      Bchrom[, k] <- island_best$chrom
     }
-
-    countMig <- countMig + 1
+    
+    # update best
+    countMig <- countMig + 1L
     genbest <- which.min(Bfit)
     bestfit[countMig] <- Bfit[genbest]
     bestchrom[, countMig] <- Bchrom[, genbest]
-
+    
     object@countMig <- countMig
     object@count <- countMig * maxgen
     object@Island <- Island
     object@IslandFit <- IslandFit
-    object@bestfit <- bestfit
-
-    # step 7: check convergence once countMig >= maxconv
+    object@bestfit <- bestfit[seq_len(countMig)]
+    
     if (countMig >= maxconv) {
-      tmpbest <- bestfit[(countMig - maxconv + 1):countMig]
-      decision <- checkConv(tmpbest, maxconv, tol)
+      tmpbest <- bestfit[(countMig - maxconv + 1L):countMig]
+      decision <- check_conv(tmpbest, maxconv, tol)
+      
       if (monitoring) {
-        cat("\n My decision:", decision)
+        message("Decision: ", decision)
       }
-      if (decision == 1) {
-        overbestfit <- bestfit[countMig]
-        overbestchrom <- bestchrom[, countMig]
-        overbestchrom <- overbestchrom[1:(overbestchrom[1] + plen + 2)]
-
-        object@convg <- 0
-        object@overbestchrom <- overbestchrom
-        object@overbestfit <- overbestfit
-
-        break
+      
+      if (decision == 1L) {
+        object@convg <- 0L
+        object@overbestfit <- bestfit[countMig]
+        object@overbestchrom <- trim_chromosome(bestchrom[, countMig], plen)
+        return(object)
       }
     }
-
-    # step 8: check stopping if countMig > maxMig
-    if (countMig >= maxMig) {
-      overbestfit <- bestfit[countMig]
-      overbestchrom <- bestchrom[, countMig]
-      overbestchrom <- overbestchrom[1:(overbestchrom[1] + plen + 2)]
-
-      object@convg <- 1
-      object@overbestchrom <- overbestchrom
-      object@overbestfit <- overbestfit
-
-      break
-    }
-
+    
     if (monitoring) {
-      overbestfit <- bestfit[countMig]
-      overbestchrom <- bestchrom[, countMig]
-      overbestchrom <- overbestchrom[1:(overbestchrom[1] + plen + 2)]
-      cat("\n==== No.", countMig, "Migration ====")
-      cat("\n countMig =", countMig)
-      cat("\n overbestfit =", overbestfit)
-      cat("\n overbestchrom =", overbestchrom, "\n")
+      current_bestfit <- bestfit[countMig]
+      current_bestchrom <- trim_chromosome(bestchrom[, countMig], plen)
+      
+      message(
+        "==== Migration ", countMig, " ====\n",
+        "countMig = ", countMig, "\n",
+        "overbestfit = ", current_bestfit, "\n",
+        "overbestchrom = ", paste(current_bestchrom, collapse = " ")
+      )
     }
   }
-
+  
+  object@convg <- 1L
+  object@overbestfit <- bestfit[countMig]
+  object@overbestchrom <- trim_chromosome(bestchrom[, countMig], plen)
+  
   return(object)
+  
 }

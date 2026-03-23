@@ -34,7 +34,7 @@ IntegerVector rank_asR(NumericVector x, bool decreasing = false)
 //' @return A single changepoint configuration format as above.
 //' @export
 // [[Rcpp::export]]
-arma::vec selectTau(int N, List prange, int minDist, double pchangepoint, int mmax, int lmax){
+arma::vec select_tau(int N, List prange, int minDist, double pchangepoint, int mmax, int lmax){
 
   m = 0;
   double a;
@@ -104,7 +104,7 @@ arma::vec selectTau(int N, List prange, int minDist, double pchangepoint, int mm
 //' \eqn{t=N-minDist} is exceeded, and the number of changepoints \eqn{m} is 
 //' obtained automatically. For added flexibility, users can specify their own 
 //' population initialization function. The default population initialization uses 
-//' \code{\link{selectTau}} to select the chromosome for the first generation 
+//' \code{\link{select_tau}} to select the chromosome for the first generation 
 //' population.
 //' @return A matrix that contains each individual's chromosome.
 //' @export
@@ -114,7 +114,7 @@ arma::mat random_population(int popSize, List prange, int N, int minDist, double
   arma::mat pop(lmax, popSize, fill::zeros);
 
   for(j=0;j<popSize;j++){
-    pop.col(j) = selectTau(N, prange, minDist, pchangepoint, mmax, lmax);
+    pop.col(j) = select_tau(N, prange, minDist, pchangepoint, mmax, lmax);
   }
 
   return(pop);
@@ -146,7 +146,7 @@ arma::mat random_population(int popSize, List prange, int N, int minDist, double
 //' next generation.
 //' @export
 // [[Rcpp::export]]
-arma::vec uniformcrossover(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N){
+arma::vec uniform_crossover(arma::vec& mom, arma::vec& dad, List prange, int minDist, int lmax, int N){
 
   int plen = prange.length();
 
@@ -240,7 +240,7 @@ arma::vec uniformcrossover(arma::vec& mom, arma::vec& dad, List prange, int minD
 //' @return A list contains the chromosomes for \code{dad} and \code{mom}.
 //' @export
 // [[Rcpp::export]]
-List selection_linearrank(arma::mat& pop, arma::vec& popFit){
+List selection_linear_rank(arma::mat& pop, arma::vec& popFit){
 
   popSize = popFit.size();
   arma::vec myorder = arma::conv_to<arma::vec>::from(arma::sort_index(arma::sort_index(popFit))+1);

@@ -55,6 +55,6 @@ and \eqn{t=N}. The process is continued until the last admissible changepoint
 \eqn{t=N-minDist} is exceeded, and the number of changepoints \eqn{m} is 
 obtained automatically. For added flexibility, users can specify their own 
 population initialization function. The default population initialization uses 
-\code{\link{selectTau}} to select the chromosome for the first generation 
+\code{\link{select_tau}} to select the chromosome for the first generation 
 population.
 }

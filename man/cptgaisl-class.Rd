@@ -89,5 +89,5 @@ used in multiple changepoint detection and optional model order selection.
 }}
 
 \seealso{
-\code{\link{cptgaisl}}, \code{\link{cptgaisl-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
+\code{\link{cptgaisl}}, \code{\link{cptgaisl-class}}, \code{\link{random_population}}, \code{\link{selection_linear_rank}}, \code{\link{uniform_crossover}}, \code{\link{mutation}}.
 }

@@ -24,6 +24,22 @@
   dots[intersect(names(dots), fmls)]
 }
 
+#' Internal: trim chromosome to its active length
+#'
+#' @param chromosome A chromosome vector.
+#' @param plen Number of AR/MA order parameters stored before changepoints.
+#'
+#' @return A trimmed chromosome vector of length `chromosome[1] + plen + 2`.
+#' @keywords internal
+#' @noRd
+trim_chromosome <- function(chromosome, plen) {
+  chromosome[seq_len(chromosome[1] + plen + 2L)]
+}
+
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("j"))
+}
+
 #' changepointGA: Genetic Algorithms for Changepoint Models
 #'
 #' Tools for fitting changepoint models with genetic algorithms and Armadillo-backed linear algebra.

@@ -38,7 +38,7 @@
 #' @slot convg Integer vector for convergence diagnostics.
 #'
 #' @return An object of class \code{cptgaisl}
-#' @seealso \code{\link{cptgaisl}}, \code{\link{cptgaisl-class}}, \code{\link{random_population}}, \code{\link{selection_linearrank}}, \code{\link{uniformcrossover}}, \code{\link{mutation}}.
+#' @seealso \code{\link{cptgaisl}}, \code{\link{cptgaisl-class}}, \code{\link{random_population}}, \code{\link{selection_linear_rank}}, \code{\link{uniform_crossover}}, \code{\link{mutation}}.
 
 setClassUnion("numericOrNULL", members = c("numeric", "NULL"))
 setClassUnion("listOrNULL", members = c("list", "NULL"))

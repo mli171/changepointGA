@@ -40,15 +40,15 @@
 #' # both tau1 and tau2 has detected changepoints
 #' tau2 <- c(25, 50, 75)
 #' tau1 <- c(20, 35, 70, 80, 90)
-#' cptDist(tau1 = tau1, tau2 = tau2, N = N)
+#' cpt_dist(tau1 = tau1, tau2 = tau2, N = N)
 #'
 #' # either tau1 or tau2 has zero detected changepoints
-#' cptDist(tau1 = tau1, tau2 = NULL, N = N)
-#' cptDist(tau1 = NULL, tau2 = tau2, N = N)
+#' cpt_dist(tau1 = tau1, tau2 = NULL, N = N)
+#' cpt_dist(tau1 = NULL, tau2 = tau2, N = N)
 #'
 #' # both tau1 and tau2 has zero detected changepoints
-#' cptDist(tau1 = NULL, tau2 = NULL, N = N)
-cptDist <- function(tau1, tau2, N) {
+#' cpt_dist(tau1 = NULL, tau2 = NULL, N = N)
+cpt_dist <- function(tau1, tau2, N) {
   m <- length(tau1)
   k <- length(tau2)
 
@@ -65,13 +65,7 @@ cptDist <- function(tau1, tau2, N) {
       if (any(tau2 < 0 | tau2 > N)) {
         stop("Second changepoint configuration invalid.")
       }
-
-      costs <- matrix(0, nrow = m, ncol = k)
-      for (i in 1:m) {
-        for (j in 1:k) {
-          costs[i, j] <- abs(tau1[i] - tau2[j]) / N
-        }
-      }
+      costs <- outer(tau1, tau2, function(x, y) abs(x - y)) / N
       if (m > k) {
         costs <- t(costs)
       }

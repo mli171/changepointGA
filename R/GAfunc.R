@@ -1,27 +1,15 @@
 #-------------------------- Check Convergence
-checkConv <- function(a, maxconv, tol) {
-  # This function is used to check convergence criterion for overall GA
-  # some inputs ++++++++++++++++++
-  #   a= the best fitness values for maxconv consecutive migrations
-  #   maxconv= if maxconv consecutive migrations, the overall best does not change, then stop
-  #   tol= tolerance level for iterations
-  # outputs ++++++++++++++++++
-  #   decision = 1 means stop and 0 means continue
-  i <- 1
-  repeat{
-    diff <- abs(a[i + 1] - a[i])
-    if (diff < tol) {
-      i <- i + 1
-      if (i >= maxconv) {
-        decision <- 1
-        break
-      }
-    } else {
-      decision <- 0
-      break
-    }
+check_conv <- function(a, maxconv, tol) {
+  a <- tail(a, maxconv)
+  
+  if (length(a) < 2L) {
+    return(0L)
   }
-  return(decision)
+  if (anyNA(a) || any(!is.finite(a))) {
+    return(0L)
+  }
+  
+  as.integer(all(abs(diff(a)) < tol))
 }
 
 #' The default mutation operator in genetic algorithm
@@ -29,7 +17,7 @@ checkConv <- function(a, maxconv, tol) {
 #' In a certain probability, the \code{mutation} genetic operator can be applied
 #' to generate a new \code{child}. By default, the new child selection can be
 #' down by the similar individual selection method in population initialization,
-#' \code{\link{selectTau}}.
+#' \code{\link{select_tau}}.
 #'
 #' @param child The child chromosome resulting from the \code{crossover} genetic
 #' operator.
@@ -49,12 +37,12 @@ checkConv <- function(a, maxconv, tol) {
 #' probability \code{pmutation} in \code{cptga} and
 #' \code{cptgaisl}. If order selection is not requested
 #' (\code{option = "cp"} in \code{cptga} and \code{cptgaisl}), the default
-#' \code{\link{mutation}} operator function uses \code{selectTau} to select
+#' \code{\link{mutation}} operator function uses \code{select_tau} to select
 #' a completely new individual with a new chromosome as the mutated child.
-#' For details, see \code{\link{selectTau}}. If order selection is needed
+#' For details, see \code{\link{select_tau}}. If order selection is needed
 #' (\code{option = "both"} in \code{cptga} and \code{cptgaisl}), we first
 #' decide whether to keep the produced child's model order with a probability
-#' of 0.5. If the child's model order is retained, the \code{selectTau}
+#' of 0.5. If the child's model order is retained, the \code{select_tau}
 #' function is used to select a completely new individual with a new chromosome
 #' as the mutated child. If a new model order is selected from the candidate
 #' model order set, there is a 0.5 probability to either select a completely new
@@ -79,7 +67,7 @@ mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
       # 1. order from child
       childMut[2:(plen + 1), ] <- child[2:(plen + 1)]
       # 1.1 cpt from new
-      tmpchildMut <- selectTau(
+      tmpchildMut <- select_tau(
         N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
         mmax = mmax, lmax = lmax
       )
@@ -96,7 +84,7 @@ mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
       a2 <- runif(1)
       if (a2 > 0.5) {
         # 2.1 cpt from new
-        tmpchildMut <- selectTau(
+        tmpchildMut <- select_tau(
           N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
           mmax = mmax, lmax = lmax
         )
@@ -109,7 +97,7 @@ mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
       }
     }
   } else {
-    tmpchildMut <- selectTau(
+    tmpchildMut <- select_tau(
       N = N, prange = NULL, minDist = minDist, pchangepoint = pchangepoint,
       mmax = mmax, lmax = lmax
     )
@@ -119,7 +107,7 @@ mutation <- function(child, prange = NULL, minDist, pchangepoint, lmax, mmax, N)
   return(childMut)
 }
 
-NewpopulationIsland <- function(ObjFunc, prange, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, pcrossover, pmutation, pchangepoint, maxgen, N, ...) {
+new_population_Island <- function(ObjFunc, prange, selection, crossover, mutation, pop, fit, minDist, lmax, mmax, pcrossover, pmutation, pchangepoint, maxgen, N, ...) {
   # This function is used to form new population
   # some inputs ++++++++++++++++++
   #   pop= population

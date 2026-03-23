@@ -29,7 +29,7 @@ library(changepointGA)
 
 ## Simulate a time series data with changepoints
 
-This package includes the time series simulation function `ts.sim()` with the ability to introduce changepoint effects. The time series \eqn{Z_{t}, t=1,\ldots,T_{s}} could be simulated from a class of time series models,
+This package includes the time series simulation function `ts_sim()` with the ability to introduce changepoint effects. The time series \eqn{Z_{t}, t=1,\ldots,T_{s}} could be simulated from a class of time series models,
 
 $$Z_{t}=\mu_{t}+e_{t}.$$
 
@@ -50,7 +50,7 @@ thetaT <- c(0.8)
 DeltaT <- c(2, -2)
 CpLocT <- c(50, 150)
 
-myts <- ts.sim(beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234)
+myts <- ts_sim(beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234)
 str(myts)
 ```
 
@@ -88,7 +88,7 @@ Considering the model used in the data simulation, we could use the R function, 
 Given a specific chromosome that encodes the ARMA model structure—namely, the AR and moving average (MA) orders—as well as the changepoint configuration, the function ARIMA.BIC.Order() evaluates the BIC for the corresponding segmented model. The returned BIC value serves as the fitness score of that configuration. The example below presents the BIC value computed at the true changepoint locations with the true ARMA model orders, providing a benchmark for comparison.
 
 ```{r}
-ARIMA.BIC.Order(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT, Xt = myts)
+arima_bic_order(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT, Xt = myts)
 ```
 
 ## Basic GA
@@ -144,8 +144,8 @@ XMatEst <- matrix(1, nrow = N, ncol = 1)
 Then we call function `cptga()` for changepoint searching and simultaneously estimate the best fitted model AR and MA orders. The estimated number of changepoints and corresponding changepoint locations could be extracted as below.
 
 ```{r}
-res.changepointGA <- suppressWarnings(cptga(
-  ObjFunc = ARIMA.BIC.Order,
+reschangepointGA <- suppressWarnings(cptga(
+  ObjFunc = arima_bic_order,
   N = N,
   prange = prange,
   suggestions = suggestions,
@@ -153,8 +153,8 @@ res.changepointGA <- suppressWarnings(cptga(
   XMat = XMatEst,
   Xt = myts
 ))
-print(res.changepointGA)
-summary(res.changepointGA)
+print(reschangepointGA)
+summary(reschangepointGA)
 ```
 
 
@@ -172,8 +172,8 @@ If model order selection is enabled (e.g., for AR, MA, or ARIMA models), the ass
 
 ```{r}
 tim1 <- Sys.time()
-res.Island.changepointGA <- suppressWarnings(cptgaisl(
-  ObjFunc = ARIMA.BIC.Order,
+resIslandchangepointGA <- suppressWarnings(cptgaisl(
+  ObjFunc = arima_bic_order,
   N = N,
   prange = prange,
   popSize = 160,
@@ -187,9 +187,9 @@ res.Island.changepointGA <- suppressWarnings(cptgaisl(
 ))
 tim2 <- Sys.time()
 tim2 - tim1
-print(res.Island.changepointGA)
-summary(res.Island.changepointGA)
-plot(res.Island.changepointGA, data = myts)
+print(resIslandchangepointGA)
+summary(resIslandchangepointGA)
+plot(resIslandchangepointGA, data = myts)
 ```
 
 ## Parallel computing
@@ -202,8 +202,8 @@ To enable parallel computing, simply set the argument `parallel = TRUE` and spec
 
 ```{r}
 tim3 <- Sys.time()
-res.Island.changepointGA <- suppressWarnings(cptgaisl(
-  ObjFunc = ARIMA.BIC.Order,
+resIslandchangepointGA <- suppressWarnings(cptgaisl(
+  ObjFunc = arima_bic_order,
   N = N,
   prange = prange,
   popSize = 160,
@@ -220,9 +220,9 @@ res.Island.changepointGA <- suppressWarnings(cptgaisl(
 
 tim4 <- Sys.time()
 tim4 - tim3
-print(res.Island.changepointGA)
-summary(res.Island.changepointGA)
-plot(res.Island.changepointGA, data = myts)
+print(resIslandchangepointGA)
+summary(resIslandchangepointGA)
+plot(resIslandchangepointGA, data = myts)
 ```
 
 ## Changepoint configuration distance calculation
@@ -230,10 +230,10 @@ plot(res.Island.changepointGA, data = myts)
 It is important to measure how different the estimated changepoint configuration away from the true configuration used in data generation. The pairwise distance metric proposed by Shi et al. (2022) can help quantify such differences. We implemented and included the method via the `cpDist()` function in this package.
 
 ```{r}
-true.tau <- c(50, 150)
-tau.Island <- res.Island.changepointGA@overbestchrom
-est.tau <- c(tau.Island[4:(4 + tau.Island[1] - 1)])
-cptDist(tau1 = true.tau, tau2 = est.tau, N = N)
+truetau <- c(50, 150)
+tauIsland <- resIslandchangepointGA@overbestchrom
+esttau <- c(tauIsland[4:(4 + tauIsland[1] - 1)])
+cpt_dist(tau1 = truetau, tau2 = esttau, N = N)
 ```
 
 
