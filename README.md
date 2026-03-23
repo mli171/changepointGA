@@ -55,11 +55,11 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(N*Cp.prop)
 
-Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+Xt = ts_sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
 tim1 = Sys.time()
-tmp1 = cptga(ObjFunc=ARIMA.BIC, N=N, XMat=XMatT, Xt=Xt)
+tmp1 = cptga(ObjFunc=arima_bic, N=N, XMat=XMatT, Xt=Xt)
 tim2 = Sys.time()
 summary(tmp1)
 plot(tmp1, data=Xt)
@@ -82,13 +82,13 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(N*Cp.prop)
 
-Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+Xt = ts_sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
 
 ## No parallel computing
 tim3 = Sys.time()
-tmp2 = cptgaisl(ObjFunc=ARIMA.BIC, N=N, XMat=XMaT, Xt=Xt)
+tmp2 = cptgaisl(ObjFunc=arima_bic, N=N, XMat=XMaT, Xt=Xt)
 tim4 = Sys.time()
 summary(tmp2)
 plot(tmp2, data=Xt)
@@ -96,7 +96,7 @@ plot(tmp2, data=Xt)
 
 ## Parallel computing
 tim5 = Sys.time()
-tmp3 = cptgaisl(ObjFunc=ARIMA.BIC, N=N, parallel=TRUE, nCore=5, XMat=XMaT, Xt=Xt)
+tmp3 = cptgaisl(ObjFunc=arima_bic, N=N, parallel=TRUE, nCore=5, XMat=XMaT, Xt=Xt)
 tim6 = Sys.time()
 summary(tmp3)
 plot(tmp3, data=Xt)
@@ -121,13 +121,13 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(N*Cp.prop)
 
-Xt = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+Xt = ts_sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
             Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
-p.range = list(ar=c(0,2), ma=c(0,2))
+prange = list(ar=c(0,2), ma=c(0,2))
 
 tim1 = Sys.time()
-tmp1 = cptga(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, option="both", 
+tmp1 = cptga(ObjFunc=arima_bic_order, N=N, prange=prange, option="both", 
              XMat=XMatT, Xt=Xt)
 tim2 = Sys.time()
 summary(tmp1)
@@ -150,13 +150,13 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(N*Cp.prop)
 
-myts = ts.sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+myts = ts_sim(beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
               Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
-p.range = list(ar=c(0,2), ma=c(0,2))
+prange = list(ar=c(0,2), ma=c(0,2))
 
 tim3 = Sys.time()
-tmp2 = cptgaisl(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, option="both", 
+tmp2 = cptgaisl(ObjFunc=arima_bic_order, N=N, prange=prange, option="both", 
                 XMat=XMatT, Xt=Xt)
 tim4 = Sys.time()
 summary(tmp2)
@@ -164,7 +164,7 @@ plot(tmp2, data=Xt)
 
 
 tim5 = Sys.time()
-tmp3 = cptgaisl(ObjFunc=ARIMA.BIC.Order, N=N, p.range=p.range, option="both", 
+tmp3 = cptgaisl(ObjFunc=arima_bic_order, N=N, prange=prange, option="both", 
                 parallel=TRUE, nCore=5, XMat=XMatT, Xt=Xt)
 tim6 = Sys.time()
 summary(tmp3)
