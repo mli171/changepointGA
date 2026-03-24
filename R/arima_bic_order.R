@@ -1,4 +1,4 @@
-#' Calculating BIC for Multiple changepoint detection with model order selection
+#' Calculating BIC for Multiple changepoint detection with AR and MA order selection
 #'
 #' The objective function for changepoint search in Autoregressive
 #' moving average with model order selection via Bayesian Information Criterion
@@ -54,7 +54,7 @@ arima_bic_order <- function(chromosome, plen = 2, XMat, Xt) {
     tau <- tau[tau > 1 & tau < N + 1] # keep CPT locations only
     tmptau <- unique(c(tau, N))
     CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
-    for (i in 1:NCOL(CpMat)) {
+    for (i in seq_len(NCOL(CpMat))) {
       CpMat[(tmptau[i] + 1):tmptau[i + 1], i] <- 1
     }
     DesignX <- cbind(XMat, CpMat)

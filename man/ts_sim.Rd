@@ -11,6 +11,7 @@ ts_sim(
   sigma,
   phi = NULL,
   theta = NULL,
+  d = 0,
   Delta = NULL,
   CpLoc = NULL,
   seed = NULL
@@ -29,6 +30,8 @@ ts_sim(
 
 \item{theta}{A vector for the moving average (MA) parameters for MA part.}
 
+\item{d}{A nonnegative integer for the order of differencing in the ARIMA model. Default is 0, which reduces to an ARMA model.}
+
 \item{Delta}{The parameter vector contains the changepoint parameters for time series mean function.}
 
 \item{CpLoc}{A vector contains the changepoint locations range from \eqn{1\leq\tau\leq T_{s}}.}
@@ -37,18 +40,16 @@ ts_sim(
 }
 \value{
 The simulated time series with attributes:
-\item{\code{Z}}{The simulated time series.}
-\item{Attributes}{
 \itemize{
- \item{\code{DesignX}} The covariates include all changepoint indicators.
- \item{\code{mu}} A vector includes the mean values for simulated time series sequences.
- \item{\code{theta}} The true parameter vector (including changepoint effects).
- \item{\code{CpEff}} The true changepoint magnitudes.
- \item{\code{CpLoc}} The true changepoint locations where we introduce the mean changing effects.
- \item{\code{arEff}} A vector givies the AR coefficients.
- \item{\code{maEff}} A vector givies the MA coefficients.
- \item{\code{seed}} The random seed used for this simulation.
- }
+  \item \code{DesignX}: The covariates including changepoint indicators.
+  \item \code{mu}: The mean vector for the simulated time series.
+  \item \code{theta}: The true parameter vector including changepoint effects.
+  \item \code{CpEff}: The true changepoint magnitudes.
+  \item \code{CpLoc}: The true changepoint locations.
+  \item \code{arEff}: The AR coefficients.
+  \item \code{maEff}: The MA coefficients.
+  \item \code{diffEff}: The differencing order.
+  \item \code{seed}: The random seed used for simulation.
 }
 }
 \description{
@@ -56,29 +57,29 @@ This is a function to simulate time series with changepoint effects. See
 details below.
 }
 \details{
-The simulated time series \eqn{Z_{t}, t=1,\ldots,T_{s}} is from a class of models,
- \deqn{Z_{t}=\mu_{t}+e_{t}.}
+The simulated time series \eqn{Z_t, t = 1, \ldots, T_s} is generated from
+\deqn{Z_t = \mu_t + e_t.}
+
+The error process \eqn{e_t} can be:
 \itemize{
- \item{Time series observations are IID} \cr \eqn{\mu_{t}} is a constant
- and \eqn{e_{t}}'s are independent and identically distributed as \eqn{N(0,\sigma)}.
- \item{ARMA(p,q) model with constant mean} \cr \eqn{\mu_{t}} is a constant,
- and \eqn{e_{t}} follows an ARMA(p,q) process.
- \item{ARMA(p,q) model with seasonality} \cr \eqn{\mu_{t}} is not a constant,
- \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}),}
- and \eqn{e_{t}} follows an ARMA(p,q) process.
- \item{ARMA(p,q) model with seasonality and trend} \cr \eqn{\mu_{t}} is not a constant,
- \deqn{\mu_{t} = ASin(\frac{2\pi t}{S})+BSin(\frac{2\pi t}{S}) + \alpha t,}
- and \eqn{e_{t}} follows an ARMA(p,q) process.
-The changepoint effects could be introduced through the \eqn{\mu_{t}} as
- \deqn{\mu_{t} = \Delta_{1}I_{t>\tau_{1}} + \ldots + \Delta_{m}I_{t>\tau_{m}},}
-where \eqn{1\leq\tau_{1}<\ldots<\tau_{m}\leq T_{s}} are the changepoint locations and
-\eqn{\Delta_{1},\ldots,\Delta_{m}} are the changepoint parameter that need to be estimated.
+  \item IID Gaussian noise when \code{phi = NULL}, \code{theta = NULL},
+    and \code{d = 0}.
+  \item An ARMA(p,q) process when \code{d = 0} and at least one of
+    \code{phi} or \code{theta} is specified.
+  \item An ARIMA(p,d,q) process when \code{d > 0}.
 }
+
+The mean structure \eqn{\mu_t} is specified through \code{XMat} and
+\code{beta}, and changepoint effects can be introduced as
+\deqn{\mu_t = X_t^\top \beta + \Delta_1 I(t \ge \tau_1) + \cdots +
+\Delta_m I(t \ge \tau_m),}
+where \eqn{1 \le \tau_1 < \cdots < \tau_m \le T_s} are changepoint
+locations and \eqn{\Delta_1, \ldots, \Delta_m} are changepoint magnitudes.
 }
 \examples{
 ##### M1: Time series observations are IID
 Ts <- 1000
-betaT <- c(0.5) # intercept
+betaT <- c(0.5)
 XMatT <- matrix(1, nrow = Ts, ncol = 1)
 colnames(XMatT) <- "intercept"
 sigmaT <- 1
@@ -93,56 +94,35 @@ myts <- ts_sim(
 
 ##### M2: ARMA(2,1) model with constant mean
 Ts <- 1000
-betaT <- c(0.5) # intercept
+betaT <- c(0.5)
 XMatT <- matrix(1, nrow = Ts, ncol = 1)
 colnames(XMatT) <- "intercept"
 sigmaT <- 1
 phiT <- c(0.5, -0.5)
 thetaT <- c(0.8)
 DeltaT <- c(2, -2)
-Cpprop <- c(1 / 4, 3 / 4)
-CpLocT <- floor(Ts * Cpprop)
+CpLocT <- floor(Ts * c(1 / 4, 3 / 4))
 
 myts <- ts_sim(
   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
-  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+  phi = phiT, theta = thetaT, d = 0,
+  Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 
-##### M3: ARMA(2,1) model with seasonality
+##### M3: ARIMA(1,1,1) model with changepoint effects
 Ts <- 1000
-betaT <- c(0.5, -0.5, 0.3) # intercept, B, D
-period <- 30
-XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period))
-colnames(XMatT) <- c("intercept", "Bvalue", "DValue")
+betaT <- c(0.5)
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
+colnames(XMatT) <- "intercept"
 sigmaT <- 1
-phiT <- c(0.5, -0.5)
-thetaT <- c(0.8)
+phiT <- c(0.5)
+thetaT <- c(-0.3)
 DeltaT <- c(2, -2)
-Cpprop <- c(1 / 4, 3 / 4)
-CpLocT <- floor(Ts * Cpprop)
+CpLocT <- floor(Ts * c(1 / 4, 3 / 4))
 
 myts <- ts_sim(
   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
-  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
-)
-
-
-##### M4: ARMA(2,1) model with seasonality and trend
-# scaled trend if large number of sample size
-Ts <- 1000
-betaT <- c(0.5, -0.5, 0.3, 0.01) # intercept, B, D, alpha
-period <- 30
-XMatT <- cbind(rep(1, Ts), cos(2 * pi * (1:Ts) / period), sin(2 * pi * (1:Ts) / period), 1:Ts)
-colnames(XMatT) <- c("intercept", "Bvalue", "DValue", "trend")
-sigmaT <- 1
-phiT <- c(0.5, -0.5)
-thetaT <- c(0.8)
-DeltaT <- c(2, -2)
-Cpprop <- c(1 / 4, 3 / 4)
-CpLocT <- floor(Ts * Cpprop)
-
-myts <- ts_sim(
-  Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
-  phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
+  phi = phiT, theta = thetaT, d = 1,
+  Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 }

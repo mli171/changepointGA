@@ -2,7 +2,7 @@
 % Please edit documentation in R/arima_bic_order.R
 \name{arima_bic_order}
 \alias{arima_bic_order}
-\title{Calculating BIC for Multiple changepoint detection with model order selection}
+\title{Calculating BIC for Multiple changepoint detection with AR and MA order selection}
 \usage{
 arima_bic_order(chromosome, plen = 2, XMat, Xt)
 }
