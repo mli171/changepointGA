@@ -3,6 +3,7 @@ make_demo_data <- function(N = 80) {
   colnames(XMatT) <- "intercept"
   
   Xt <- ts_sim(
+    Ts = N,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,

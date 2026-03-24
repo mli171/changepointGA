@@ -206,23 +206,23 @@ marking the boundary of the chromosome.
 \examples{
 \donttest{
 
-N <- 1000
-XMatT <- matrix(1, nrow = N, ncol = 1)
+Ts <- 1000
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
 Xt <- ts_sim(
-  beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = NULL,
+  Ts = Ts, beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = NULL,
   Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
 )
 
 ## Multiple changepoint detection without model order selection
 
 # without suggestions
-GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, XMat = XMatT, Xt = Xt)
+GAISLres <- cptgaisl(ObjFunc = arima_bic, N = Ts, XMat = XMatT, Xt = Xt)
 summary(GAISLres)
 plot(GAISLres, data = Xt)
 
 # with suggestions
 suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
-GAISLres <- cptgaisl(ObjFunc = arima_bic, N = N, suggestions = suggestions, XMat = XMatT, Xt = Xt)
+GAISLres <- cptgaisl(ObjFunc = arima_bic, N = Ts, suggestions = suggestions, XMat = XMatT, Xt = Xt)
 summary(GAISLres)
 plot(GAISLres, data = Xt)
 
@@ -233,7 +233,7 @@ prange <- list(ar = c(0, 3), ma = c(0, 3))
 
 # without suggestions
 GAISLres <- cptgaisl(
-  ObjFunc = arima_bic_order, N = N, prange = prange,
+  ObjFunc = arima_bic_order, N = Ts, prange = prange,
   option = "both", XMat = XMatT, Xt = Xt
 )
 summary(GAISLres)
@@ -242,7 +242,7 @@ plot(GAISLres, data = Xt)
 # with suggestions
 suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
 GAISLres <- cptgaisl(
-  ObjFunc = arima_bic_order, N = N, prange = prange,
+  ObjFunc = arima_bic_order, N = Ts, prange = prange,
   suggestions = suggestions, option = "both", XMat = XMatT, Xt = Xt
 )
 summary(GAISLres)

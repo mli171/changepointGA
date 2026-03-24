@@ -5,6 +5,7 @@
 \title{Time series simulation with changepoint effects}
 \usage{
 ts_sim(
+  Ts,
   beta,
   XMat,
   sigma,
@@ -16,6 +17,8 @@ ts_sim(
 )
 }
 \arguments{
+\item{Ts}{A integer indicating simulated time series length (sample size).}
+
 \item{beta}{A parameter vector contains other mean function parameters without changepoint parameters.}
 
 \item{XMat}{The covairates for time series mean function without changepoint indicators.}
@@ -84,7 +87,7 @@ Cpprop <- c(1 / 4, 3 / 4)
 CpLocT <- floor(Ts * Cpprop)
 
 myts <- ts_sim(
-  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 
@@ -101,7 +104,7 @@ Cpprop <- c(1 / 4, 3 / 4)
 CpLocT <- floor(Ts * Cpprop)
 
 myts <- ts_sim(
-  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 
@@ -119,7 +122,7 @@ Cpprop <- c(1 / 4, 3 / 4)
 CpLocT <- floor(Ts * Cpprop)
 
 myts <- ts_sim(
-  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 
@@ -139,7 +142,7 @@ Cpprop <- c(1 / 4, 3 / 4)
 CpLocT <- floor(Ts * Cpprop)
 
 myts <- ts_sim(
-  beta = betaT, XMat = XMatT, sigma = sigmaT,
+  Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 )
 }

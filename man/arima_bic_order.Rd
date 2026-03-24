@@ -32,10 +32,10 @@ moving average with model order selection via Bayesian Information Criterion
 (BIC).
 }
 \examples{
-N <- 1000
-XMatT <- matrix(1, nrow = N, ncol = 1)
+Ts <- 1000
+XMatT <- matrix(1, nrow = Ts, ncol = 1)
 Xt <- ts_sim(
-  beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = 0.8,
+  Ts = Ts, beta = 0.5, XMat = XMatT, sigma = 1, phi = 0.5, theta = 0.8,
   Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
 )
 

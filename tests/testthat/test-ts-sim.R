@@ -4,6 +4,7 @@ test_that("ts_sim is reproducible with the same seed", {
   colnames(XMatT) <- "intercept"
   
   sim1 <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,
@@ -13,6 +14,7 @@ test_that("ts_sim is reproducible with the same seed", {
   )
   
   sim2 <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,
@@ -30,6 +32,7 @@ test_that("ts_sim returns numeric output with expected length", {
   colnames(XMatT) <- "intercept"
   
   sim <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,
@@ -48,6 +51,7 @@ test_that("ts_sim works with ARMA terms", {
   colnames(XMatT) <- "intercept"
   
   sim <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,

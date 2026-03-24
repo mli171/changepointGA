@@ -50,7 +50,7 @@ thetaT <- c(0.8)
 DeltaT <- c(2, -2)
 CpLocT <- c(50, 150)
 
-myts <- ts_sim(beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234)
+myts <- ts_sim(Ts=Ts, beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234)
 str(myts)
 ```
 

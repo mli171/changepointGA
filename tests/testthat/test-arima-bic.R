@@ -1,9 +1,10 @@
 test_that("arima_bic returns a finite numeric scalar", {
-  N <- 200
-  XMatT <- matrix(1, nrow = N, ncol = 1)
+  Ts <- 200
+  XMatT <- matrix(1, nrow = Ts, ncol = 1)
   colnames(XMatT) <- "intercept"
   
   Xt <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,
@@ -14,7 +15,7 @@ test_that("arima_bic returns a finite numeric scalar", {
     seed = 1234
   )
   
-  chromosome <- c(2, 50, 150, N + 1)
+  chromosome <- c(2, 50, 150, Ts + 1)
   
   out <- arima_bic(chromosome, XMat = XMatT, Xt = Xt)
   
@@ -24,11 +25,12 @@ test_that("arima_bic returns a finite numeric scalar", {
 })
 
 test_that("arima_bic is deterministic for fixed input", {
-  N <- 200
-  XMatT <- matrix(1, nrow = N, ncol = 1)
+  Ts <- 200
+  XMatT <- matrix(1, nrow = Ts, ncol = 1)
   colnames(XMatT) <- "intercept"
   
   Xt <- ts_sim(
+    Ts = Ts,
     beta = 0.5,
     XMat = XMatT,
     sigma = 1,
@@ -39,7 +41,7 @@ test_that("arima_bic is deterministic for fixed input", {
     seed = 1234
   )
   
-  chromosome <- c(2, 50, 150, N + 1)
+  chromosome <- c(2, 50, 150, Ts + 1)
   
   out1 <- arima_bic(chromosome, XMat = XMatT, Xt = Xt)
   out2 <- arima_bic(chromosome, XMat = XMatT, Xt = Xt)

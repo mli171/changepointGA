@@ -2,7 +2,8 @@
 #'
 #' This is a function to simulate time series with changepoint effects. See
 #' details below.
-#'
+#' 
+#' @param Ts A integer indicating simulated time series length (sample size).
 #' @param beta A parameter vector contains other mean function parameters without changepoint parameters.
 #' @param XMat The covairates for time series mean function without changepoint indicators.
 #' @param sigma The standard deviation for time series residuals \eqn{\epsilon_{t}}.
@@ -61,7 +62,7 @@
 #' CpLocT <- floor(Ts * Cpprop)
 #'
 #' myts <- ts_sim(
-#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
 #'
@@ -78,7 +79,7 @@
 #' CpLocT <- floor(Ts * Cpprop)
 #'
 #' myts <- ts_sim(
-#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
 #'
@@ -96,7 +97,7 @@
 #' CpLocT <- floor(Ts * Cpprop)
 #'
 #' myts <- ts_sim(
-#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
 #'
@@ -116,15 +117,13 @@
 #' CpLocT <- floor(Ts * Cpprop)
 #'
 #' myts <- ts_sim(
-#'   beta = betaT, XMat = XMatT, sigma = sigmaT,
+#'   Ts = Ts, beta = betaT, XMat = XMatT, sigma = sigmaT,
 #'   phi = phiT, theta = thetaT, Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
-ts_sim <- function(beta, XMat, sigma, phi = NULL, theta = NULL, Delta = NULL, CpLoc = NULL, seed = NULL) {
+ts_sim <- function(Ts, beta, XMat, sigma, phi = NULL, theta = NULL, Delta = NULL, CpLoc = NULL, seed = NULL) {
   if (!is.null(seed)) {
     set.seed(seed)
   }
-
-  Ts <- NROW(XMat)
 
   if (is.null(Delta)) {
     if (is.null(CpLoc)) {
