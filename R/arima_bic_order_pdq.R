@@ -1,95 +1,122 @@
-#' Calculating BIC for multiple changepoint detection with ARIMA order selection
+#' Calculate BIC for changepoint detection with ARIMA order selection
 #'
-#' The objective function for changepoint search in autoregressive integrated
-#' moving average models with simultaneous model order selection via the
-#' Bayesian Information Criterion (BIC). This function is designed for the
-#' case where the orders of the AR, differencing, and MA components are all
-#' selected together with changepoint locations.
+#' Objective function for simultaneous selection of changepoint locations and
+#' ARIMA model orders using the Bayesian Information Criterion (BIC).
 #'
-#' @param chromosome A vector consisting of the number of changepoints, the
-#' order of the AR component (refers to the number of lagged terms used to
-#' model the current value of a time series), the differencing order, the
-#' order of the MA component (refers to the number of lagged error terms used
-#' to model the current value of a time series), the changepoint locations,
-#' and a value of time series sample size plus 1 (\eqn{N+1}) indicating the
-#' end of the chromosome. The chromosome is represented as
-#' \code{c(m, p, d, q, tau1, tau2, ..., N + 1)}.
-#' @param plen The number of model order parameters to be selected. For this
-#' function, \code{plen = 3}, corresponding to the AR, differencing, and MA
-#' orders.
-#' @param XMat A matrix containing the covariates, excluding changepoint
-#' effects, for time series regression.
-#' @param Xt The simulated ARIMA time series generated from the
-#' \code{ts_sim} function.
+#' Each chromosome encodes the number of changepoints, the ARIMA orders
+#' \eqn{(p,d,q)}, and candidate changepoint locations. For a given chromosome,
+#' the function constructs the corresponding changepoint design matrix, combines
+#' it with the user-supplied regression design matrix, fits an ARIMA model with
+#' regressors, and returns the BIC value.
 #'
-#' @return The BIC value of the objective function. If model fitting fails,
-#' \code{NA} is returned.
+#' @param chromosome A numeric vector encoding the candidate model. The
+#'   chromosome is assumed to have the form
+#'   \code{c(m, p, d, q, tau1, tau2, ..., tauK)}, where \code{m} is the number
+#'   of changepoints, \code{p}, \code{d}, and \code{q} are the ARIMA orders,
+#'   and the remaining entries are candidate changepoint locations.
+#' @param plen An integer giving the number of model-order entries in the
+#'   chromosome. The default is \code{3}, corresponding to \eqn{(p,d,q)}.
+#' @param XMat A matrix of regression covariates excluding changepoint
+#'   indicators.
+#' @param Xt A numeric vector containing the observed time series.
 #'
 #' @details
-#' This function fits an ARIMA(\eqn{p,d,q}) model, where \eqn{p}, \eqn{d},
-#' and \eqn{q} are extracted from the chromosome and coerced to integer values.
-#' If changepoints are present, the corresponding indicator variables are
-#' appended to the design matrix and included as regression effects in the
-#' fitted model.
+#' The first element of \code{chromosome} specifies the number of changepoints.
+#' The next \code{plen} elements specify the ARIMA orders, which are rounded to
+#' integers. Remaining elements are treated as candidate changepoint locations.
+#'
+#' If changepoints are present, the function constructs a block-indicator matrix
+#' whose columns represent successive changepoint segments. This matrix is then
+#' appended to \code{XMat} to form the regression design.
+#'
+#' Before fitting, columns with zero variance or non-finite values are removed.
+#' Remaining regressors are mean-centered. The ARIMA model is then fitted using
+#' \code{\link[stats]{arima}} with \code{include.mean = FALSE}, and the
+#' corresponding BIC is returned.
+#'
+#' If model fitting fails, the function returns a large penalty value
+#' (\code{1e10}) so that the candidate is disfavored during optimization.
+#'
+#' @return A numeric scalar giving the BIC of the fitted candidate model. If the
+#'   ARIMA fit fails, the function returns \code{1e10}.
 #'
 #' @import stats
 #' @useDynLib changepointGA
 #' @export
 #'
 #' @examples
-#' Ts <- 1000
+#' Ts <- 200
 #' XMatT <- matrix(1, nrow = Ts, ncol = 1)
+#' colnames(XMatT) <- "intercept"
+#'
 #' Xt <- ts_sim(
 #'   Ts = Ts, beta = 0.5, XMat = XMatT, sigma = 1,
-#'   phi = 0.5, theta = 0.8, d = 1,
-#'   Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
+#'   phi = 0.5, theta = 0.3, d = 1,
+#'   Delta = c(2, -2), CpLoc = c(50, 150), seed = 1234
 #' )
 #'
-#' # one chromosome representation: c(m, p, d, q, tau1, tau2, N + 1)
-#' chromosome <- c(2, 1, 1, 1, 250, 750, 1001)
-#' arima_bic_order_pdq(chromosome, plen = 3, XMat = XMatT, Xt = Xt)
+#' ## chromosome = c(m, p, d, q, tau1, tau2, ...)
+#' chromosome <- c(2, 1, 1, 1, 50, 150, Ts + 1)
+#'
+#' arima_bic_order_pdq(
+#'   chromosome = chromosome,
+#'   plen = 3,
+#'   XMat = XMatT,
+#'   Xt = Xt
+#' )
 arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
-  m <- chromosome[1]
-  porder <- chromosome[2:(plen + 1)]   # c(p, d, q)
+  m <- as.integer(round(chromosome[1]))
+  porder <- as.integer(round(chromosome[2:(plen + 1)]))   # c(p, d, q)
   tau <- chromosome[(plen + 2):length(chromosome)]
   N <- length(Xt)
   
-  porder <- as.integer(round(porder))
-  
+  # build changepoint design
   if (m == 0) {
     DesignX <- XMat
-    fit <- try(arima(Xt,
-                     order = c(porder[1], porder[2], porder[3]),
-                     xreg = DesignX, include.mean = FALSE,
-                     optim.control = list(maxit = 50)
-    ), silent = TRUE)
-    
-    if (inherits(fit, "try-error")) {
-      bic_obj <- NA
-    } else {
-      bic_obj <- BIC(fit)
-    }
   } else {
-    tau <- tau[tau > 1 & tau < N + 1]
-    tmptau <- unique(c(tau, N))
-    CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
-    for (i in seq_len(NCOL(CpMat))) {
-      CpMat[(tmptau[i] + 1):tmptau[i + 1], i] <- 1
-    }
-    DesignX <- cbind(XMat, CpMat)
+    tau <- tau[seq_len(min(m, length(tau)))]
+    tau <- as.integer(round(tau))
+    tau <- tau[tau >= 1 & tau <= N]
     
-    fit <- try(arima(Xt,
-                     order = c(porder[1], porder[2], porder[3]),
-                     xreg = DesignX, include.mean = FALSE,
-                     optim.control = list(maxit = 50)
-    ), silent = TRUE)
-    
-    if (inherits(fit, "try-error")) {
-      bic_obj <- NA
+    if (length(tau) == 0) {
+      DesignX <- XMat
     } else {
-      bic_obj <- BIC(fit)
+      tmptau <- sort(unique(c(tau, N + 1)))
+      CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
+      for (i in seq_len(ncol(CpMat))) {
+        CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
+      }
+      DesignX <- cbind(XMat, CpMat)
     }
   }
   
-  return(bic_obj)
+  # remove duplicate / zero-variance columns
+  if (!is.null(dim(DesignX)) && ncol(DesignX) > 0) {
+    keep <- apply(DesignX, 2, function(z) all(is.finite(z)) && sd(z) > 0)
+    if (any(keep)) {
+      Xfit <- DesignX[, keep, drop = FALSE]
+      Xfit <- scale(Xfit, scale = FALSE)
+    } else {
+      Xfit <- NULL
+    }
+  } else {
+    Xfit <- NULL
+  }
+  
+  fit <- try(
+    arima(
+      Xt,
+      order = c(porder[1], porder[2], porder[3]),
+      xreg = Xfit,
+      include.mean = FALSE,
+      optim.control = list(maxit = 50)
+    ),
+    silent = TRUE
+  )
+  
+  if (inherits(fit, "try-error")) {
+    return(1e10)
+  }
+  
+  BIC(fit)
 }

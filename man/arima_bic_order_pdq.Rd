@@ -2,58 +2,75 @@
 % Please edit documentation in R/arima_bic_order_pdq.R
 \name{arima_bic_order_pdq}
 \alias{arima_bic_order_pdq}
-\title{Calculating BIC for multiple changepoint detection with ARIMA order selection}
+\title{Calculate BIC for changepoint detection with ARIMA order selection}
 \usage{
 arima_bic_order_pdq(chromosome, plen = 3, XMat, Xt)
 }
 \arguments{
-\item{chromosome}{A vector consisting of the number of changepoints, the
-order of the AR component (refers to the number of lagged terms used to
-model the current value of a time series), the differencing order, the
-order of the MA component (refers to the number of lagged error terms used
-to model the current value of a time series), the changepoint locations,
-and a value of time series sample size plus 1 (\eqn{N+1}) indicating the
-end of the chromosome. The chromosome is represented as
-\code{c(m, p, d, q, tau1, tau2, ..., N + 1)}.}
+\item{chromosome}{A numeric vector encoding the candidate model. The
+chromosome is assumed to have the form
+\code{c(m, p, d, q, tau1, tau2, ..., tauK)}, where \code{m} is the number
+of changepoints, \code{p}, \code{d}, and \code{q} are the ARIMA orders,
+and the remaining entries are candidate changepoint locations.}
 
-\item{plen}{The number of model order parameters to be selected. For this
-function, \code{plen = 3}, corresponding to the AR, differencing, and MA
-orders.}
+\item{plen}{An integer giving the number of model-order entries in the
+chromosome. The default is \code{3}, corresponding to \eqn{(p,d,q)}.}
 
-\item{XMat}{A matrix containing the covariates, excluding changepoint
-effects, for time series regression.}
+\item{XMat}{A matrix of regression covariates excluding changepoint
+indicators.}
 
-\item{Xt}{The simulated ARIMA time series generated from the
-\code{ts_sim} function.}
+\item{Xt}{A numeric vector containing the observed time series.}
 }
 \value{
-The BIC value of the objective function. If model fitting fails,
-\code{NA} is returned.
+A numeric scalar giving the BIC of the fitted candidate model. If the
+  ARIMA fit fails, the function returns \code{1e10}.
 }
 \description{
-The objective function for changepoint search in autoregressive integrated
-moving average models with simultaneous model order selection via the
-Bayesian Information Criterion (BIC). This function is designed for the
-case where the orders of the AR, differencing, and MA components are all
-selected together with changepoint locations.
+Objective function for simultaneous selection of changepoint locations and
+ARIMA model orders using the Bayesian Information Criterion (BIC).
 }
 \details{
-This function fits an ARIMA(\eqn{p,d,q}) model, where \eqn{p}, \eqn{d},
-and \eqn{q} are extracted from the chromosome and coerced to integer values.
-If changepoints are present, the corresponding indicator variables are
-appended to the design matrix and included as regression effects in the
-fitted model.
+Each chromosome encodes the number of changepoints, the ARIMA orders
+\eqn{(p,d,q)}, and candidate changepoint locations. For a given chromosome,
+the function constructs the corresponding changepoint design matrix, combines
+it with the user-supplied regression design matrix, fits an ARIMA model with
+regressors, and returns the BIC value.
+
+
+The first element of \code{chromosome} specifies the number of changepoints.
+The next \code{plen} elements specify the ARIMA orders, which are rounded to
+integers. Remaining elements are treated as candidate changepoint locations.
+
+If changepoints are present, the function constructs a block-indicator matrix
+whose columns represent successive changepoint segments. This matrix is then
+appended to \code{XMat} to form the regression design.
+
+Before fitting, columns with zero variance or non-finite values are removed.
+Remaining regressors are mean-centered. The ARIMA model is then fitted using
+\code{\link[stats]{arima}} with \code{include.mean = FALSE}, and the
+corresponding BIC is returned.
+
+If model fitting fails, the function returns a large penalty value
+(\code{1e10}) so that the candidate is disfavored during optimization.
 }
 \examples{
-Ts <- 1000
+Ts <- 200
 XMatT <- matrix(1, nrow = Ts, ncol = 1)
+colnames(XMatT) <- "intercept"
+
 Xt <- ts_sim(
   Ts = Ts, beta = 0.5, XMat = XMatT, sigma = 1,
-  phi = 0.5, theta = 0.8, d = 1,
-  Delta = c(2, -2), CpLoc = c(250, 750), seed = 1234
+  phi = 0.5, theta = 0.3, d = 1,
+  Delta = c(2, -2), CpLoc = c(50, 150), seed = 1234
 )
 
-# one chromosome representation: c(m, p, d, q, tau1, tau2, N + 1)
-chromosome <- c(2, 1, 1, 1, 250, 750, 1001)
-arima_bic_order_pdq(chromosome, plen = 3, XMat = XMatT, Xt = Xt)
+## chromosome = c(m, p, d, q, tau1, tau2, ...)
+chromosome <- c(2, 1, 1, 1, 50, 150, Ts + 1)
+
+arima_bic_order_pdq(
+  chromosome = chromosome,
+  plen = 3,
+  XMat = XMatT,
+  Xt = Xt
+)
 }

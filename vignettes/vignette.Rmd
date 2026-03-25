@@ -88,7 +88,7 @@ Considering the model used in the data simulation, we could use the R function, 
 Given a specific chromosome that encodes the ARMA model structure—namely, the AR and moving average (MA) orders—as well as the changepoint configuration, the function ARIMA.BIC.Order() evaluates the BIC for the corresponding segmented model. The returned BIC value serves as the fitness score of that configuration. The example below presents the BIC value computed at the true changepoint locations with the true ARMA model orders, providing a benchmark for comparison.
 
 ```{r}
-arima_bic_order(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT, Xt = myts)
+arima_bic_order_pq(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT, Xt = myts)
 ```
 
 ## Basic GA
@@ -145,7 +145,7 @@ Then we call function `cptga()` for changepoint searching and simultaneously est
 
 ```{r}
 reschangepointGA <- suppressWarnings(cptga(
-  ObjFunc = arima_bic_order,
+  ObjFunc = arima_bic_order_pq,
   N = N,
   prange = prange,
   suggestions = suggestions,
@@ -173,7 +173,7 @@ If model order selection is enabled (e.g., for AR, MA, or ARIMA models), the ass
 ```{r}
 tim1 <- Sys.time()
 resIslandchangepointGA <- suppressWarnings(cptgaisl(
-  ObjFunc = arima_bic_order,
+  ObjFunc = arima_bic_order_pq,
   N = N,
   prange = prange,
   popSize = 160,
@@ -203,7 +203,7 @@ To enable parallel computing, simply set the argument `parallel = TRUE` and spec
 ```{r}
 tim3 <- Sys.time()
 resIslandchangepointGA <- suppressWarnings(cptgaisl(
-  ObjFunc = arima_bic_order,
+  ObjFunc = arima_bic_order_pq,
   N = N,
   prange = prange,
   popSize = 160,

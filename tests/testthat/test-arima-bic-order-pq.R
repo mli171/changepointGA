@@ -17,7 +17,7 @@ test_that("arima_bic_order returns a finite numeric scalar", {
   
   chromosome <- c(2, 1, 1, 50, 150, Ts + 1)
   
-  out <- arima_bic_order(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
+  out <- arima_bic_order_pq(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
   
   expect_true(is.numeric(out))
   expect_length(out, 1)
@@ -43,8 +43,8 @@ test_that("arima_bic_order is deterministic for fixed input", {
   
   chromosome <- c(2, 1, 1, 50, 150, Ts + 1)
   
-  out1 <- arima_bic_order(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
-  out2 <- arima_bic_order(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
+  out1 <- arima_bic_order_pq(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
+  out2 <- arima_bic_order_pq(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
   
   expect_equal(out1, out2)
 })

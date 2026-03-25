@@ -100,8 +100,7 @@
 #'   phi = phiT, theta = thetaT, d = 1,
 #'   Delta = DeltaT, CpLoc = CpLocT, seed = 1234
 #' )
-ts_sim <- function(Ts, beta, XMat, sigma,
-                   phi = NULL, theta = NULL, d = 0,
+ts_sim <- function(Ts, beta, XMat, sigma, phi = NULL, theta = NULL, d = 0,
                    Delta = NULL, CpLoc = NULL, seed = NULL) {
   if (!is.null(seed)) {
     set.seed(seed)
@@ -109,9 +108,9 @@ ts_sim <- function(Ts, beta, XMat, sigma,
   
   if (is.null(Delta)) {
     if (is.null(CpLoc)) {
-      warning("No changepoint effects!")
+      warning("\n No changepoint effects!\n")
       DesignX <- XMat
-      mu <- drop(DesignX %*% beta)
+      mu <- DesignX %*% beta
     } else {
       stop("Changepoint effects invalid!")
     }
@@ -119,50 +118,47 @@ ts_sim <- function(Ts, beta, XMat, sigma,
     if (is.null(CpLoc)) {
       stop("Changepoint effects invalid!")
     } else {
-      if (any(CpLoc > Ts) || any(CpLoc < 1)) {
+      if (any(CpLoc > Ts) | any(CpLoc < 0)) {
         stop("Changepoint effects invalid!")
       }
       if (length(Delta) != length(CpLoc)) {
         stop("Changepoint effects invalid!")
       }
-      
+      # changepoints
       tmptau <- unique(c(CpLoc, Ts + 1))
       CpMat <- matrix(0, nrow = Ts, ncol = length(tmptau) - 1)
-      
       for (i in 1:NCOL(CpMat)) {
         CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
       }
-      
       DesignX <- cbind(XMat, CpMat)
-      beta_full <- c(beta, Delta)
-      mu <- drop(DesignX %*% beta_full)
+      beta <- c(beta, Delta)
+      mu <- DesignX %*% beta
     }
   }
   
-  p <- if (is.null(phi)) 0 else length(phi)
-  q <- if (is.null(theta)) 0 else length(theta)
-  
-  if (p == 0 && q == 0 && d == 0) {
-    et <- rnorm(n = Ts, mean = 0, sd = sigma)
+  if (is.null(phi) & is.null(theta) & d == 0) {
+    et <- rnorm(n = Ts, mean = 0, sd = sigma) # independent
   } else {
-    et <- as.numeric(
-      arima.sim(
-        n = Ts,
-        model = list(order = c(p, d, q), ar = phi, ma = theta),
-        sd = sigma
-      )
+    p <- if (is.null(phi)) 0 else length(phi)
+    q <- if (is.null(theta)) 0 else length(theta)
+    
+    et <- arima.sim(
+      n = Ts,
+      model = list(order = c(p, d, q), ar = phi, ma = theta),
+      sd = sigma
     )
     
+    et <- as.numeric(et)
     if (length(et) > Ts) {
       et <- tail(et, Ts)
     }
   }
   
-  Z <- mu + et
+  Z <- et + mu
   
   attr(Z, "DesignX") <- DesignX
   attr(Z, "mu") <- mu
-  attr(Z, "theta") <- if (exists("beta_full")) beta_full else beta
+  attr(Z, "theta") <- beta
   attr(Z, "CpEff") <- Delta
   attr(Z, "CpLoc") <- CpLoc
   attr(Z, "arEff") <- phi

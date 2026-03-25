@@ -217,7 +217,7 @@ prange <- list(ar = c(0, 3), ma = c(0, 3))
 
 # without suggestions
 GAres <- cptga(
-  ObjFunc = arima_bic_order, N = Ts, prange = prange,
+  ObjFunc = arima_bic_order_pq, N = Ts, prange = prange,
   option = "both", XMat = XMatT, Xt = Xt
 )
 summary(GAres)
@@ -226,7 +226,7 @@ plot(GAres, data = Xt)
 # with suggestions
 suggestions <- list(NULL, 250, c(250, 500), c(250, 625), c(250, 500, 750))
 GAres <- cptga(
-  ObjFunc = arima_bic_order, N = Ts, prange = prange,
+  ObjFunc = arima_bic_order_pq, N = Ts, prange = prange,
   suggestions = suggestions, option = "both", XMat = XMatT, Xt = Xt
 )
 summary(GAres)

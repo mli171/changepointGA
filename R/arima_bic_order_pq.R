@@ -31,8 +31,8 @@
 #'
 #' # one chromosome representation
 #' chromosome <- c(2, 1, 1, 250, 750, 1001)
-#' arima_bic_order(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
-arima_bic_order <- function(chromosome, plen = 2, XMat, Xt) {
+#' arima_bic_order_pq(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
+arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
   m <- chromosome[1]
   porder <- chromosome[2:(plen + 1)]
   tau <- chromosome[(plen + 2):length(chromosome)]
@@ -51,11 +51,10 @@ arima_bic_order <- function(chromosome, plen = 2, XMat, Xt) {
       bic_obj <- BIC(fit)
     }
   } else {
-    tau <- tau[tau > 1 & tau < N + 1] # keep CPT locations only
-    tmptau <- unique(c(tau, N))
+    tmptau <- unique(c(tau, N + 1))
     CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
-    for (i in seq_len(NCOL(CpMat))) {
-      CpMat[(tmptau[i] + 1):tmptau[i + 1], i] <- 1
+    for (i in 1:NCOL(CpMat)) {
+      CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
     }
     DesignX <- cbind(XMat, CpMat)
     fit <- try(arima(Xt,
