@@ -1,8 +1,8 @@
 Package: changepointGA
 Type: Package
-Title: Changepoint Detection via Modified Genetic Algorithm
+Title: Changepoint Detection via Modified Genetic Algorithms
 Version: 0.1.4
-Date: 2026-03-23
+Date: 2026-03-27
 Authors@R: c(
            person(given = "Mo",
                   family = "Li",
@@ -14,7 +14,7 @@ Authors@R: c(
                   email = "qlu2@vcu.edu")
             )
 Description: The Genetic Algorithm (GA) is used to perform changepoint analysis in time series data. The package also includes an extended island version of GA, as described in Lu, Lund, and Lee (2010, <doi:10.1214/09-AOAS289>). By mimicking the principles of natural selection and evolution, GA provides a powerful stochastic search technique for solving combinatorial optimization problems. In 'changepointGA', each chromosome represents a changepoint configuration, including the number and locations of changepoints, hyperparameters, and model parameters. The package employs genetic operators—selection, crossover, and mutation—to iteratively improve solutions based on the given fitness (objective) function. Key features of 'changepointGA' include encoding changepoint configurations in an integer format, enabling dynamic and simultaneous estimation of model hyperparameters, changepoint configurations, and associated parameters. The detailed algorithmic implementation can be found in the package vignettes and in the paper of Li (2024, <doi:10.48550/arXiv.2410.15571>).
-License: Apache License (>= 2.0)
+License: MIT + file LICENSE
 RoxygenNote: 7.3.3
 Depends: R (>= 4.3.0)
 Imports: methods, foreach, doParallel, Rcpp, clue, stats, utils
