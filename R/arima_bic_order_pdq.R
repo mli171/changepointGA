@@ -66,17 +66,16 @@
 #' )
 arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
   m <- as.integer(round(chromosome[1]))
-  porder <- as.integer(round(chromosome[2:(plen + 1)]))   # c(p, d, q)
+  porder <- as.integer(round(chromosome[2:(plen + 1)]))
   tau <- chromosome[(plen + 2):length(chromosome)]
   N <- length(Xt)
   
-  # build changepoint design
   if (m == 0) {
     DesignX <- XMat
   } else {
     tau <- tau[seq_len(min(m, length(tau)))]
     tau <- as.integer(round(tau))
-    tau <- tau[tau >= 1 & tau <= N]
+    tau <- tau[tau >= 1 & tau < N]
     
     if (length(tau) == 0) {
       DesignX <- XMat
@@ -90,24 +89,17 @@ arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
     }
   }
   
-  # remove duplicate / zero-variance columns
-  if (!is.null(dim(DesignX)) && ncol(DesignX) > 0) {
-    keep <- apply(DesignX, 2, function(z) all(is.finite(z)) && sd(z) > 0)
-    if (any(keep)) {
-      Xfit <- DesignX[, keep, drop = FALSE]
-      Xfit <- scale(Xfit, scale = FALSE)
-    } else {
-      Xfit <- NULL
-    }
-  } else {
-    Xfit <- NULL
+  if (!is.null(DesignX)) {
+    keep <- apply(as.matrix(DesignX), 2, function(z) sd(z) > 0)
+    DesignX <- as.matrix(DesignX)[, keep, drop = FALSE]
+    if (ncol(DesignX) == 0) DesignX <- NULL
   }
   
   fit <- try(
     arima(
       Xt,
       order = c(porder[1], porder[2], porder[3]),
-      xreg = Xfit,
+      xreg = DesignX,
       include.mean = FALSE,
       optim.control = list(maxit = 50)
     ),
