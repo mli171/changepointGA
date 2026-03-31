@@ -65,10 +65,14 @@
 #'   Xt = Xt
 #' )
 arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
+  N <- length(Xt)
+  if (any(!is.finite(chromosome[1:(plen + 1)]))) return(1e10)
   m <- as.integer(round(chromosome[1]))
   porder <- as.integer(round(chromosome[2:(plen + 1)]))
+  if (any(is.na(porder)) || any(porder < 0)) return(1e10)
+  
+  if (is.na(m) || m < 0) return(1e10)
   tau <- chromosome[(plen + 2):length(chromosome)]
-  N <- length(Xt)
   
   if (m == 0) {
     DesignX <- XMat
@@ -90,7 +94,7 @@ arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
   }
   
   if (!is.null(DesignX)) {
-    keep <- apply(as.matrix(DesignX), 2, function(z) sd(z) > 0)
+    keep <- apply(as.matrix(DesignX), 2, function(z) all(is.finite(z)) && sd(z) > 0)
     DesignX <- as.matrix(DesignX)[, keep, drop = FALSE]
     if (ncol(DesignX) == 0) DesignX <- NULL
   }
