@@ -39,6 +39,9 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
   tau <- chromosome[(plen + 2):length(chromosome)]
   N <- length(Xt)
 
+  if (is.na(m) || m < 0) return(1e10)
+  if (any(is.na(porder)) || any(porder < 0)) return(1e10)
+  
   if (m == 0) {
     DesignX <- XMat
     fit <- try(arima(Xt,
@@ -46,9 +49,10 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
       optim.control = list(maxit = 50)
     ))
     if (inherits(fit, "try-error")) {
-      bic_obj <- NA
+      bic_obj <- 1e10
     } else {
       bic_obj <- BIC(fit)
+      if (!is.finite(bic_obj)) bic_obj <- 1e10
     }
   } else {
     tau <- tau[seq_len(min(m, length(tau)))]
@@ -65,9 +69,10 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
       optim.control = list(maxit = 50)
     ))
     if (inherits(fit, "try-error")) {
-      bic_obj <- NA
+      bic_obj <- 1e10
     } else {
       bic_obj <- BIC(fit)
+      if (!is.finite(bic_obj)) bic_obj <- 1e10
     }
   }
 
