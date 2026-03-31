@@ -33,13 +33,13 @@
 #' chromosome <- c(2, 1, 1, 250, 750, 1001)
 #' arima_bic_order_pq(chromosome, plen = 2, XMat = XMatT, Xt = Xt)
 arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
-  m <- chromosome[1]
-  porder <- chromosome[2:(plen + 1)]
+  
+  m <- as.integer(round(chromosome[1]))
+  porder <- as.integer(round(chromosome[2:(plen + 1)]))
   tau <- chromosome[(plen + 2):length(chromosome)]
-  N <- length(Xt) # length of the series
+  N <- length(Xt)
 
   if (m == 0) {
-    ## Case 1, Zero Changepoint
     DesignX <- XMat
     fit <- try(arima(Xt,
       order = c(porder[1], 0, porder[2]), xreg = DesignX, include.mean = F,
@@ -51,10 +51,13 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
       bic_obj <- BIC(fit)
     }
   } else {
-    tmptau <- unique(c(tau, N + 1))
+    tau <- tau[seq_len(min(m, length(tau)))]
+    tau <- as.integer(round(tau))
+    tau <- tau[tau >= 1 & tau < N]
+    tmptau <- sort(unique(c(tau, N)))
     CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
     for (i in 1:NCOL(CpMat)) {
-      CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
+      CpMat[(tmptau[i] + 1):tmptau[i + 1], i] <- 1
     }
     DesignX <- cbind(XMat, CpMat)
     fit <- try(arima(Xt,

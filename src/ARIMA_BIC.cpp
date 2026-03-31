@@ -17,7 +17,7 @@ double arima_bic_changepointGA_rcpp(NumericVector chromosome_, NumericMatrix XMa
   
   for (int i = 1; i <= m_raw; ++i) {
     int t = static_cast<int>(chromosome[i]);
-    if (t > 1 && t < N + 1) {
+    if (t >= 1 && t < N) {
       tau.push_back(t);
     }
   }
@@ -26,14 +26,16 @@ double arima_bic_changepointGA_rcpp(NumericVector chromosome_, NumericMatrix XMa
   int m = tau.size();
   if (m > 0) {
     std::vector<int> tmptau = tau;
-    tmptau.push_back(N + 1);
+    tmptau.push_back(N);
     std::sort(tmptau.begin(), tmptau.end());
     tmptau.erase(std::unique(tmptau.begin(), tmptau.end()), tmptau.end());
     
-    arma::mat CpMat = arma::zeros<arma::mat>(N, m);
-    for (int i = 0; i < m; ++i) {
-      int start = tmptau[i];
-      int end = std::min(tmptau[i + 1] - 1, N);
+    int m_eff = tmptau.size() - 1;
+    arma::mat CpMat = arma::zeros<arma::mat>(N, m_eff);
+    
+    for (int i = 0; i < m_eff; ++i) {
+      int start = tmptau[i] + 1;
+      int end   = tmptau[i + 1];
       for (int j = start - 1; j <= end - 1; ++j) {
         CpMat(j, i) = 1.0;
       }

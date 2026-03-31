@@ -81,10 +81,10 @@ arima_bic_order_pdq <- function(chromosome, plen = 3, XMat, Xt) {
     if (length(tau) == 0) {
       DesignX <- XMat
     } else {
-      tmptau <- sort(unique(c(tau, N + 1)))
+      tmptau <- sort(unique(c(tau, N)))
       CpMat <- matrix(0, nrow = N, ncol = length(tmptau) - 1)
       for (i in seq_len(ncol(CpMat))) {
-        CpMat[tmptau[i]:(tmptau[i + 1] - 1), i] <- 1
+        CpMat[(tmptau[i] + 1):tmptau[i + 1], i] <- 1
       }
       DesignX <- cbind(XMat, CpMat)
     }
