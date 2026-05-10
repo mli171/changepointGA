@@ -275,8 +275,8 @@ plot.cptga <- function(x,
     changepoint_str <- "Changepoint Locations: None"
   }
   
-  op <- par(no.readonly = TRUE)
-  on.exit(par(op))
+  op <- par(c("mar", "cex.lab", "cex.axis", "cex.main"))
+  on.exit(par(op), add = TRUE)
   
   par(
     mar = c(5, 5, 6, 2),
