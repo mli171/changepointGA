@@ -236,6 +236,7 @@ setMethod("summary", "cptgaisl", function(object, ...) {
 #' @exportS3Method
 plot.cptgaisl <- function(x,
                           data,
+                          show_segmean = TRUE,
                           main = NULL,
                           XTickLab = NULL,
                           XTickPos = NULL,
@@ -313,17 +314,19 @@ plot.cptgaisl <- function(x,
     abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
   }
   
-  mu.seg <- sapply(seq_along(starts), function(i) {
-    mean(data[starts[i]:ends[i]])
-  })
-  
-  for (i in seq_along(mu.seg)) {
-    x0 <- if (use_custom_X) XTickLab[starts[i]] else starts[i]
-    x1 <- if (use_custom_X) XTickLab[ends[i]]   else ends[i]
+  if (show_segmean) {
+    mu.seg <- sapply(seq_along(starts), function(i) {
+      mean(data[starts[i]:ends[i]])
+    })
     
-    segments(x0 = x0, y0 = mu.seg[i],
-             x1 = x1, y1 = mu.seg[i],
-             col = "red", lty = "dashed", lwd = lwd)
+    for (i in seq_along(mu.seg)) {
+      x0 <- if (use_custom_X) XTickLab[starts[i]] else starts[i]
+      x1 <- if (use_custom_X) XTickLab[ends[i]]   else ends[i]
+      
+      segments(x0 = x0, y0 = mu.seg[i],
+               x1 = x1, y1 = mu.seg[i],
+               col = "red", lty = "dashed", lwd = lwd)
+    }
   }
   
   mtext(paste("Fitness:", fit), side = 3, line = 1.5, adj = 0, cex = cex.lab)
