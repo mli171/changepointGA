@@ -205,6 +205,7 @@ setMethod("summary", "cptga", function(object, ...) {
 #' @param x An object of class \code{cptgaisl}, typically returned by a basic genetic algorithm based
 #' changepoint detection procedure.
 #' @param data A numeric vector representing the observed univariate time series.
+#' @param show_segmean Binary, whether to include the segments' means.
 #' @param main Optional main title for the plot.
 #' @param XTickLab Optional vector (e.g., numeric or date) for custom x-axis labels.
 #'        Must be the same length as \code{data}.

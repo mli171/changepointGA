@@ -208,6 +208,7 @@ setMethod("summary", "cptgaisl", function(object, ...) {
 #' changepoint detection procedure.
 #' @param data A numeric vector representing the observed univariate time series.
 #' @param main Optional main title for the plot.
+#' @param show_segmean Binary, whether to include the segments' means.
 #' @param XTickLab Optional vector (e.g., numeric or date) for custom x-axis labels.
 #'        Must be the same length as \code{data}.
 #' @param XTickPos Optional vector specifying which elements of \code{XTickLab} to show as ticks.

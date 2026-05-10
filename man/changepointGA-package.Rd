@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Mo Li \email{mo.li@louisiana.edu}
   \item QiQi Lu \email{qlu2@vcu.edu}
 }
 

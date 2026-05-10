@@ -7,6 +7,7 @@
 \method{plot}{cptgaisl}(
   x,
   data,
+  show_segmean = TRUE,
   main = NULL,
   XTickLab = NULL,
   XTickPos = NULL,
@@ -24,6 +25,8 @@
 changepoint detection procedure.}
 
 \item{data}{A numeric vector representing the observed univariate time series.}
+
+\item{show_segmean}{Binary, whether to include the segments' means.}
 
 \item{main}{Optional main title for the plot.}
 
