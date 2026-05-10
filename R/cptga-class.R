@@ -234,6 +234,7 @@ setMethod("summary", "cptga", function(object, ...) {
 #' @exportS3Method
 plot.cptga <- function(x,
                        data,
+                       fitted_line = NULL,
                        main = NULL,
                        XTickLab = NULL,
                        XTickPos = NULL,
@@ -246,9 +247,10 @@ plot.cptga <- function(x,
   Ts <- length(data)
   use_custom_X <- !is.null(XTickLab) && length(XTickLab) == Ts
   plot_x <- if (use_custom_X) XTickLab else 1:Ts
-
+  
   chrom <- x@overbestchrom
   m <- chrom[1]
+  
   if (m > 0) {
     tau <- if (x@option == "both") {
       n.hyparam <- length(x@prange)
@@ -256,65 +258,77 @@ plot.cptga <- function(x,
     } else {
       chrom[2:(1 + m)]
     }
+    tau <- sort(unique(tau))
   } else {
-    tau <- NULL
+    tau <- integer(0)
   }
-
+  
   fit <- sprintf("%.3f", x@overbestfit)
-  tau_vals <- if (!is.null(tau)) if (use_custom_X) XTickLab[tau] else tau else NULL
-  changepoint_str <- if (!is.null(tau_vals)) {
-    paste0("Changepoints: ", paste(tau_vals, collapse = ", "))
+  
+  starts <- c(1, tau + 1)
+  ends   <- c(tau, Ts)
+  
+  if (length(tau) > 0) {
+    tau_vals <- if (use_custom_X) XTickLab[tau] else tau
+    changepoint_str <- paste0("Changepoints: ", paste(tau_vals, collapse = ", "))
   } else {
-    "Changepoint Locations: None"
+    changepoint_str <- "Changepoint Locations: None"
   }
-
+  
   op <- par(no.readonly = TRUE)
   on.exit(par(op))
-
+  
   par(
     mar = c(5, 5, 6, 2),
     cex.lab = cex.lab,
     cex.axis = cex.axis,
     cex.main = cex.main
   )
-
+  
   plot(plot_x, data,
-    type = "l",
-    xlab = XAxisLab,
-    ylab = YAxisLab,
-    xaxt = "n",
-    ...
-  )
+       type = "l",
+       xlab = XAxisLab,
+       ylab = YAxisLab,
+       xaxt = "n",
+       ylim = if (is.null(fitted_line)) range(data, na.rm = TRUE)
+       else range(c(data, fitted_line), na.rm = TRUE),
+       ...)
+  
   if (!is.null(main)) {
-    title(main = main, line = 3.5) # push title down a bit
+    title(main = main, line = 3.5)
   }
-
+  
   if (!is.null(XTickPos) && use_custom_X) {
-    axis(1, at = match(XTickPos, XTickLab), labels = XTickPos)
+    axis(1, at = XTickPos, labels = XTickPos)
   } else {
     axis(1, at = pretty(plot_x), labels = pretty(plot_x))
   }
-
-  if (!is.null(tau)) {
-    cp_x <- if (use_custom_X) XTickLab[tau] else tau
-    abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
-
-    tau_full <- c(1, tau, Ts + 1)
-    seg_len <- diff(tau_full)
-    ff <- rep(0:m, times = seg_len)
-    mu.seg <- tapply(data, ff, mean)
-
-    for (i in seq_along(mu.seg)) {
-      segments(
-        x0 = if (use_custom_X) XTickLab[tau_full[i]] else tau_full[i],
-        y0 = mu.seg[i],
-        x1 = if (use_custom_X) XTickLab[tau_full[i + 1]] else tau_full[i + 1],
-        y1 = mu.seg[i],
-        col = "red", lty = "dashed", lwd = lwd
-      )
+  
+  if (length(tau) > 0) {
+    cp_x <- if (use_custom_X) {
+      sapply(tau, function(k) (XTickLab[k] + XTickLab[k + 1]) / 2)
+    } else {
+      tau + 0.5
     }
+    abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
   }
-
+  
+  mu.seg <- sapply(seq_along(starts), function(i) {
+    mean(data[starts[i]:ends[i]])
+  })
+  
+  for (i in seq_along(mu.seg)) {
+    x0 <- if (use_custom_X) XTickLab[starts[i]] else starts[i]
+    x1 <- if (use_custom_X) XTickLab[ends[i]]   else ends[i]
+    
+    segments(x0, mu.seg[i], x1, mu.seg[i],
+             col = "red", lty = "dashed", lwd = lwd)
+  }
+  
+  if (!is.null(fitted_line)) {
+    lines(plot_x, fitted_line, col = "forestgreen", lwd = 3)
+  }
+  
   mtext(paste("Fitness:", fit), side = 3, line = 1.5, adj = 0, cex = cex.lab)
   mtext(changepoint_str, side = 3, line = 0.5, adj = 0, cex = cex.lab)
 }
