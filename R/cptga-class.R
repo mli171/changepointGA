@@ -306,11 +306,7 @@ plot.cptga <- function(x,
   }
   
   if (length(tau) > 0) {
-    cp_x <- if (use_custom_X) {
-      sapply(tau, function(k) (XTickLab[k] + XTickLab[k + 1]) / 2)
-    } else {
-      tau + 0.5
-    }
+    cp_x <- if (use_custom_X) XTickLab[tau] else tau
     abline(v = cp_x, col = "blue", lty = "dashed", lwd = lwd)
   }
   
