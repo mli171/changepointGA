@@ -293,8 +293,6 @@ plot.cptga <- function(x,
        xlab = XAxisLab,
        ylab = YAxisLab,
        xaxt = "n",
-       ylim = if (is.null(fitted_line)) range(data, na.rm = TRUE)
-       else range(c(data, fitted_line), na.rm = TRUE),
        ...)
   
   if (!is.null(main)) {
