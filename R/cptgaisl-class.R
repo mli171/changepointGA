@@ -125,11 +125,13 @@ print.summary.cptgaisl <- function(x, digits = getOption("digits"), max_display 
   cat(paste("   Crossover probability   = ", format(x@pcrossover, digits = digits), "\n"))
   cat(paste("   Mutation probability    = ", format(x@pmutation, digits = digits), "\n"))
   cat(paste("   Changepoint probability = ", format(x@pchangepoint, digits = digits), "\n"))
+  cat(paste("   minDist                 = ", x@minDist, "\n"))
   cat(paste("   Task mode               = ", x@option, "\n"))
   cat(paste("   Parallel Usage          = ", x@parallel, "\n"))
   if (x@parallel) {
     cat(paste("   Number of thread      = ", x@nCore, "\n"))
   }
+  cat(paste("   Seed                    = ", x@seed, "\n"))
   if (!is.null(x@suggestions)) {
     cat("   Suggestions: \n")
     for (i in seq_along(x@suggestions)) {
@@ -142,7 +144,7 @@ print.summary.cptgaisl <- function(x, digits = getOption("digits"), max_display 
       cat("\n")
     }
   }
-  cat("\n##### Island GA results ##### \n")
+  cat("\n##### Island Model GA results ##### \n")
   cat(paste("   Optimal Fitness value =", format(x@overbestfit, digits = digits), "\n"))
   cat(paste("   Optimal Solution: \n"))
   m.sol <- x@overbestchrom[1]

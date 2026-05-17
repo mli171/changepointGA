@@ -123,11 +123,13 @@ print.summary.cptga <- function(x, digits = getOption("digits"), max_display = 5
   cat(paste("   Crossover probability   = ", format(x@pcrossover, digits = digits), "\n"))
   cat(paste("   Mutation probability    = ", format(x@pmutation, digits = digits), "\n"))
   cat(paste("   Changepoint probability = ", format(x@pchangepoint, digits = digits), "\n"))
+  cat(paste("   minDist                 = ", x@minDist, "\n"))
   cat(paste("   Task mode               = ", x@option, "\n"))
   cat(paste("   Parallel Usage          = ", x@parallel, "\n"))
   if (x@parallel) {
     cat(paste("   Number of thread      = ", x@nCore, "\n"))
   }
+  cat(paste("   Seed                    = ", x@seed, "\n"))
   if (!is.null(x@suggestions)) {
     cat("   Suggestions: \n")
     for (i in seq_along(x@suggestions)) {
