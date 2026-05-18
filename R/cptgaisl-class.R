@@ -131,7 +131,12 @@ print.summary.cptgaisl <- function(x, digits = getOption("digits"), max_display 
   if (x@parallel) {
     cat(paste("   Number of thread      = ", x@nCore, "\n"))
   }
-  cat(paste("   Seed                    = ", x@seed, "\n"))
+  seed_print <- if (is.null(x@seed) || length(x@seed) == 0) {
+    "NULL"
+  } else {
+    as.character(x@seed)
+  }
+  cat(paste("   Seed                    = ", seed_print, "\n"))
   if (!is.null(x@suggestions)) {
     cat("   Suggestions: \n")
     for (i in seq_along(x@suggestions)) {
