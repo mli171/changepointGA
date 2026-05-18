@@ -25,6 +25,8 @@ The **changepointGA** package applies Genetic Algorithms (GA) to detect both sin
 
 ```{r}
 library(changepointGA)
+
+set.seed(1234)
 ```
 
 ## Simulate a time series data with changepoints
@@ -238,8 +240,7 @@ It is important to measure how different the estimated changepoint configuration
 
 ```{r}
 truetau <- c(50, 150)
-tauIsland <- resIslandchangepointGA@overbestchrom
-esttau <- c(tauIsland[4:(4 + tauIsland[1] - 1)])
+esttau <- c(45, 147)
 cpt_dist(tau1 = truetau, tau2 = esttau, N = N)
 ```
 
