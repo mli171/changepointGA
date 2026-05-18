@@ -51,7 +51,7 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
     if (inherits(fit, "try-error")) {
       bic_obj <- 1e10
     } else {
-      bic_obj <- BIC(fit)
+      bic_obj <- BIC(fit) 
       if (!is.finite(bic_obj)) bic_obj <- 1e10
     }
   } else {
@@ -71,7 +71,7 @@ arima_bic_order_pq <- function(chromosome, plen = 2, XMat, Xt) {
     if (inherits(fit, "try-error")) {
       bic_obj <- 1e10
     } else {
-      bic_obj <- BIC(fit)
+      bic_obj <- BIC(fit) + m*log(N)
       if (!is.finite(bic_obj)) bic_obj <- 1e10
     }
   }
