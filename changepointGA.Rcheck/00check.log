@@ -1,0 +1,32 @@
+* using log directory ‘/Users/mli171/Desktop/GA/changepointGA/changepointGA/changepointGA.Rcheck’
+* using R version 4.5.0 (2025-04-11)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 14.0.0 (clang-1400.0.29.202)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS 26.3.1
+* using session charset: UTF-8
+* using option ‘--as-cran’
+* checking for file ‘changepointGA/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘changepointGA’ version ‘0.1.5’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... [3s/19s] OK
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘changepointGA’ can be installed ... WARNING
+Found the following significant warnings:
+  /Library/Frameworks/R.framework/Resources/include/R_ext/Boolean.h:62:36: warning: unknown warning group '-Wfixed-enum-extension', ignored [-Wunknown-warning-option]
+See ‘/Users/mli171/Desktop/GA/changepointGA/changepointGA/changepointGA.Rcheck/00install.out’ for details.
+* used C++ compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+* used SDK: ‘’
+* checking C++ specification ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ...

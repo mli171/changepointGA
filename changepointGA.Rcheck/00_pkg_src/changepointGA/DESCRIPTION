@@ -21,11 +21,13 @@ LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: C++17
 URL: https://github.com/mli171/changepointGA
 BugReports: https://github.com/mli171/changepointGA/issues
-Suggests: 
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 Encoding: UTF-8
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+NeedsCompilation: yes
+Packaged: 2026-05-18 06:14:54 UTC; mli171
+Author: Mo Li [aut, cre],
+  QiQi Lu [aut]
+Maintainer: Mo Li <mo.li@louisiana.edu>
