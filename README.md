@@ -1,6 +1,7 @@
 # changepointGA
 
 Authors: Mo Li (mo.li@louisiana.edu), QiQi Lu (qlu2@vcu.edu)
+
 ---
 
 ## Overview
@@ -27,21 +28,27 @@ highlight the package’s value in biological and climate research.
 ## Installation
 You can install the version of changepointGA from CRAN:
 
-```{r}
+```r
 install.packages("changepointGA")
 ```
 
 or the development version from Github:
 
-```{r}
+```r
 # install.packages("remotes")
 remotes::install_github("mli171/changepointGA", build_vignettes = FALSE, force = TRUE)
 ```
 
 ## Changepoint Detection Only
 
-### An example of using the GA 
-```{r}
+Call the library.
+
+```r
+library(changepointGA)
+```
+
+### An example of using `cptga()`
+```r
 ##### Stationary time series with autocorrelation
 Ts = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
@@ -67,8 +74,8 @@ plot(tmp1, data=Xt)
 tim2 - tim1
 ```
 
-### An example of using the island-based GA 
-```{r}
+### An example of using `cptgaisl()`
+```r
 ##### Stationary time series with autocorrelation
 Ts = 1000
 betaT = c(0.5) # intercept
@@ -86,7 +93,7 @@ Xt = ts_sim(Ts=Ts, beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=NULL,
 
 ## No parallel computing
 tim3 = Sys.time()
-tmp2 = cptgaisl(ObjFunc=arima_bic, N=Ts, XMat=XMaT, Xt=Xt)
+tmp2 = cptgaisl(ObjFunc=arima_bic, N=Ts, XMat=XMatT, Xt=Xt)
 tim4 = Sys.time()
 summary(tmp2)
 plot(tmp2, data=Xt)
@@ -94,7 +101,7 @@ plot(tmp2, data=Xt)
 
 ## Parallel computing
 tim5 = Sys.time()
-tmp3 = cptgaisl(ObjFunc=arima_bic, N=Ts, parallel=TRUE, nCore=5, XMat=XMaT, Xt=Xt)
+tmp3 = cptgaisl(ObjFunc=arima_bic, N=Ts, parallel=TRUE, nCore=5, XMat=XMatT, Xt=Xt)
 tim6 = Sys.time()
 summary(tmp3)
 plot(tmp3, data=Xt)
@@ -105,8 +112,8 @@ tim6 - tim5
 
 ## Changepoint Detection + Model order selection
 
-### An example of using the GA 
-```{r}
+### An example of using `cptga()`
+```r
 Ts = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
 period = 30
@@ -125,7 +132,7 @@ Xt = ts_sim(Ts=Ts, beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT,
 prange = list(ar=c(0,2), ma=c(0,2))
 
 tim1 = Sys.time()
-tmp1 = cptga(ObjFunc=arima_bic_order, N=Ts, prange=prange, option="both", 
+tmp1 = cptga(ObjFunc=arima_bic_order_pq, N=Ts, prange=prange, option="both", 
              XMat=XMatT, Xt=Xt)
 tim2 = Sys.time()
 summary(tmp1)
@@ -134,8 +141,8 @@ plot(tmp1, data=Xt)
 tim2 - tim1
 ```
 
-### An example of using the island model GA 
-```{r}
+### An example of using `cptgaisl()`
+```r
 Ts = 1000
 betaT = c(0.5, -0.5, 0.3) # intercept, B, D
 period = 30
@@ -148,13 +155,13 @@ DeltaT = c(2, -2)
 Cp.prop = c(1/4, 3/4)
 CpLocT = floor(Ts*Cp.prop)
 
-myts = ts_sim(Ts=Ts, beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
-              Delta=DeltaT, CpLoc=CpLocT, seed=1234)
+Xt = ts_sim(Ts=Ts, beta=betaT, XMat=XMatT, sigma=sigmaT, phi=phiT, theta=thetaT, 
+            Delta=DeltaT, CpLoc=CpLocT, seed=1234)
 
 prange = list(ar=c(0,2), ma=c(0,2))
 
 tim3 = Sys.time()
-tmp2 = cptgaisl(ObjFunc=arima_bic_order, N=Ts, prange=prange, option="both", 
+tmp2 = cptgaisl(ObjFunc=arima_bic_order_pq, N=Ts, prange=prange, option="both", 
                 XMat=XMatT, Xt=Xt)
 tim4 = Sys.time()
 summary(tmp2)
@@ -162,7 +169,7 @@ plot(tmp2, data=Xt)
 
 
 tim5 = Sys.time()
-tmp3 = cptgaisl(ObjFunc=arima_bic_order, N=Ts, prange=prange, option="both", 
+tmp3 = cptgaisl(ObjFunc=arima_bic_order_pq, N=Ts, prange=prange, option="both", 
                 parallel=TRUE, nCore=5, XMat=XMatT, Xt=Xt)
 tim6 = Sys.time()
 summary(tmp3)
@@ -172,7 +179,7 @@ tim4 - tim3
 tim6 - tim5
 ```
 
-# Code style
+## Code style
 
 Before pushing changes, please run 
 
@@ -182,7 +189,7 @@ styler::style_pkg()
 
 to ensure your code follows the tidyverse style guide.
 
-# Citation
+## Citation
 If you use `changepointGA` in your research, please cite:
 
 Li, M., & Lu, Q. (2024). *changepointGA: An R package for Fast Changepoint Detection via Genetic Algorithm*. arXiv preprint arXiv:2410.15571. https://arxiv.org/abs/2410.15571
