@@ -181,3 +181,8 @@ styler::style_pkg()
 ```
 
 to ensure your code follows the tidyverse style guide.
+
+# Citation
+If you use `changepointGA` in your research, please cite:
+
+Li, M., & Lu, Q. (2024). *changepointGA: An R package for Fast Changepoint Detection via Genetic Algorithm*. arXiv preprint arXiv:2410.15571. https://arxiv.org/abs/2410.15571
