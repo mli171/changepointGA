@@ -5,7 +5,7 @@
 #' (AMOC) problem.
 #'
 #' @param popSize An integer represents the number of individual in each
-#' population for GA (or subpopulation for IslandGA).
+#' population for basic GA (or subpopulation for island model GA).
 #' @param prange Default is \code{NULL} for only changepoint detection. If
 #' \code{prange} is specified as a list object, which contains the range of
 #' each model order parameters for order selection (integers). The number of
@@ -73,8 +73,7 @@ amoc_selection <- function(pop, popFit) {
 #' @param dad Among two selected individuals, \code{dad} represents the selected
 #' chromosome representation with larger fitness function value.
 #' @param prange The default value is \code{NULL}. If there is no requirement
-#' on model order selection, such an auxiliary argument is needed for \code{GA}
-#' and \code{IslandGA} functions.
+#' on model order selection, such an auxiliary argument is needed for \code{cptga} and \code{cptgaisl} functions.
 #' @param minDist The minimum length between two adjacent changepoints.
 #' @param lmax The maximum possible length of the chromosome representation.
 #' @param N The length of time series.

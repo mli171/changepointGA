@@ -1,6 +1,6 @@
 #' Island model based genetic algorithm
 #'
-#' Perform the modified island-based genetic algorithm (IslandGA) for multiple changepoint detection.
+#' Perform the island model genetic algorithm for multiple changepoint detection.
 #' Minimization of an objective function using genetic algorithm (GA).
 #' The algorithm can be run sequentially or in explicit parallelisation.
 #'

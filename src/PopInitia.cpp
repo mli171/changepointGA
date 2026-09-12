@@ -71,7 +71,7 @@ arma::vec select_tau(int N, List prange, int minDist, double pchangepoint, int m
 //' to construct the first generation population.
 //'
 //' @param popSize An integer represents the number of individual in each
-//' population for GA (or subpopulation for IslandGA).
+//' population for basic GA (or subpopulation for island model GA).
 //' @param prange Default is \code{NULL} for only changepoint detection. If
 //' \code{prange} is specified as a list object, which contains the range of
 //' each model order parameters for order selection (integers). The number of

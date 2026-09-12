@@ -87,14 +87,14 @@ for (i in 1:(m + 1)) {
 
 ## The objective function for optimization
 
-Considering the model used in the data simulation, we could use the R function, `ARIMA.BIC.Order()`, included in the **changepointGA** package. This function inputs include the 
+Considering the model used in the data simulation, we could use the R function, `arima_bic_order_pq()`, included in the **changepointGA** package. This function inputs include the 
 
 - `chromosome`, consists of the number of changepoints, the order of AR component (refers to the number of lagged terms used to model the current value of a time series), the order of MA component (refers to the number of lagged error terms used to model the current value of a time series), the changepoint locations, and a value of time series sample size plus 1 ($N+1$) indicating the end of the chromosome;
 - `plen` represents the number of model order hyperparameters. We have `plen=2` for this example representing one hyperparameter for AR order and one hyperparameter for MA order;
 - `XMat` requires the design matrix, including the of-interested covariates;
 - `Xt` requires the simulated time series data objects.
 
-Given a specific chromosome that encodes the ARMA model structure—namely, the AR and moving average (MA) orders—as well as the changepoint configuration, the function ARIMA.BIC.Order() evaluates the BIC for the corresponding segmented model. The returned BIC value serves as the fitness score of that configuration. The example below presents the BIC value computed at the true changepoint locations with the true ARMA model orders, providing a benchmark for comparison.
+Given a specific chromosome that encodes the ARMA model structure—namely, the AR and moving average (MA) orders—as well as the changepoint configuration, the function `arima_bic_order_pq()` evaluates the BIC for the corresponding segmented model. The returned BIC value serves as the fitness score of that configuration. The example below presents the BIC value computed at the true changepoint locations with the true ARMA model orders, providing a benchmark for comparison.
 
 ```{r}
 arima_bic_order_pq(chromosome = c(2, 1, 1, 50, 150, Ts + 1), plen = 2, XMat = XMatT, Xt = myts)

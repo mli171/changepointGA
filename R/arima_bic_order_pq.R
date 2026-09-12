@@ -15,7 +15,7 @@
 #' changepoint detection task, \code{plen} should be nonzero.
 #' @param XMat A matrix contains the covariates, but not includes changepoint
 #' effects, for time series regression.
-#' @param Xt The simulated ARMA time series from \code{ts.sim} function.
+#' @param Xt The simulated ARMA time series from \code{ts_sim} function.
 #' @return The BIC value of the objective function.
 #' @import stats
 #' @importFrom utils tail
