@@ -46,7 +46,7 @@ $$\mu_{t}=    \begin{cases}
         & \tau_2 + 1 \leq t \leq N.
     \end{cases}$$
 
-including the intercept term with $\beta_{0}=0.5$ and two changepoints at $\tau_{1}=125$ and $\tau_{2}=375$ with the mean changing effects of $\Delta_{1}=2$ and $\Delta_{2}=-2$. The users can also include additional covariates into matrix (`XMatT` below) for other possible model dynamics, such as tread and seasonality.
+including the intercept term with $\beta_{0}=0.5$ and two changepoints at $\tau_{1}=50$ and $\tau_{2}=150$ with the mean changing effects of $\Delta_{1}=2$ and $\Delta_{2}=-2$. The users can also include additional covariates into matrix (`XMatT` below) for other possible model dynamics, such as trend and seasonality.
 
 ```{r}
 Ts <- 200
@@ -63,7 +63,7 @@ myts <- ts_sim(Ts=Ts, beta = betaT, XMat = XMatT, sigma = sigmaT, phi = phiT, th
 str(myts)
 ```
 
-The simulated time series could be plotted in the figure below. The vertical dashed blue lines indicate the true changepoint location and the horizontal red dashed segments represent the time series segment sample mean. We can clearly observe the mean changing effects from the introduced changepoints $\tau_{1}=250$ and $\tau_{2}=500$. The **changepointGA** package will be used to detected these two changepoints.
+The simulated time series could be plotted in the figure below. The vertical dashed blue lines indicate the true changepoint location and the horizontal red dashed segments represent the time series segment sample mean. We can clearly observe the mean changing effects from the introduced changepoints $\tau_{1}=50$ and $\tau_{2}=150$. The **changepointGA** package will be used to detect these two changepoints.
 
 ```{r, fig.align = "center", fig.height=4, fig.width=6}
 plot(x = 1:Ts, y = myts, type = "l", xlab = "Time", ylab = "Y")

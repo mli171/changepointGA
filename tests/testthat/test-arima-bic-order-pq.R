@@ -1,4 +1,4 @@
-test_that("arima_bic_order returns a finite numeric scalar", {
+test_that("arima_bic_order_pq returns a finite numeric scalar", {
   Ts <- 200
   XMatT <- matrix(1, nrow = Ts, ncol = 1)
   colnames(XMatT) <- "intercept"
@@ -24,7 +24,7 @@ test_that("arima_bic_order returns a finite numeric scalar", {
   expect_true(is.finite(out))
 })
 
-test_that("arima_bic_order is deterministic for fixed input", {
+test_that("arima_bic_order_pq is deterministic for fixed input", {
   Ts <- 200
   XMatT <- matrix(1, nrow = Ts, ncol = 1)
   colnames(XMatT) <- "intercept"

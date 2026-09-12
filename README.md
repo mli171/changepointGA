@@ -32,7 +32,7 @@ You can install the version of changepointGA from CRAN:
 install.packages("changepointGA")
 ```
 
-or the development version from Github:
+or the development version from GitHub:
 
 ```r
 # install.packages("remotes")
