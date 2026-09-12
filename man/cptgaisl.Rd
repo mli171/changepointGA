@@ -177,7 +177,7 @@ Return an object class \code{cptgaisl-class}. See
 \code{\link{cptgaisl-class}} for a more detailed description.
 }
 \description{
-Perform the modified island-based genetic algorithm (IslandGA) for multiple changepoint detection.
+Perform the island model genetic algorithm for multiple changepoint detection.
 Minimization of an objective function using genetic algorithm (GA).
 The algorithm can be run sequentially or in explicit parallelisation.
 }

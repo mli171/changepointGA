@@ -31,7 +31,7 @@ set.seed(1234)
 
 ## Simulate a time series data with changepoints
 
-This package includes the time series simulation function `ts_sim()` with the ability to introduce changepoint effects. The time series \eqn{Z_{t}, t=1,\ldots,T_{s}} could be simulated from a class of time series models,
+This package includes the time series simulation function `ts_sim()` with the ability to introduce changepoint effects. The time series $Z_t,\ t=1,\ldots,T_s$ could be simulated from a class of time series models,
 
 $$Z_{t}=\mu_{t}+e_{t}.$$
 

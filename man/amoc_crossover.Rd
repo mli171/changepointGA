@@ -14,8 +14,7 @@ chromosome representation with lower fitness function value.}
 chromosome representation with larger fitness function value.}
 
 \item{prange}{The default value is \code{NULL}. If there is no requirement
-on model order selection, such an auxiliary argument is needed for \code{GA}
-and \code{IslandGA} functions.}
+on model order selection, such an auxiliary argument is needed for \code{cptga} and \code{cptgaisl} functions.}
 
 \item{minDist}{The minimum length between two adjacent changepoints.}
 

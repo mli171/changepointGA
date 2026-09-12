@@ -105,19 +105,19 @@ amoc_crossover <- function(mom, dad, prange = NULL, minDist, lmax, N) {
 #' @param child The child chromosome resulting from the \code{crossover} genetic
 #' operator.
 #' @param prange The default value is \code{NULL}. If there is no requirement
-#' on model order selection, such an auxiliary argument is needed for \code{GA}
-#' and \code{IslandGA} functions.
+#' on model order selection, this auxiliary argument is required by
+#' \code{cptga} and \code{cptgaisl}.
 #' @param minDist The minimum length between two adjacent changepoints in
 #' \code{\link{amoc_selection}} operator, which is also the jump magnitude in the
 #' \code{amoc_mutation} operator.
-#' @param pchangepoint An auxiliary argument is needed for \code{GA}
-#' and \code{IslandGA} functions.
-#' @param lmax An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-#' functions.
-#' @param mmax An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-#' functions.
-#' @param N An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-#' functions.
+#' @param pchangepoint An auxiliary argument required by \code{cptga} and
+#' \code{cptgaisl}.
+#' @param lmax An auxiliary argument required by \code{cptga} and
+#' \code{cptgaisl}.
+#' @param mmax An auxiliary argument required by \code{cptga} and
+#' \code{cptgaisl}.
+#' @param N An auxiliary argument required by \code{cptga} and
+#' \code{cptgaisl}.
 #' @return The resulting child chromosome representation.
 #' @import Rcpp
 #' @import stats

@@ -8,7 +8,7 @@ random_population(popSize, prange, N, minDist, pchangepoint, mmax, lmax)
 }
 \arguments{
 \item{popSize}{An integer represents the number of individual in each
-population for GA (or subpopulation for IslandGA).}
+population for basic GA (or subpopulation for island model GA).}
 
 \item{prange}{Default is \code{NULL} for only changepoint detection. If
 \code{prange} is specified as a list object, which contains the range of

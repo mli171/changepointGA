@@ -19,24 +19,24 @@ amoc_mutation(
 operator.}
 
 \item{prange}{The default value is \code{NULL}. If there is no requirement
-on model order selection, such an auxiliary argument is needed for \code{GA}
-and \code{IslandGA} functions.}
+on model order selection, this auxiliary argument is required by
+\code{cptga} and \code{cptgaisl}.}
 
 \item{minDist}{The minimum length between two adjacent changepoints in
 \code{\link{amoc_selection}} operator, which is also the jump magnitude in the
 \code{amoc_mutation} operator.}
 
-\item{pchangepoint}{An auxiliary argument is needed for \code{GA}
-and \code{IslandGA} functions.}
+\item{pchangepoint}{An auxiliary argument required by \code{cptga} and
+\code{cptgaisl}.}
 
-\item{lmax}{An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-functions.}
+\item{lmax}{An auxiliary argument required by \code{cptga} and
+\code{cptgaisl}.}
 
-\item{mmax}{An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-functions.}
+\item{mmax}{An auxiliary argument required by \code{cptga} and
+\code{cptgaisl}.}
 
-\item{N}{An auxiliary argument is needed for \code{GA} and \code{IslandGA}
-functions.}
+\item{N}{An auxiliary argument required by \code{cptga} and
+\code{cptgaisl}.}
 }
 \value{
 The resulting child chromosome representation.

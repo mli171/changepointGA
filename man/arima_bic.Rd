@@ -18,7 +18,7 @@ changepoint detection task, \code{plen} should be nonzero.}
 \item{XMat}{A matrix contains the covariates, but not includes changepoint
 effects, for time series regression.}
 
-\item{Xt}{The simulated ARMA time series from \code{ts.sim} function.}
+\item{Xt}{The simulated ARMA time series from \code{ts_sim} function.}
 }
 \value{
 The BIC value of the objective function.
