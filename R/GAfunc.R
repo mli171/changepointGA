@@ -186,3 +186,221 @@ new_population_Island <- function(ObjFunc, prange, selection, crossover, mutatio
 
   return(rbind(fit, pop))
 }
+
+
+#' Birth-death-relocate mutation operator
+#'
+#' Perform a structured birth-death-relocate (BDR) mutation for changepoint
+#' chromosomes. Conditional on mutation, the operator randomly selects one
+#' feasible operation from birth, death, and relocation, with equal probability
+#' among the feasible operation types.
+#'
+#' The operator can be used as an unguided BDR mutation or as a
+#' consensus-guided BDR mutation. When \code{consensus_score} is provided and
+#' \code{consensus_lambda > 0}, the cross-island consensus information is used
+#' to guide the locations involved in birth, death, and relocation moves.
+#'
+#' @details
+#' For a chromosome
+#' \deqn{C = (m, \boldsymbol{s}, \boldsymbol{\tau}, N+1)',}
+#' where \eqn{m} is the number of changepoints,
+#' \eqn{\boldsymbol{s}} contains optional model-order parameters, and
+#' \eqn{\boldsymbol{\tau}} contains the ordered changepoint locations, the BDR
+#' mutation applies exactly one feasible structural operation.
+#'
+#' A birth move adds one changepoint at a feasible location satisfying the
+#' boundary and minimum-spacing constraints. A death move removes one existing
+#' changepoint. A relocation move selects one existing changepoint and moves it
+#' to another feasible location while keeping the number of changepoints fixed.
+#'
+#' When all three operations are feasible, each is selected with probability
+#' one third. When only one or two operations are feasible, the probability is
+#' redistributed equally among the available operations.
+#'
+#' If \code{consensus_score = NULL} or \code{consensus_lambda = 0}, the
+#' operator performs unguided BDR mutation. Otherwise, consensus information
+#' guides the mutation. Birth locations with stronger consensus support receive
+#' larger sampling weights. During a death move, changepoints with weaker
+#' consensus support receive larger deletion weights. During relocation,
+#' weakly supported changepoints are more likely to be selected as the source,
+#' while strongly supported feasible locations are more likely to be selected
+#' as the destination.
+#'
+#' The model-order parameters in \eqn{\boldsymbol{s}}, when present, are not
+#' modified by this mutation operator.
+#'
+#' @param child A vector or one-column matrix containing the chromosome to be
+#' mutated.
+#' @param prange The default value is \code{NULL} for changepoint detection only
+#' task. If model order selection and changepoint detection are performed
+#' simultaneously, \code{prange} should be a list specifying the allowable
+#' ranges of the model-order parameters.
+#' @param minDist The minimum length between two adjacent changepoints.
+#' @param pchangepoint The probability that a changepoint has occurred. This
+#' argument is retained for compatibility with the mutation-operator interface.
+#' @param lmax The maximum possible length of the chromosome representation.
+#' @param mmax The maximum number of changepoints allowed in the time series.
+#' @param N The sample size of the time series.
+#' @param consensus_score An optional numerical vector of length \code{N}
+#' containing the consensus support score for each candidate location.
+#' The default value is \code{NULL}, corresponding to unguided BDR mutation.
+#' @param consensus_lambda A numerical value controlling the strength of
+#' consensus guidance. A value of zero gives unguided BDR mutation. Larger
+#' values give greater weight to the consensus score. The default is \code{0}.
+#'
+#' @return A one-column integer matrix containing the mutated chromosome.
+#'
+#' @references
+#' Li, M. (2026). Structured and Consensus-Guided Island Model Genetic
+#' Algorithm for Multiple Changepoint Detection. Manuscript submitted
+#' for publication.
+#'
+#' @seealso
+#' \code{\link{cptgaisl}},
+#' \code{\link{cptgascisl}}
+#'
+#' @export
+mutation_birth_death_relocate <- function(
+    child,
+    prange = NULL,
+    minDist,
+    pchangepoint,
+    lmax,
+    mmax,
+    N,
+    consensus_score = NULL,
+    consensus_lambda = 0
+) {
+  
+  child <- as.integer(child)
+  
+  plen <- length(prange)
+  K <- child[1L]
+  tau_start <- plen + 2L
+  K_max <- min(mmax, lmax - plen - 2L)
+  
+  if (plen > 0L) {
+    hyper <- child[2L:(plen + 1L)]
+  } else {
+    hyper <- integer(0)
+  }
+  
+  if (K > 0L) {
+    tau <- sort(child[tau_start:(tau_start + K - 1L)])
+  } else {
+    tau <- integer(0)
+  }
+  
+  # birth operator
+  birth_candidates <- integer(0)
+  
+  if (K < K_max) {
+    if (K == 0L) {
+      # current no cpt
+      lower <- 1L + minDist
+      upper <- N - minDist
+      if (lower <= upper) {birth_candidates <- seq.int(lower, upper)}
+    } else {
+      lower <- c(1L + minDist, tau + minDist)
+      upper <- c(tau - minDist, N - minDist)
+      valid_intervals <- which(lower <= upper) # remove invalid intervals caused by two close cpts
+      if (length(valid_intervals) > 0L) {
+        birth_candidates <- unlist(lapply(valid_intervals, function(j) seq.int(lower[j], upper[j])),use.names = FALSE)
+      }
+    }
+  }
+  
+  # globally relocate operator
+  relocate_candidates <- vector("list", K)
+  
+  if (K > 0L) {
+    for (j in seq_len(K)) {
+      # build relocate neighborhood globally
+      lower <- if (j == 1L) 1L + minDist else tau[j - 1L] + minDist
+      upper <- if (j == K) N - minDist else tau[j + 1L] - minDist
+      if (lower <= upper) {
+        candidates_j <- seq.int(lower, upper)
+        candidates_j <- candidates_j[candidates_j != tau[j]]
+        if (length(candidates_j) > 0L) {
+          relocate_candidates[[j]] <- candidates_j
+        }
+      }
+    }
+  }
+  relocatable <- which(lengths(relocate_candidates) > 0L)
+  
+  # decide birth/death/relocate which one to operate equal prob
+  
+  possible_operations <- character(0)
+  
+  if (length(birth_candidates) > 0L) possible_operations <- c(possible_operations, "birth")
+  if (K > 0L) possible_operations <- c(possible_operations, "death")
+  if (length(relocatable) > 0L) possible_operations <- c(possible_operations, "relocate")
+  
+  if (length(possible_operations) == 0L) {
+    return(matrix(child, nrow = lmax, ncol = 1L))
+  }
+  
+  operation <- sample(possible_operations, 1L)
+  
+  if (operation == "birth") {
+    if (is.null(consensus_score) || consensus_lambda <= 0) {
+      new_tau <- birth_candidates[sample.int(length(birth_candidates), 1L)]
+    } else {
+      birth_weights <- (1 - consensus_lambda) + consensus_lambda * consensus_score[birth_candidates]
+      new_tau <- birth_candidates[sample.int(length(birth_candidates), 1L, prob = birth_weights)]
+    }
+    tau <- sort(c(tau, new_tau))
+  }
+  
+  if (operation == "death") {
+    if (is.null(consensus_score) || consensus_lambda <= 0) {
+      remove_j <- sample.int(K, 1L)
+    } else {
+      death_weights <- (1 - consensus_lambda) + consensus_lambda * (1 - consensus_score[tau])
+      remove_j <- sample.int(K, 1L, prob = death_weights)
+    }
+    
+    tau <- tau[-remove_j]
+  }
+  
+  if (operation == "relocate") {
+    if (is.null(consensus_score) || consensus_lambda <= 0) {
+      relocate_j <- relocatable[sample.int(length(relocatable), 1L)]
+    } else {
+      source_weights <- (1 - consensus_lambda) + consensus_lambda * (1 - consensus_score[tau[relocatable]])
+      relocate_j <- relocatable[sample.int(length(relocatable), 1L, prob = source_weights)]
+    }
+    candidates_j <- relocate_candidates[[relocate_j]]
+    if (is.null(consensus_score) || consensus_lambda <= 0) {
+      tau[relocate_j] <- candidates_j[sample.int(length(candidates_j), 1L)]
+    } else {
+      destination_weights <- (1 - consensus_lambda) + consensus_lambda * consensus_score[candidates_j]
+      tau[relocate_j] <- candidates_j[sample.int(length(candidates_j), 1L, prob = destination_weights)]
+    }
+    tau <- sort(tau)
+  }
+  
+  # Reconstruct chromosome
+  # Birth:    K -> K+1
+  # Death:    K -> K-1
+  # Relocate: K -> K
+  
+  K <- length(tau)
+  
+  childMut <- matrix(0L, nrow = lmax, ncol = 1L) # return an matrix object to match
+  childMut[1L, 1L] <- K
+  
+  if (plen > 0L) {
+    childMut[2L:(plen + 1L), 1L] <- hyper # BDR NOT change hyper-parameters
+  }
+  
+  if (K > 0L) {
+    childMut[tau_start:(tau_start + K - 1L), 1L] <- tau
+  }
+  
+  childMut[tau_start + K, 1L] <- N + 1L
+  
+  childMut
+  
+}
