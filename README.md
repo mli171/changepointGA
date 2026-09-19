@@ -274,5 +274,5 @@ If you use `changepointGA` in your research, please cite the article correspondi
 
 - For `cptgascisl()`, please cite:
 
-  Li, M. (2026). *Structured and Consensus-Guided Island Model Genetic Algorithm for Multiple Changepoint Detection*. Manuscript prepared for publication.
+  Li, M. (2026). *Structured and Consensus-Guided Island Model Genetic Algorithm for Multiple Changepoint Detection*. Manuscript in preparation for publication.
 
